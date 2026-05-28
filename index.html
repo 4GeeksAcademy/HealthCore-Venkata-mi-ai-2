@@ -57,18 +57,25 @@
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-brandblue-900 focus:shadow">Skip to main content</a>
 
   <div class="w-full bg-brandblue-900 text-white" aria-label="Top utility navigation">
-    <div class="mx-auto flex max-w-7xl items-center justify-end px-4 py-2 text-xs sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-7xl items-center justify-end gap-4 px-4 py-2 text-xs sm:px-6 lg:px-8">
       <nav aria-label="Utility" class="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
-        <a href="#" class="hover:underline">For Physicians</a>
+        <a href="#" class="hover:underline" data-i18n="utilityPhysicians">For Physicians</a>
         <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline">Vendors</a>
+        <a href="#" class="hover:underline" data-i18n="utilityVendors">Vendors</a>
         <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline">Careers</a>
+        <a href="#" class="hover:underline" data-i18n="utilityCareers">Careers</a>
         <span class="text-white/70" aria-hidden="true">|</span>
         <a href="#" class="hover:underline">MyChart</a>
         <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline">Login</a>
+        <a href="#" class="hover:underline" data-i18n="utilityLogin">Login</a>
       </nav>
+      <div class="flex items-center gap-2 rounded-md bg-white/15 px-2 py-1" aria-label="Language selector">
+        <label for="language-select" class="font-semibold text-white" data-i18n="selectLanguage">Select Language</label>
+        <select id="language-select" class="rounded border border-white/40 bg-brandblue-900 px-2 py-0.5 text-white focus:outline-none focus:ring-2 focus:ring-white/50" aria-label="Select language">
+          <option value="en">English</option>
+          <option value="es">Espanol</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -76,23 +83,23 @@
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
       <!-- Logo -->
       <div class="flex items-center min-w-[210px]">
-        <span class="text-2xl font-bold text-brandblue-900 leading-tight">Healthcore</span>
+        <span class="text-2xl font-bold text-brandblue-900 leading-tight" data-i18n="brandName">Healthcore</span>
       </div>
       <!-- Main navigation -->
       <nav aria-label="Primary" class="hidden lg:flex items-center gap-4 flex-1 justify-center">
-        <a href="#doctors" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap">DOCTORS</a>
-        <a href="#locations" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap">LOCATIONS</a>
-        <a href="#services" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap">SERVICES & SPECIALTIES</a>
-        <a href="#costs" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap">COSTS & BILLING</a>
-        <a href="#care" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap">GET CARE NOW</a>
-        <a href="#about" class="inline-flex items-center rounded-md border border-brandblue-900 px-3 py-1.5 text-[12px] font-semibold tracking-wide leading-none text-brandblue-900 whitespace-nowrap transition hover:border-brandgreen-700 hover:text-brandgreen-700">ABOUT HEALTHCORE</a>
+        <a href="#doctors" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navDoctors">DOCTORS</a>
+        <a href="#locations" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navLocations">LOCATIONS</a>
+        <a href="#services" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navServices">SERVICES & SPECIALTIES</a>
+        <a href="#costs" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navCosts">COSTS & BILLING</a>
+        <a href="#care" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navCare">GET CARE NOW</a>
+        <a href="#about" class="inline-flex items-center rounded-md border border-brandblue-900 px-3 py-1.5 text-[12px] font-semibold tracking-wide leading-none text-brandblue-900 whitespace-nowrap transition hover:border-brandgreen-700 hover:text-brandgreen-700" data-i18n="navAbout">ABOUT HEALTHCORE</a>
       </nav>
       <!-- Right icons -->
       <div class="flex items-center gap-6 min-w-[260px] justify-end">
         <!-- Search -->
         <div class="flex flex-col items-center">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6 text-brandblue-900"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path stroke="currentColor" stroke-width="2" d="M21 21l-3.8-3.8"/></svg>
-          <span class="text-xs font-medium mt-1 text-brandblue-900">SEARCH</span>
+          <span class="text-xs font-medium mt-1 text-brandblue-900" data-i18n="headerSearch">SEARCH</span>
         </div>
         <!-- Phone -->
         <div class="flex flex-col items-center">
@@ -102,7 +109,7 @@
         <!-- Hamburger -->
         <div class="flex flex-col items-center">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6 text-brandblue-900"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          <span class="text-xs font-medium mt-1 text-brandblue-900">MORE</span>
+          <span class="text-xs font-medium mt-1 text-brandblue-900" data-i18n="headerMore">MORE</span>
         </div>
       </div>
     </div>
@@ -112,16 +119,16 @@
     <section class="bg-brandblue-900 text-white" aria-labelledby="hero-title">
       <div class="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-2 md:items-center lg:px-8 lg:py-24">
         <div>
-          <p class="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-100">Healthcare reimagined</p>
-          <h1 id="hero-title" class="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl">Advanced, simplified healthcare for every stage of life.</h1>
-          <p class="mt-6 max-w-xl text-base leading-7 text-teal-100 sm:text-lg">Healthcore combines trusted clinical teams with modern digital coordination so patients can access care faster, stay informed, and receive support when it matters most.</p>
+          <p class="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-100" data-i18n="heroEyebrow">Healthcare reimagined</p>
+          <h1 id="hero-title" class="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl" data-i18n="heroTitle">Advanced, simplified healthcare for every stage of life.</h1>
+          <p class="mt-6 max-w-xl text-base leading-7 text-teal-100 sm:text-lg" data-i18n="heroText">Healthcore combines trusted clinical teams with modern digital coordination so patients can access care faster, stay informed, and receive support when it matters most.</p>
         </div>
         <article class="rounded-2xl bg-white/10 p-6 shadow-xl ring-1 ring-white/25" aria-label="Healthcore impact metrics">
-          <h2 class="text-xl font-bold">Built for trust and operational excellence</h2>
+          <h2 class="text-xl font-bold" data-i18n="heroCardTitle">Built for trust and operational excellence</h2>
           <ul class="mt-4 space-y-3 text-sm text-teal-50">
-            <li>12 clinics across the United States and United Kingdom</li>
-            <li>Primary care, specialist consultations, chronic care, prevention</li>
-            <li>Patient-first model with bilingual support and extended access</li>
+            <li data-i18n="heroPoint1">12 clinics across the United States and United Kingdom</li>
+            <li data-i18n="heroPoint2">Primary care, specialist consultations, chronic care, prevention</li>
+            <li data-i18n="heroPoint3">Patient-first model with bilingual support and extended access</li>
           </ul>
         </article>
       </div>
@@ -133,22 +140,22 @@
       <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         <!-- Primary Care Card -->
         <div class="rounded-lg bg-white shadow-lg border border-slate-200 flex flex-col items-center p-8 h-full">
-          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center">Primary Care</h3>
-          <p class="text-base text-slate-700 mb-8 text-center">Access our extensive network of primary care providers, offering in-person and video visits for your everyday health needs.</p>
-          <a href="#" class="w-full rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900">FIND A PROVIDER</a>
+          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center" data-i18n="cardPrimaryTitle">Primary Care</h3>
+          <p class="text-base text-slate-700 mb-8 text-center" data-i18n="cardPrimaryText">Access our extensive network of primary care providers, offering in-person and video visits for your everyday health needs.</p>
+          <a href="#" class="w-full rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900" data-i18n="cardPrimaryBtn">FIND A PROVIDER</a>
         </div>
         <!-- Urgent Care Card -->
         <div class="rounded-lg bg-white shadow-lg border border-slate-200 flex flex-col items-center p-8 h-full">
-          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center">Urgent Care</h3>
-          <p class="text-base text-slate-700 mb-8 text-center">Get in and out in about 30 minutes and get back to what matters most. Walk-in and same-day appointments available.</p>
-          <a href="#" class="w-full rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900">SAVE MY SPOT</a>
+          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center" data-i18n="cardUrgentTitle">Urgent Care</h3>
+          <p class="text-base text-slate-700 mb-8 text-center" data-i18n="cardUrgentText">Get in and out in about 30 minutes and get back to what matters most. Walk-in and same-day appointments available.</p>
+          <a href="#" class="w-full rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900" data-i18n="cardUrgentBtn">SAVE MY SPOT</a>
         </div>
         <!-- On-Demand Video Visits Card -->
         <div class="rounded-lg bg-white shadow-lg border border-slate-200 flex flex-col items-center p-8 h-full">
-          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center">On-Demand Video Visits</h3>
-          <p class="text-base text-slate-700 mb-8 text-center">Experience quality urgent care from the comfort of your home with secure, on-demand video visits.</p>
+          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center" data-i18n="cardVideoTitle">On-Demand Video Visits</h3>
+          <p class="text-base text-slate-700 mb-8 text-center" data-i18n="cardVideoText">Experience quality urgent care from the comfort of your home with secure, on-demand video visits.</p>
           <div class="mt-auto w-full">
-            <a href="#" class="block rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900">GET STARTED</a>
+            <a href="#" class="block rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900" data-i18n="cardVideoBtn">GET STARTED</a>
           </div>
         </div>
       </div>
@@ -156,47 +163,47 @@
 
     <section id="about" class="bg-white" aria-labelledby="about-title">
       <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 id="about-title" class="text-center text-3xl font-extrabold text-slate-900 sm:text-4xl">About Healthcore</h2>
-        <p class="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-600">Founded in 2011, Healthcore has grown into a cross-border outpatient healthcare network dedicated to accessible care, operational quality, and compliance-first data practices across HIPAA and UK GDPR environments.</p>
+        <h2 id="about-title" class="text-center text-3xl font-extrabold text-slate-900 sm:text-4xl" data-i18n="aboutTitle">About Healthcore</h2>
+        <p class="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-600" data-i18n="aboutText">Founded in 2011, Healthcore has grown into a cross-border outpatient healthcare network dedicated to accessible care, operational quality, and compliance-first data practices across HIPAA and UK GDPR environments.</p>
       </div>
     </section>
 
     <section id="signup" class="bg-slate-100" aria-labelledby="signup-title">
       <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <div class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200 sm:p-8">
-          <h2 id="signup-title" class="text-3xl font-extrabold text-slate-900">Patient Sign-Up Form</h2>
-          <p class="mt-3 text-sm leading-6 text-slate-600">Complete the form below and our team will contact you with the next steps.</p>
+          <h2 id="signup-title" class="text-3xl font-extrabold text-slate-900" data-i18n="signupTitle">Patient Sign-Up Form</h2>
+          <p class="mt-3 text-sm leading-6 text-slate-600" data-i18n="signupText">Complete the form below and our team will contact you with the next steps.</p>
 
           <div id="formSuccess" class="mt-6 hidden rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" role="status" aria-live="polite">
-            Your application was submitted successfully. A Healthcore specialist will reach out soon.
+            <span data-i18n="signupSuccess">Your application was submitted successfully. A Healthcore specialist will reach out soon.</span>
           </div>
 
           <form id="healthcoreForm" class="mt-6 space-y-5" novalidate aria-label="Patient application form">
             <div>
-              <label for="fullName" class="mb-2 block text-sm font-bold text-slate-800">Full Name</label>
+              <label for="fullName" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelName">Full Name</label>
               <input id="fullName" name="fullName" type="text" autocomplete="name" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="fullNameError" required>
               <p id="fullNameError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
             </div>
 
             <div>
-              <label for="email" class="mb-2 block text-sm font-bold text-slate-800">Email Address</label>
+              <label for="email" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelEmail">Email Address</label>
               <input id="email" name="email" type="email" autocomplete="email" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="emailError" required>
               <p id="emailError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
             </div>
 
             <div>
-              <label for="phone" class="mb-2 block text-sm font-bold text-slate-800">Phone Number</label>
+              <label for="phone" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelPhone">Phone Number</label>
               <input id="phone" name="phone" type="tel" autocomplete="tel" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="phoneError" required>
               <p id="phoneError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
             </div>
 
             <div>
-              <label for="concerns" class="mb-2 block text-sm font-bold text-slate-800">Primary Health Concerns / Patient Info</label>
+              <label for="concerns" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelConcerns">Primary Health Concerns / Patient Info</label>
               <textarea id="concerns" name="concerns" rows="5" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="concernsError" required></textarea>
               <p id="concernsError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
             </div>
 
-            <button type="submit" class="inline-flex w-full items-center justify-center rounded-lg bg-brandblue-700 px-6 py-3 text-sm font-bold text-white transition hover:bg-brandblue-900 focus:outline-none focus:ring-2 focus:ring-brandblue-700 focus:ring-offset-2 sm:w-auto">Save My Spot</button>
+            <button type="submit" class="inline-flex w-full items-center justify-center rounded-lg bg-brandblue-700 px-6 py-3 text-sm font-bold text-white transition hover:bg-brandblue-900 focus:outline-none focus:ring-2 focus:ring-brandblue-700 focus:ring-offset-2 sm:w-auto" data-i18n="signupButton">Save My Spot</button>
           </form>
         </div>
       </div>
@@ -208,7 +215,7 @@
         <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-12">
           <!-- Engage with us -->
           <div class="flex-1 flex flex-col items-center md:items-start">
-            <h2 class="text-xl font-semibold mb-4">Engage with us</h2>
+            <h2 class="text-xl font-semibold mb-4" data-i18n="footerEngage">Engage with us</h2>
             <div class="flex flex-wrap gap-6 mb-2">
               <a href="#" aria-label="Facebook" class="rounded-full bg-[#3b5998] w-14 h-14 flex items-center justify-center shadow-md hover:scale-105 transition"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12c0-5.522-4.478-10-10-10S2 6.478 2 12c0 5.006 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.261c-1.243 0-1.632.771-1.632 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 17.006 22 12z"/></svg></a>
               <a href="#" aria-label="YouTube" class="rounded-full bg-[#FF0000] w-14 h-14 flex items-center justify-center shadow-md hover:scale-105 transition"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 5 12 5 12 5h-.1s-4.2 0-7.1.1c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.9.1 6.9.1s4.2 0 7.1-.1c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2zM9.8 15.3V8.7l6.4 3.3-6.4 3.3z"/></svg></a>
@@ -218,15 +225,15 @@
           </div>
           <!-- Contact us -->
           <div class="flex-1 flex flex-col items-center md:items-start">
-            <h2 class="text-xl font-semibold mb-4">Contact us</h2>
-            <a href="#" class="text-white hover:underline mb-2">Send us a message</a>
+            <h2 class="text-xl font-semibold mb-4" data-i18n="footerContact">Contact us</h2>
+            <a href="#" class="text-white hover:underline mb-2" data-i18n="footerMessage">Send us a message</a>
             <p class="text-white">701 Brazos Street<br>Austin, TX 78701</p>
           </div>
           <!-- Our beliefs -->
           <div class="flex-1 flex flex-col items-center md:items-start">
-            <h2 class="text-xl font-semibold mb-4">Our beliefs</h2>
-            <p class="text-white max-w-xs mb-2">Healthcore delivers advanced, simplified healthcare with trusted expertise, intelligent support, and patient-centric care across every interaction.</p>
-            <a href="#" class="text-white hover:underline">Learn More</a>
+            <h2 class="text-xl font-semibold mb-4" data-i18n="footerBeliefs">Our beliefs</h2>
+            <p class="text-white max-w-xs mb-2" data-i18n="footerBeliefsText">Healthcore delivers advanced, simplified healthcare with trusted expertise, intelligent support, and patient-centric care across every interaction.</p>
+            <a href="#" class="text-white hover:underline" data-i18n="footerLearn">Learn More</a>
           </div>
         </div>
         <div class="mt-10"></div>
@@ -234,125 +241,18 @@
       <!-- Bottom bar footer -->
       <div class="w-full bg-brandblue-900 border-t border-brandblue-800">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-2 text-xs text-white">
-          <div class="mb-2 md:mb-0">&copy; 2026 Healthcore. All rights reserved.</div>
+          <div class="mb-2 md:mb-0" data-i18n="footerRights">&copy; 2026 Healthcore. All rights reserved.</div>
           <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-end">
-            <a href="#" class="text-white hover:underline">Privacy Statement</a>
-            <a href="#" class="text-white hover:underline">Terms of Use</a>
-            <a href="#" class="text-white hover:underline">Disclaimer</a>
-            <a href="#" class="text-white hover:underline">Price Transparency</a>
-            <a href="#" class="text-white hover:underline">Notice of Privacy Practices</a>
+            <a href="#" class="text-white hover:underline" data-i18n="footerPrivacy">Privacy Statement</a>
+            <a href="#" class="text-white hover:underline" data-i18n="footerTerms">Terms of Use</a>
+            <a href="#" class="text-white hover:underline" data-i18n="footerDisclaimer">Disclaimer</a>
+            <a href="#" class="text-white hover:underline" data-i18n="footerPrice">Price Transparency</a>
+            <a href="#" class="text-white hover:underline" data-i18n="footerNotice">Notice of Privacy Practices</a>
           </div>
         </div>
       </div>
     </footer>
 
-  <script>
-    (function () {
-      const form = document.getElementById("healthcoreForm");
-      const successBanner = document.getElementById("formSuccess");
-
-      const fields = {
-        fullName: document.getElementById("fullName"),
-        email: document.getElementById("email"),
-        phone: document.getElementById("phone"),
-        concerns: document.getElementById("concerns")
-      };
-
-      const errors = {
-        fullName: document.getElementById("fullNameError"),
-        email: document.getElementById("emailError"),
-        phone: document.getElementById("phoneError"),
-        concerns: document.getElementById("concernsError")
-      };
-
-      function showError(fieldKey, message) {
-        const input = fields[fieldKey];
-        const error = errors[fieldKey];
-        error.textContent = message;
-        error.classList.remove("hidden");
-        input.setAttribute("aria-invalid", "true");
-        input.classList.remove("border-slate-300");
-        input.classList.add("border-red-500");
-      }
-
-      function clearError(fieldKey) {
-        const input = fields[fieldKey];
-        const error = errors[fieldKey];
-        error.textContent = "";
-        error.classList.add("hidden");
-        input.setAttribute("aria-invalid", "false");
-        input.classList.remove("border-red-500");
-        input.classList.add("border-slate-300");
-      }
-
-      function validateName() {
-        const value = fields.fullName.value.trim();
-        if (value.length < 3) {
-          showError("fullName", "Please enter your full name (at least 3 characters).");
-          return false;
-        }
-        clearError("fullName");
-        return true;
-      }
-
-      function validateEmail() {
-        const value = fields.email.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-          showError("email", "Please enter a valid email address.");
-          return false;
-        }
-        clearError("email");
-        return true;
-      }
-
-      function validatePhone() {
-        const value = fields.phone.value.trim();
-        const phoneRegex = /^\+?[0-9\s()\-]{7,20}$/;
-        if (!phoneRegex.test(value)) {
-          showError("phone", "Please enter a valid phone number.");
-          return false;
-        }
-        clearError("phone");
-        return true;
-      }
-
-      function validateConcerns() {
-        const value = fields.concerns.value.trim();
-        if (value.length < 20) {
-          showError("concerns", "Please provide at least 20 characters about your health concerns or other relevant information.");
-          return false;
-        }
-        clearError("concerns");
-        return true;
-      }
-
-      form.addEventListener("submit", function (event) {
-        event.preventDefault();
-        successBanner.classList.add("hidden");
-
-        const nameValid = validateName();
-        const emailValid = validateEmail();
-        const phoneValid = validatePhone();
-        const concernsValid = validateConcerns();
-
-        if (!(nameValid && emailValid && phoneValid && concernsValid)) {
-          const firstInvalid = form.querySelector("[aria-invalid='true']");
-          if (firstInvalid) {
-            firstInvalid.focus();
-          }
-          return;
-        }
-
-        successBanner.classList.remove("hidden");
-        form.reset();
-      });
-
-      fields.fullName.addEventListener("blur", validateName);
-      fields.email.addEventListener("blur", validateEmail);
-      fields.phone.addEventListener("blur", validatePhone);
-      fields.concerns.addEventListener("blur", validateConcerns);
-    })();
-  </script>
+  <script src="scripts/main.js"></script>
 </body>
 </html>
