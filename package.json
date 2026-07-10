@@ -1,0 +1,18 @@
+{
+  "name": "healthcore-milestone2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Milestone 2 utilities and source validation",
+  "scripts": {
+    "test": "npm run test:src",
+    "test:src": "tsx --test src/**/*.test.ts",
+    "test:src:verbose": "tsx --test --test-reporter=spec src/**/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx src/examples/milestone2-smoke.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
