@@ -1,0 +1,29 @@
+# HealthCore plan stamp index
+
+Ordered registry of implementation stamps. **Newest sequence wins** for “what is already done.”
+
+Format per line:
+
+`sequence | stamp | milestone | date | title | status | phase | path`
+
+---
+
+## Registry
+
+1 | HC-PLAN-001 | MS4 (legacy name) | 2026-07-22 | HealthCore Agent Infrastructure Init | implemented | phase-1 | [HC-PLAN-001-20260722-agent-infra-init.md](./HC-PLAN-001-20260722-agent-infra-init.md)
+
+2 | HC-PLAN-002 | MS4 (legacy name) | 2026-07-22 | HealthCore Frontend Multi-App Workspace | implemented | phase-2 | [HC-PLAN-002-20260722-frontend-multi-app.md](./HC-PLAN-002-20260722-frontend-multi-app.md)
+
+3 | HC-MS4-PLAN-003 | MS4 | 2026-07-22 | MS4 Evaluation Archive and Milestone Plan Naming | implemented | post-milestone | [HC-MS4-PLAN-003-20260722-eval-and-naming.md](./HC-MS4-PLAN-003-20260722-eval-and-naming.md)
+
+4 | HC-MS4-PLAN-004 | MS4 | 2026-07-22 | MS4 Eval Rubric Mapping Correction | implemented | post-milestone | [HC-MS4-PLAN-004-20260722-eval-rubric-mapping.md](./HC-MS4-PLAN-004-20260722-eval-rubric-mapping.md)
+
+5 | HC-MS4-PLAN-005 | MS4 | 2026-07-22 | MS2 src/utils Ops Visible in Backoffice | implemented | post-milestone | [HC-MS4-PLAN-005-20260722-ms2-ops-in-backoffice.md](./HC-MS4-PLAN-005-20260722-ms2-ops-in-backoffice.md)
+
+## Naming note
+
+From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.
+
+## Mapping correction note
+
+HC-MS4-PLAN-004 incorrectly treated hiring tracker as Milestone 2. **HC-MS4-PLAN-005** corrects that: Milestone 2 = `src/utils` visible in backoffice. Prefer PLAN-005 over PLAN-004 for rubric item #8.

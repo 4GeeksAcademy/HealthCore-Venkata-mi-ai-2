@@ -1,10 +1,18 @@
 # `uis` folder
 
-This folder contains **all the user interfaces** related to the company for the cross-functional AI Engineering project (for example: web applications, internal dashboards, customer portals, Streamlit/Gradio apps, etc.).
+This folder contains **all HealthCore user interfaces** for the cross-functional AI Engineering project.
 
-Each subfolder inside `uis/` must correspond to **one specific user interface** (for example: `website`, `backoffice`) and include its own technical and functional documentation.
+| App / entry | Path | Audience | Run |
+|-------------|------|----------|-----|
+| Public website | [`healthcore/`](./healthcore/) | Patients & public | `cd uis/healthcore && npm run dev` → port **3000** |
+| Internal backoffice | [`backoffice/`](./backoffice/) | HealthCore Digital staff | `cd uis/backoffice && npm run dev` → port **3001** |
+| Thin static entry | [`index.html`](./index.html) | Developers / agents | Points to the apps above (not a full marketing site) |
 
-- **Main purpose**: to centralize in a single place all the frontend applications that support the company's use cases.
-- **Recommendation**: document in this file (or in sub-READMEs) the applications you add, their objective, the technology used, and how to run them.
+## Notes
+
+- Public and backoffice layouts are **isolated** — do not share marketing chrome.
+- The People & Workforce Hiring Tracker (Diane Foster) lives at **`/hiring`** inside backoffice.
+- The former standalone `talent-pipeline-tracker` app was migrated into backoffice and retired.
+- Shared assets: [`image/healthcore-logo.svg`](./image/healthcore-logo.svg).
 
 > _Spanish version: [README.es.md](./README.es.md)._

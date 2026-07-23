@@ -3,258 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Healthcore | Advanced, Simplified Healthcare</title>
-  <meta name="description" content="Healthcore provides advanced, simplified outpatient healthcare across the US and UK with trusted clinicians, modern digital support, and patient-first care.">
-  <meta name="keywords" content="Healthcore, healthcare, outpatient care, patient care, medical services, US UK clinics">
-  <meta name="author" content="Healthcore">
-  <meta property="og:title" content="Healthcore | Advanced, Simplified Healthcare">
-  <meta property="og:description" content="Trusted expertise, 24/7 support, and patient-centric care for modern healthcare journeys.">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brandblue: {
-              50: '#eaf1fb',
-              100: '#c8dbf6',
-              500: '#2563eb',
-              700: '#1d4ed8',
-              900: '#1e3a8a',
-            },
-            brandgreen: {
-              100: '#d1fae5',
-              500: '#10b981',
-              700: '#047857',
-            },
-          },
-        },
-      },
-    };
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "MedicalBusiness",
-    "name": "Healthcore",
-    "description": "Outpatient healthcare provider delivering primary care, specialist consultations, chronic disease management, and preventive health programs.",
-    "foundingDate": "2011",
-    "areaServed": ["United States", "United Kingdom"],
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Austin",
-      "addressRegion": "Texas",
-      "addressCountry": "US"
-    },
-    "numberOfEmployees": "200",
-    "slogan": "Advanced, Simplified Healthcare"
-  }
-  </script>
+  <title>HealthCore | Public site entry</title>
+  <meta name="description" content="Entry point for the HealthCore public Next.js website and internal backoffice apps.">
+  <style>
+    :root {
+      --blue-900: #1e3a8a;
+      --blue-700: #1d4ed8;
+      --slate-50: #f8fafc;
+      --slate-600: #475569;
+      --slate-900: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--slate-900);
+      background:
+        linear-gradient(160deg, #eaf1fb 0%, var(--slate-50) 45%, #d1fae5 100%);
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+    main {
+      width: min(640px, 100%);
+      background: #fff;
+      border: 1px solid #dbe3f0;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .brand img { width: 40px; height: 40px; }
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--blue-900);
+    }
+    p {
+      margin: 0.85rem 0 0;
+      color: var(--slate-600);
+      line-height: 1.65;
+    }
+    code {
+      background: #eef2ff;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.35rem;
+      font-size: 0.92em;
+    }
+    ol { margin: 1rem 0 0; padding-left: 1.25rem; color: var(--slate-600); line-height: 1.7; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      border-radius: 0.65rem;
+      background: var(--blue-700);
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    a.button.secondary {
+      background: #fff;
+      color: var(--blue-900);
+      border: 1px solid var(--blue-900);
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased">
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-brandblue-900 focus:shadow">Skip to main content</a>
-
-  <div class="w-full bg-brandblue-900 text-white" aria-label="Top utility navigation">
-    <div class="mx-auto flex max-w-7xl items-center justify-end gap-4 px-4 py-2 text-xs sm:px-6 lg:px-8">
-      <nav aria-label="Utility" class="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
-        <a href="#" class="hover:underline" data-i18n="utilityPhysicians">For Physicians</a>
-        <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline" data-i18n="utilityVendors">Vendors</a>
-        <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline" data-i18n="utilityCareers">Careers</a>
-        <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline">MyChart</a>
-        <span class="text-white/70" aria-hidden="true">|</span>
-        <a href="#" class="hover:underline" data-i18n="utilityLogin">Login</a>
-      </nav>
-      <div class="flex items-center gap-2 rounded-md bg-white/15 px-2 py-1" aria-label="Language selector">
-        <label for="language-select" class="font-semibold text-white" data-i18n="selectLanguage">Select Language</label>
-        <select id="language-select" class="rounded border border-white/40 bg-brandblue-900 px-2 py-0.5 text-white focus:outline-none focus:ring-2 focus:ring-white/50" aria-label="Select language">
-          <option value="en">English</option>
-          <option value="es">Espanol</option>
-        </select>
-      </div>
+<body>
+  <main>
+    <div class="brand">
+      <img src="image/healthcore-logo.svg" alt="" width="40" height="40">
+      <h1>HealthCore</h1>
     </div>
-  </div>
-
-  <header class="sticky top-0 z-40 border-b border-brandblue-100 bg-white/95 backdrop-blur" aria-label="Top Navigation">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-      <!-- Logo -->
-      <div class="flex items-center min-w-[210px]">
-        <!-- HealthCore Logo -->
-        <img src="image/healthcore-logo.svg" alt="HealthCore logo" width="36" height="36" class="mr-2" />
-        <span class="text-2xl font-bold text-brandblue-900 leading-tight" data-i18n="brandName">Healthcore</span>
-      </div>
-      <!-- Main navigation -->
-      <nav aria-label="Primary" class="hidden lg:flex items-center gap-4 flex-1 justify-center">
-        <a href="#doctors" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navDoctors">DOCTORS</a>
-        <a href="#locations" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navLocations">LOCATIONS</a>
-        <a href="#services" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navServices">SERVICES & SPECIALTIES</a>
-        <a href="#costs" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navCosts">COSTS & BILLING</a>
-        <a href="#care" class="text-[13px] font-semibold tracking-wide text-brandblue-900 hover:text-brandgreen-700 whitespace-nowrap" data-i18n="navCare">GET CARE NOW</a>
-        <a href="#about" class="inline-flex items-center rounded-md border border-brandblue-900 px-3 py-1.5 text-[12px] font-semibold tracking-wide leading-none text-brandblue-900 whitespace-nowrap transition hover:border-brandgreen-700 hover:text-brandgreen-700" data-i18n="navAbout">ABOUT HEALTHCORE</a>
-      </nav>
-      <!-- Right icons -->
-      <div class="flex items-center gap-6 min-w-[260px] justify-end">
-        <!-- Search -->
-        <div class="flex flex-col items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6 text-brandblue-900"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path stroke="currentColor" stroke-width="2" d="M21 21l-3.8-3.8"/></svg>
-          <span class="text-xs font-medium mt-1 text-brandblue-900" data-i18n="headerSearch">SEARCH</span>
-        </div>
-        <!-- Phone -->
-        <div class="flex flex-col items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6 text-brandgreen-700"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0-2.071 1.679-3.75 3.75-3.75h12c2.071 0 3.75 1.679 3.75 3.75v10.5c0 2.071-1.679 3.75-3.75 3.75h-12a3.75 3.75 0 01-3.75-3.75V6.75z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5h.008v.008H6.75V7.5zm0 3h.008v.008H6.75V10.5zm0 3h.008v.008H6.75V13.5zm3-6h.008v.008H9.75V7.5zm0 3h.008v.008H9.75V10.5zm0 3h.008v.008H9.75V13.5zm3-6h.008v.008h-.008V7.5zm0 3h.008v.008h-.008V10.5zm0 3h.008v.008h-.008V13.5zm3-6h.008v.008h-.008V7.5zm0 3h.008v.008h-.008V10.5zm0 3h.008v.008h-.008V13.5z"/></svg>
-          <a href="tel:+18005550199" class="mt-1 text-xs font-medium text-brandgreen-700 hover:underline" aria-label="Call Healthcore at 1-800-555-0199">1-800-555-0199</a>
-        </div>
-        <!-- Hamburger -->
-        <div class="flex flex-col items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6 text-brandblue-900"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          <span class="text-xs font-medium mt-1 text-brandblue-900" data-i18n="headerMore">MORE</span>
-        </div>
-      </div>
+    <p>
+      The full public marketing experience now lives in the Next.js app at
+      <code>uis/healthcore</code>. This file is a thin entry so agents and developers
+      do not maintain a second duplicate website.
+    </p>
+    <p><strong>Run the public site</strong></p>
+    <ol>
+      <li><code>cd uis/healthcore</code></li>
+      <li><code>npm install</code></li>
+      <li><code>npm run dev</code> → <code>http://localhost:3000</code></li>
+    </ol>
+    <p><strong>Run the internal backoffice</strong> (hiring tracker + welcome)</p>
+    <ol>
+      <li><code>cd uis/backoffice</code></li>
+      <li><code>npm install</code></li>
+      <li><code>npm run dev</code> → <code>http://localhost:3001</code></li>
+    </ol>
+    <div class="actions">
+      <a class="button" href="./healthcore/README.md">Public app README</a>
+      <a class="button secondary" href="./backoffice/README.md">Backoffice README</a>
     </div>
-  </header>
-
-  <main id="main-content">
-    <section class="bg-brandblue-900 text-white" aria-labelledby="hero-title">
-      <div class="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 md:grid-cols-2 md:items-center lg:px-8 lg:py-24">
-        <div>
-          <p class="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-100" data-i18n="heroEyebrow">Healthcare reimagined</p>
-          <h1 id="hero-title" class="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl" data-i18n="heroTitle">Advanced, simplified healthcare for every stage of life.</h1>
-          <p class="mt-6 max-w-xl text-base leading-7 text-teal-100 sm:text-lg" data-i18n="heroText">Healthcore combines trusted clinical teams with modern digital coordination so patients can access care faster, stay informed, and receive support when it matters most.</p>
-        </div>
-        <article class="rounded-2xl bg-white/10 p-6 shadow-xl ring-1 ring-white/25" aria-label="Healthcore impact metrics">
-          <h2 class="text-xl font-bold" data-i18n="heroCardTitle">Built for trust and operational excellence</h2>
-          <ul class="mt-4 space-y-3 text-sm text-teal-50">
-            <li data-i18n="heroPoint1">12 clinics across the United States and United Kingdom</li>
-            <li data-i18n="heroPoint2">Primary care, specialist consultations, chronic care, prevention</li>
-            <li data-i18n="heroPoint3">Patient-first model with bilingual support and extended access</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <!-- New Services Cards Section -->
-    <section id="services" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="services-cards-title">
-      <h2 id="services-cards-title" class="sr-only">Healthcore Services</h2>
-      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Primary Care Card -->
-        <div class="rounded-lg bg-white shadow-lg border border-slate-200 flex flex-col items-center p-8 h-full">
-          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center" data-i18n="cardPrimaryTitle">Primary Care</h3>
-          <p class="text-base text-slate-700 mb-8 text-center" data-i18n="cardPrimaryText">Access our extensive network of primary care providers, offering in-person and video visits for your everyday health needs.</p>
-          <a href="#" class="w-full rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900" data-i18n="cardPrimaryBtn">FIND A PROVIDER</a>
-        </div>
-        <!-- Urgent Care Card -->
-        <div class="rounded-lg bg-white shadow-lg border border-slate-200 flex flex-col items-center p-8 h-full">
-          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center" data-i18n="cardUrgentTitle">Urgent Care</h3>
-          <p class="text-base text-slate-700 mb-8 text-center" data-i18n="cardUrgentText">Get in and out in about 30 minutes and get back to what matters most. Walk-in and same-day appointments available.</p>
-          <a href="#" class="w-full rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900" data-i18n="cardUrgentBtn">SAVE MY SPOT</a>
-        </div>
-        <!-- On-Demand Video Visits Card -->
-        <div class="rounded-lg bg-white shadow-lg border border-slate-200 flex flex-col items-center p-8 h-full">
-          <h3 class="text-2xl font-semibold text-slate-900 mb-4 text-center" data-i18n="cardVideoTitle">On-Demand Video Visits</h3>
-          <p class="text-base text-slate-700 mb-8 text-center" data-i18n="cardVideoText">Experience quality urgent care from the comfort of your home with secure, on-demand video visits.</p>
-          <div class="mt-auto w-full">
-            <a href="#" class="block rounded bg-brandblue-700 px-6 py-3 text-base font-bold text-white text-center transition hover:bg-brandblue-900" data-i18n="cardVideoBtn">GET STARTED</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="bg-white" aria-labelledby="about-title">
-      <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 id="about-title" class="text-center text-3xl font-extrabold text-slate-900 sm:text-4xl" data-i18n="aboutTitle">About Healthcore</h2>
-        <p class="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-600" data-i18n="aboutText">Founded in 2011, Healthcore has grown into a cross-border outpatient healthcare network dedicated to accessible care, operational quality, and compliance-first data practices across HIPAA and UK GDPR environments.</p>
-      </div>
-    </section>
-
-    <section id="signup" class="bg-slate-100" aria-labelledby="signup-title">
-      <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-        <div class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200 sm:p-8">
-          <h2 id="signup-title" class="text-3xl font-extrabold text-slate-900" data-i18n="signupTitle">Patient Sign-Up Form</h2>
-          <p class="mt-3 text-sm leading-6 text-slate-600" data-i18n="signupText">Complete the form below and our team will contact you with the next steps.</p>
-
-          <div id="formSuccess" class="mt-6 hidden rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800" role="status" aria-live="polite">
-            <span data-i18n="signupSuccess">Your application was submitted successfully. A Healthcore specialist will reach out soon.</span>
-          </div>
-
-          <form id="healthcoreForm" class="mt-6 space-y-5" novalidate aria-label="Patient application form">
-            <div>
-              <label for="fullName" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelName">Full Name</label>
-              <input id="fullName" name="fullName" type="text" autocomplete="name" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="fullNameError" required>
-              <p id="fullNameError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
-            </div>
-
-            <div>
-              <label for="email" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelEmail">Email Address</label>
-              <input id="email" name="email" type="email" autocomplete="email" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="emailError" required>
-              <p id="emailError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
-            </div>
-
-            <div>
-              <label for="phone" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelPhone">Phone Number</label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="phoneError" required>
-              <p id="phoneError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
-            </div>
-
-            <div>
-              <label for="concerns" class="mb-2 block text-sm font-bold text-slate-800" data-i18n="labelConcerns">Primary Health Concerns / Patient Info</label>
-              <textarea id="concerns" name="concerns" rows="5" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/30" aria-describedby="concernsError" required></textarea>
-              <p id="concernsError" class="mt-2 hidden text-sm font-medium text-red-700"></p>
-            </div>
-
-            <button type="submit" class="inline-flex w-full items-center justify-center rounded-lg bg-brandblue-700 px-6 py-3 text-sm font-bold text-white transition hover:bg-brandblue-900 focus:outline-none focus:ring-2 focus:ring-brandblue-700 focus:ring-offset-2 sm:w-auto" data-i18n="signupButton">Save My Spot</button>
-          </form>
-        </div>
-      </div>
-    </section>
   </main>
-
-  <footer class="bg-brandblue-900 text-white mt-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-12">
-          <!-- Engage with us -->
-          <div class="flex-1 flex flex-col items-center md:items-start">
-            <h2 class="text-xl font-semibold mb-4" data-i18n="footerEngage">Engage with us</h2>
-            <div class="flex flex-wrap gap-6 mb-2">
-              <a href="#" aria-label="Facebook" class="rounded-full bg-[#3b5998] w-14 h-14 flex items-center justify-center shadow-md hover:scale-105 transition"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12c0-5.522-4.478-10-10-10S2 6.478 2 12c0 5.006 3.657 9.128 8.438 9.877v-6.987h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.261c-1.243 0-1.632.771-1.632 1.562v1.875h2.773l-.443 2.89h-2.33v6.987C18.343 21.128 22 17.006 22 12z"/></svg></a>
-              <a href="#" aria-label="YouTube" class="rounded-full bg-[#FF0000] w-14 h-14 flex items-center justify-center shadow-md hover:scale-105 transition"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.8 8.001s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 5 12 5 12 5h-.1s-4.2 0-7.1.1c-.4.1-1.2.1-1.9.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.5.1 6.9.1 6.9.1s4.2 0 7.1-.1c.4-.1 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2zM9.8 15.3V8.7l6.4 3.3-6.4 3.3z"/></svg></a>
-              <a href="#" aria-label="Instagram" class="rounded-full bg-gradient-to-tr from-[#405DE6] via-[#E1306C] to-[#FCAF45] w-14 h-14 flex items-center justify-center shadow-md hover:scale-105 transition"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 2.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm6.5 1.25a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
-              <a href="#" aria-label="Pinterest" class="rounded-full bg-[#C8232C] w-14 h-14 flex items-center justify-center shadow-md hover:scale-105 transition"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.04C6.48 2.04 2 6.52 2 12.04c0 4.19 2.66 7.75 6.39 9.02-.09-.77-.17-1.95.04-2.79.19-.8 1.22-5.09 1.22-5.09s-.31-.62-.31-1.54c0-1.44.84-2.52 1.89-2.52.89 0 1.32.67 1.32 1.47 0 .9-.57 2.25-.86 3.5-.25 1.05.53 1.91 1.56 1.91 1.87 0 3.13-2.4 3.13-5.25 0-2.17-1.47-3.8-4.14-3.8-3.01 0-4.89 2.25-4.89 4.77 0 .86.25 1.47.64 1.94.18.21.21.29.14.53-.05.17-.17.57-.22.73-.07.23-.23.31-.53.23-1.48-.48-2.16-1.77-2.16-3.23 0-2.4 2.03-5.28 6.06-5.28 3.24 0 5.37 2.35 5.37 4.87 0 3.33-1.85 5.81-4.59 5.81-1.01 0-1.96-.55-2.29-1.18l-.62 2.36c-.19.74-.57 1.67-.85 2.23.64.2 1.32.31 2.03.31 5.52 0 10-4.48 10-10S17.52 2.04 12 2.04z"/></svg></a>
-            </div>
-          </div>
-          <!-- Contact us -->
-          <div class="flex-1 flex flex-col items-center md:items-start">
-            <h2 class="text-xl font-semibold mb-4" data-i18n="footerContact">Contact us</h2>
-            <a href="#" class="text-white hover:underline mb-2" data-i18n="footerMessage">Send us a message</a>
-            <p class="text-white">701 Brazos Street<br>Austin, TX 78701</p>
-          </div>
-          <!-- Our beliefs -->
-          <div class="flex-1 flex flex-col items-center md:items-start">
-            <h2 class="text-xl font-semibold mb-4" data-i18n="footerBeliefs">Our beliefs</h2>
-            <p class="text-white max-w-xs mb-2" data-i18n="footerBeliefsText">Healthcore delivers advanced, simplified healthcare with trusted expertise, intelligent support, and patient-centric care across every interaction.</p>
-            <a href="#" class="text-white hover:underline" data-i18n="footerLearn">Learn More</a>
-          </div>
-        </div>
-        <div class="mt-10"></div>
-      </div>
-      <!-- Bottom bar footer -->
-      <div class="w-full bg-brandblue-900 border-t border-brandblue-800">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-2 text-xs text-white">
-          <div class="mb-2 md:mb-0" data-i18n="footerRights">&copy; 2026 Healthcore. All rights reserved.</div>
-          <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-end">
-            <a href="#" class="text-white hover:underline" data-i18n="footerPrivacy">Privacy Statement</a>
-            <a href="#" class="text-white hover:underline" data-i18n="footerTerms">Terms of Use</a>
-            <a href="#" class="text-white hover:underline" data-i18n="footerDisclaimer">Disclaimer</a>
-            <a href="#" class="text-white hover:underline" data-i18n="footerPrice">Price Transparency</a>
-            <a href="#" class="text-white hover:underline" data-i18n="footerNotice">Notice of Privacy Practices</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-  <script src="scripts/main.js"></script>
 </body>
 </html>
