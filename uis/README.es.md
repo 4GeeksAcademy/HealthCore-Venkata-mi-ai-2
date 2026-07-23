@@ -1,8 +1,11 @@
 # Carpeta `uis`
 
-Esta carpeta contiene **todas las interfaces de usuario** relacionadas con la compañía para el proyecto transversal de AI Engineering (por ejemplo: aplicaciones web, dashboards internos, portales de clientes, apps de Streamlit/Gradio, etc.).
+Esta carpeta contiene **todas las interfaces de HealthCore**.
 
-Cada subcarpeta dentro de `uis/` debe corresponder a **una interfaz de usuario concreta** (por ejemplo `website`, `backoffice`) e incluir su propia documentación técnica y funcional.
+| App / entrada | Ruta | Audiencia | Ejecutar |
+|---------------|------|-----------|----------|
+| Sitio público | [`healthcore/`](./healthcore/) | Pacientes y público | `cd uis/healthcore && npm run dev` → puerto **3000** |
+| Backoffice interno | [`backoffice/`](./backoffice/) | Equipo HealthCore Digital | `cd uis/backoffice && npm run dev` → puerto **3001** |
+| Entrada estática | [`index.html`](./index.html) | Desarrolladores / agentes | Apunta a las apps anteriores |
 
-- **Propósito principal**: centralizar en un único lugar todas las aplicaciones frontend que dan soporte a los casos de uso de la compañía.
-- **Recomendación**: documenta en este archivo (o en sub-READMEs) las aplicaciones que vayas añadiendo, su objetivo, tecnología usada y cómo ejecutarlas.
+> _English version: [README.md](./README.md)._
