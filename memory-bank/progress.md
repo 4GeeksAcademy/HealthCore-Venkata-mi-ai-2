@@ -1,7 +1,7 @@
 # HealthCore — Progress
 
 **Last updated:** 2026-07-31  
-**Latest stamped plan:** [HC-MS4-PLAN-008](./plans/HC-MS4-PLAN-008-20260731-architecture-proposal-project-cleanup.md) (`implemented`, MS4, docs)  
+**Latest stamped plan:** [HC-MS4-PLAN-009](./plans/HC-MS4-PLAN-009-20260731-architecture-proposal-sources.md) (`implemented`, MS4, docs)  
 **Prior completed stamp:** [HC-MS4-PLAN-005](./plans/HC-MS4-PLAN-005-20260722-ms2-ops-in-backoffice.md) (`implemented`, MS4)  
 **Latest milestone eval:** [MS4_Project_Eval](./evaluations/MS4_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
 
@@ -21,15 +21,22 @@
 | MS4 evaluation | **complete PASS** |
 | FastAPI architecture proposal | See **Today’s update** below (in review until human sign-off) |
 
-## Today’s update (2026-07-31) — single entry
+## Today’s update (2026-07-31)
 
-**FastAPI architecture proposal** — [`docs/ARCHITECTURE_PROPOSAL.md`](../docs/ARCHITECTURE_PROPOSAL.md)
+**Artifact:** [`docs/ARCHITECTURE_PROPOSAL.md`](../docs/ARCHITECTURE_PROPOSAL.md) — doc-only FastAPI proposal (no backend scaffolded). Status: **In review**.
 
-- Doc-only proposal for a HealthCore Digital FastAPI backend under `backend/` (no backend scaffolded).
-- Recommends **Layered / Clean Architecture** after comparing Layered/Clean, MVC, Microservices, and Serverless.
-- Grounded in project surfaces: `src/utils`, `uis/healthcore` (`:3000`), `uis/backoffice` (`:3001` `/ops` + `/hiring`); backoffice is the API client; public site does not consume ops/hiring APIs.
-- Latest pass: project cleanup (removed non-project fluff; locked session/cookie staff auth; shortened summary). Status: **In review**.
-- Same-day stamps (history): PLAN-006 → PLAN-007 → **PLAN-008** (latest).
+### History (same day)
+
+1. **[HC-MS4-PLAN-006](./plans/HC-MS4-PLAN-006-20260731-fastapi-architecture-proposal.md)** — Initial proposal: Layered/Clean recommendation, HealthCore company context, backend folder layout, domain routers, FastAPI standards, FE/BE separation, risks.
+2. **[HC-MS4-PLAN-007](./plans/HC-MS4-PLAN-007-20260731-architecture-pattern-comparison.md)** — Expanded Section 2: pros/cons for Layered/Clean, MVC, Microservices, Serverless + comparative table and strong recommendation.
+3. **[HC-MS4-PLAN-008](./plans/HC-MS4-PLAN-008-20260731-architecture-proposal-project-cleanup.md)** — Project cleanup: linked `src/utils` and ports `:3000`/`:3001`; locked session/cookie staff auth; public site does not consume ops/hiring APIs; removed non-project fluff.
+4. **[HC-MS4-PLAN-009](./plans/HC-MS4-PLAN-009-20260731-architecture-proposal-sources.md)** — **Latest:** Section 5 cites official FastAPI sources (Bigger Applications, Dependencies, CORS, Settings, Body) for the conventions rubric.
+
+### Current snapshot (latest)
+
+- Recommends **Layered / Clean Architecture** after comparing four patterns.
+- Grounded in `src/utils`, `uis/healthcore` (`:3000`), `uis/backoffice` (`:3001` `/ops` + `/hiring`).
+- Explicit FastAPI documentation sources in Section 5.
 
 ## Run
 
