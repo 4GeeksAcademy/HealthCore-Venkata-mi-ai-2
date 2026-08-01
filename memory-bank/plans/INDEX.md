@@ -26,6 +26,8 @@ Format per line:
 
 8 | HC-MS4-PLAN-008 | MS4 | 2026-07-31 | Architecture Proposal Project Cleanup | implemented | docs | [HC-MS4-PLAN-008-20260731-architecture-proposal-project-cleanup.md](./HC-MS4-PLAN-008-20260731-architecture-proposal-project-cleanup.md)
 
+9 | HC-MS4-PLAN-009 | MS4 | 2026-07-31 | Architecture Proposal FastAPI Sources Citation | implemented | docs | [HC-MS4-PLAN-009-20260731-architecture-proposal-sources.md](./HC-MS4-PLAN-009-20260731-architecture-proposal-sources.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

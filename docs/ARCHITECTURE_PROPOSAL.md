@@ -279,18 +279,29 @@ Routers are grouped by primary domain under `/api/v1`. Descriptions are **concep
 
 ## 5. FastAPI Industry Standards and Design Influence
 
-| Industry convention | How it influenced this design |
-|---------------------|-------------------------------|
-| Package root under `app/` with `main` as composition root | Startup, middleware, and router wiring in one place; domains stay testable. |
-| One router module per domain, aggregated centrally | Mirrors HealthCore’s four primary domains and OpenAPI tags for ops/hiring APIs. |
-| Pydantic v2 schemas separate from ORM / DB models | Prevents exposing member IDs or clinical free text in JSON responses. |
-| Dependency injection via `Depends` | Injects settings, DB sessions, and staff auth without global state. |
-| Configuration via environment + `pydantic-settings` | Matches the repo rule against committing `.env*` secrets; thresholds (8%, 20%, 90/30) can be config-driven. |
-| Explicit CORS with allowlisted origins | Supports `uis/healthcore` (`:3000`) and `uis/backoffice` (`:3001`) without `*` + credentials in production. |
-| Central exception handlers and structured logging | Consistent errors; PHI-safe logs (no clinical notes or real member IDs). |
-| API versioning (`/api/v1`) | Lets ops formulas and hiring workflows evolve without breaking clients overnight. |
+Conventions below were researched from the **official FastAPI documentation** and applied to HealthCore’s proposed `backend/` layout (routers by domain, Pydantic schemas, dependency injection, CORS, and environment-based settings).
 
-These conventions keep a FastAPI modular monolith maintainable for HealthCore’s regulated outpatient network.
+| Industry convention | How it influenced this design | Official source |
+|---------------------|-------------------------------|-----------------|
+| Package root under `app/` with `main` as composition root; routers in separate modules | Startup, middleware, and router wiring in one place; one router file per HealthCore domain (`billing`, `appointments`, `clinicians`, `hiring`) | [Bigger Applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/) |
+| Path operations / endpoint modules | Conceptual `/api/v1/...` route map grouped by domain, not a single routes file | [First Steps](https://fastapi.tiangolo.com/tutorial/first-steps/) |
+| Pydantic models for request/response schemas | Schemas separate from persistence so member IDs and clinical free text are not leaked in JSON | [Body — Multiple Parameters / Pydantic models](https://fastapi.tiangolo.com/tutorial/body/) (Pydantic integration is core FastAPI) |
+| Dependency injection via `Depends` | Injects settings, DB sessions, and staff auth without global state | [Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/) |
+| Environment-based settings (no secrets in repo) | Thresholds (8%, 20%, 90/30), CORS origins, and DB URLs come from environment—aligned with HealthCore’s `.env*` protection rule | [Settings and Environment Variables](https://fastapi.tiangolo.com/advanced/settings/) |
+| Explicit CORS middleware with allowlisted origins | Supports `uis/healthcore` (`:3000`) and `uis/backoffice` (`:3001`) without `*` + credentials in production | [CORS (Cross-Origin Resource Sharing)](https://fastapi.tiangolo.com/tutorial/cors/) |
+| Central exception handlers and structured logging | Consistent error envelopes; PHI-safe logs (no clinical notes or real member IDs) | FastAPI exception-handling patterns applied to HealthCore privacy rules |
+| API versioning (`/api/v1`) | Lets ops formulas and hiring workflows evolve without breaking backoffice clients overnight | Common API practice combined with Bigger Applications router prefixes |
+
+### Sources (explicit)
+
+1. FastAPI — Bigger Applications: https://fastapi.tiangolo.com/tutorial/bigger-applications/
+2. FastAPI — First Steps: https://fastapi.tiangolo.com/tutorial/first-steps/
+3. FastAPI — Dependencies: https://fastapi.tiangolo.com/tutorial/dependencies/
+4. FastAPI — CORS: https://fastapi.tiangolo.com/tutorial/cors/
+5. FastAPI — Settings and Environment Variables: https://fastapi.tiangolo.com/advanced/settings/
+6. FastAPI — Request Body / Pydantic models: https://fastapi.tiangolo.com/tutorial/body/
+
+These sourced conventions keep a FastAPI modular monolith maintainable for HealthCore’s regulated outpatient network.
 
 ---
 
