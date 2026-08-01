@@ -20,6 +20,12 @@ Format per line:
 
 5 | HC-MS4-PLAN-005 | MS4 | 2026-07-22 | MS2 src/utils Ops Visible in Backoffice | implemented | post-milestone | [HC-MS4-PLAN-005-20260722-ms2-ops-in-backoffice.md](./HC-MS4-PLAN-005-20260722-ms2-ops-in-backoffice.md)
 
+6 | HC-MS4-PLAN-006 | MS4 | 2026-07-31 | FastAPI Architecture Proposal Document | implemented | docs | [HC-MS4-PLAN-006-20260731-fastapi-architecture-proposal.md](./HC-MS4-PLAN-006-20260731-fastapi-architecture-proposal.md)
+
+7 | HC-MS4-PLAN-007 | MS4 | 2026-07-31 | Architecture Proposal Pattern Comparison Expansion | implemented | docs | [HC-MS4-PLAN-007-20260731-architecture-pattern-comparison.md](./HC-MS4-PLAN-007-20260731-architecture-pattern-comparison.md)
+
+8 | HC-MS4-PLAN-008 | MS4 | 2026-07-31 | Architecture Proposal Project Cleanup | implemented | docs | [HC-MS4-PLAN-008-20260731-architecture-proposal-project-cleanup.md](./HC-MS4-PLAN-008-20260731-architecture-proposal-project-cleanup.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.
