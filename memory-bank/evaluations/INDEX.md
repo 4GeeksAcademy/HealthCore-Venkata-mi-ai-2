@@ -11,3 +11,13 @@ Format per line:
 ## Registry
 
 MS4 | Milestone 4 Project Evaluation | 2026-07-22 | complete | [MS4_Project_Eval.md](./MS4_Project_Eval.md)
+
+## Task results (`Results/`)
+
+Task-level rubric evaluations (not full milestone closes). Format:
+
+`task | title | date | status | score | path`
+
+---
+
+IncidentFileAnalyzer | Company Incident File Analyzer | 2026-08-05 | complete | 14/14 Pass | [Results/IncidentFileAnalyzer.md](./Results/IncidentFileAnalyzer.md)
