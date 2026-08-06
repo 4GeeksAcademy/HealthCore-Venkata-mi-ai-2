@@ -4,6 +4,12 @@ This folder contains **all the backend services** (APIs and background workers) 
 
 Each subfolder inside `services/` must correspond to **one specific service** (for example: `admin-api`, `data-processor-worker`) and include its own technical and functional documentation.
 
+## Services
+
+| Service | Path | Purpose |
+|---------|------|---------|
+| Incident Analyzer API | [`api/`](./api/) | FastAPI CSV incident analysis (`POST /api/incidents/analyze`, `GET /api/incidents/results/export`) |
+
 - **Main purpose**: to centralize all the backend logic, APIs, and queue consumers that support the company's use cases.
 - **Recommendation**: document in this file (or in sub-READMEs) the services you add, their objective, the technology used, and how to run them.
 
