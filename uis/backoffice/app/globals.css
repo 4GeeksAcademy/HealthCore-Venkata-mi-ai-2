@@ -325,6 +325,28 @@ textarea {
   color: var(--warning);
 }
 
+.incident-dropzone {
+  margin-top: 1rem;
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  background: var(--accent-soft);
+  padding: 2rem 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.incident-dropzone[data-dragging="true"] {
+  border-color: var(--accent);
+  background: #cfe8df;
+}
+
+.incident-dropzone p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;

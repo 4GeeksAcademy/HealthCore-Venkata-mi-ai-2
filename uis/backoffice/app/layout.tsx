@@ -42,6 +42,7 @@ export default function RootLayout({
             <nav aria-label="Backoffice">
               <Link href="/">Home</Link>
               <Link href="/ops">Milestone 2 ops</Link>
+              <Link href="/incidents">Incident analysis</Link>
               <Link href="/hiring">Hiring tracker</Link>
             </nav>
           </div>
