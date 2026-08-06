@@ -21,3 +21,5 @@ Task-level rubric evaluations (not full milestone closes). Format:
 ---
 
 IncidentFileAnalyzer | Company Incident File Analyzer | 2026-08-05 | complete | 14/14 Pass | [Results/IncidentFileAnalyzer.md](./Results/IncidentFileAnalyzer.md)
+
+IncidentFileAnalyzer (main) | Company Incident File Analyzer — main re-eval | 2026-08-05 | complete | 14/14 Pass | [Results/IncidentFileAnalyzer-main.md](./Results/IncidentFileAnalyzer-main.md)
