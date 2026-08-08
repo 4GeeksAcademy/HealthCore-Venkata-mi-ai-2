@@ -23,10 +23,11 @@ Invalid records must be classified by problem type (for example: missing require
 | Field | Description |
 |-------|-------------|
 | `incident_id` | Unique incident identifier |
-| `reported_date` | Date the incident was reported |
+| `clinic_id` | HealthCore clinic identifier |
+| `country` | Clinic country (`US` or `UK`) |
+| `patient_id` | Synthetic patient identifier |
 | `category` | Incident category (must be in the allowed set below) |
 | `status` | Incident status (must be in the allowed set below) |
-| `location_id` | Clinic / location identifier |
 
 ### Optional fields
 
@@ -42,16 +43,16 @@ Invalid records must be classified by problem type (for example: missing require
 
 ### Allowed categories
 
-- `clinical_safety`
-- `facilities`
-- `it_systems`
-- `billing_access`
-- `patient_experience`
-- `workforce`
+- `APPOINTMENT`
+- `BILLING`
+- `CLINICAL`
+- `FACILITIES`
+- `IT`
+- `WORKFORCE`
 
 ### Sample input
 
-CLI example (maps the generic `incidents-COMPANY.csv` pattern):
+CLI example:
 
 ```bash
 python analyze.py incidents-healthcore.csv
@@ -138,38 +139,38 @@ Verified against sample file [`scripts/samples/incidents-healthcore.csv`](../../
 
 | Metric | Value |
 |--------|-------|
-| Total processed | 20 |
-| Valid | 16 |
-| Invalid | 4 |
-| Avg satisfaction (closed with score) | 3.75 |
-| Closed cases with score | 6 |
+| Total processed | 100 |
+| Valid | 94 |
+| Invalid | 6 |
+| Avg satisfaction (closed with score) | 3.58 |
+| Closed cases with score | 50 |
 
 **Invalid by problem type**
 
 | Type | Count |
 |------|-------|
-| `missing_required_field` | 2 |
-| `category_not_allowed` | 1 |
+| `missing_required_field` | 3 |
+| `category_not_allowed` | 2 |
 | `status_not_allowed` | 1 |
 
 **By category (valid only)**
 
 | Category | Count |
 |----------|-------|
-| `billing_access` | 3 |
-| `clinical_safety` | 2 |
-| `facilities` | 3 |
-| `it_systems` | 3 |
-| `patient_experience` | 3 |
-| `workforce` | 2 |
+| `APPOINTMENT` | 16 |
+| `BILLING` | 16 |
+| `CLINICAL` | 16 |
+| `FACILITIES` | 16 |
+| `IT` | 15 |
+| `WORKFORCE` | 15 |
 
 **By status (valid only)**
 
 | Status | Count |
 |--------|-------|
-| `closed` | 7 |
-| `discarded` | 3 |
-| `open` | 6 |
+| `closed` | 60 |
+| `discarded` | 10 |
+| `open` | 24 |
 
 ---
 

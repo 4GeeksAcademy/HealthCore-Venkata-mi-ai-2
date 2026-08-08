@@ -10,21 +10,22 @@ from typing import Any
 
 REQUIRED_FIELDS = (
     "incident_id",
-    "reported_date",
+    "clinic_id",
+    "country",
+    "patient_id",
     "category",
     "status",
-    "location_id",
 )
 
 ALLOWED_STATUSES = frozenset({"open", "closed", "discarded"})
 ALLOWED_CATEGORIES = frozenset(
     {
-        "clinical_safety",
-        "facilities",
-        "it_systems",
-        "billing_access",
-        "patient_experience",
-        "workforce",
+        "APPOINTMENT",
+        "BILLING",
+        "CLINICAL",
+        "FACILITIES",
+        "IT",
+        "WORKFORCE",
     }
 )
 

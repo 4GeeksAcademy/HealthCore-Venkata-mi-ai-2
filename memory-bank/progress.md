@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-08-05  
-**Latest stamped plan:** [HC-MS4-PLAN-011](./plans/HC-MS4-PLAN-011-20260805-incident-analyzer-impl.md) (`implemented`, MS4, implementation)  
-**Prior completed stamp:** [HC-MS4-PLAN-010](./plans/HC-MS4-PLAN-010-20260805-incident-analyzer-context.md) (`implemented`, MS4, docs)  
+**Last updated:** 2026-08-07  
+**Latest stamped plan:** [HC-MS4-PLAN-012](./plans/HC-MS4-PLAN-012-20260807-incident-analyzer-domain-fix.md) (`implemented`, MS4, implementation)  
+**Prior completed stamp:** [HC-MS4-PLAN-011](./plans/HC-MS4-PLAN-011-20260805-incident-analyzer-impl.md) (`implemented`, MS4, implementation)  
 **Latest milestone eval:** [MS4_Project_Eval](./evaluations/MS4_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
 
 ## Rubric mapping (MS4)
@@ -20,13 +20,15 @@
 | Backoffice | Done — welcome, `/ops`, `/hiring`, **`/incidents`** |
 | MS4 evaluation | **complete PASS** |
 | FastAPI architecture proposal | In review (PLAN-006–009) |
-| Incident File Analyzer | **Implemented** (PLAN-011) — CLI + `services/api` + backoffice UI; eval **14/14 Pass** → [Results/IncidentFileAnalyzer.md](./evaluations/Results/IncidentFileAnalyzer.md) |
+| Incident File Analyzer | **Domain fixed** (PLAN-012) — HealthCore schema (`clinic_id`/`country`/`patient_id`, uppercase categories); sample **100 / 94 / 6 / avg 3.58** → [Results/IncidentFileAnalyzer-20260807.md](./evaluations/Results/IncidentFileAnalyzer-20260807.md) |
 
-## Today’s update (2026-08-05)
+## Today’s update (2026-08-07)
 
-**Incident File Analyzer (PLAN-011):** Shared Python analysis in `services/api/app/incident_analysis.py`; CLI `scripts/analyze.py`; FastAPI `POST /api/incidents/analyze` + `GET /api/incidents/results/export`; backoffice `/incidents` upload UI. Sample + expected values in [`IncidentFileAnalyzer.md`](../docs/Project_Contexts/IncidentFileAnalyzer.md).
+**Incident File Analyzer domain fix (PLAN-012):** Teacher feedback — generic `reported_date`/`location_id` and lowercase categories blocked HealthCore validation. Rebuilt [`scripts/samples/incidents-healthcore.csv`](../scripts/samples/incidents-healthcore.csv), updated shared [`incident_analysis.py`](../services/api/app/incident_analysis.py) and [`IncidentFileAnalyzer.md`](../docs/Project_Contexts/IncidentFileAnalyzer.md). CLI/API/UI wiring unchanged. Eval → [Results/IncidentFileAnalyzer-20260807.md](./evaluations/Results/IncidentFileAnalyzer-20260807.md).
 
-### Prior (same day)
+### Prior (2026-08-05)
+
+**Incident File Analyzer (PLAN-011):** Shared Python analysis; CLI; FastAPI; backoffice `/incidents`. (Superseded domain contract by PLAN-012.)
 
 **CONTEXT doc (PLAN-010):** [`docs/Project_Contexts/IncidentFileAnalyzer.md`](../docs/Project_Contexts/IncidentFileAnalyzer.md).
 

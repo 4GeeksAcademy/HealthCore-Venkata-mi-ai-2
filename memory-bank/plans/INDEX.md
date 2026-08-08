@@ -32,6 +32,8 @@ Format per line:
 
 11 | HC-MS4-PLAN-011 | MS4 | 2026-08-05 | Incident File Analyzer Implementation | implemented | implementation | [HC-MS4-PLAN-011-20260805-incident-analyzer-impl.md](./HC-MS4-PLAN-011-20260805-incident-analyzer-impl.md)
 
+12 | HC-MS4-PLAN-012 | MS4 | 2026-08-07 | Incident File Analyzer HealthCore Domain Fix | implemented | implementation | [HC-MS4-PLAN-012-20260807-incident-analyzer-domain-fix.md](./HC-MS4-PLAN-012-20260807-incident-analyzer-domain-fix.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.
