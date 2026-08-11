@@ -415,6 +415,16 @@ textarea {
   font-weight: 600;
 }
 
+.supplier-status-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.supplier-status-suspended {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
 .detail-list {
   display: grid;
   gap: 0.75rem;
