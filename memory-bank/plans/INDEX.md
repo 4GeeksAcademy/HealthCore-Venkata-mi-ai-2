@@ -34,6 +34,12 @@ Format per line:
 
 12 | HC-MS4-PLAN-012 | MS4 | 2026-08-07 | Incident File Analyzer HealthCore Domain Fix | implemented | implementation | [HC-MS4-PLAN-012-20260807-incident-analyzer-domain-fix.md](./HC-MS4-PLAN-012-20260807-incident-analyzer-domain-fix.md)
 
+13 | HC-MS4-PLAN-013 | MS4 | 2026-08-10 | Company Supplier Directory TinyDB API Context Document | implemented | docs | [HC-MS4-PLAN-013-20260810-supplier-directory-context.md](./HC-MS4-PLAN-013-20260810-supplier-directory-context.md)
+
+14 | HC-MS4-PLAN-014 | MS4 | 2026-08-10 | Supplier Directory TinyDB CONTEXT Evaluation Tighten | implemented | docs | [HC-MS4-PLAN-014-20260810-supplier-directory-context-tighten.md](./HC-MS4-PLAN-014-20260810-supplier-directory-context-tighten.md)
+
+15 | HC-MS4-PLAN-015 | MS4 | 2026-08-10 | Supplier Directory TinyDB API and Backoffice Implementation | implemented | implementation | [HC-MS4-PLAN-015-20260810-supplier-directory-impl.md](./HC-MS4-PLAN-015-20260810-supplier-directory-impl.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.
