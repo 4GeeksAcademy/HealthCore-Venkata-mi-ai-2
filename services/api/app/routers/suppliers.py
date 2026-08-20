@@ -41,7 +41,7 @@ def get_supplier(supplier_id: int) -> SupplierResponse:
 
 @router.patch("/{supplier_id}/rate", response_model=SupplierResponse)
 def patch_rate(supplier_id: int, payload: RateUpdate) -> SupplierResponse:
-    updated = store.update_rate(supplier_id, payload.contract_rate)
+    updated = store.update_rate(supplier_id, payload.monthly_rate)
     if updated is None:
         raise HTTPException(status_code=404, detail="Supplier not found.")
     return updated

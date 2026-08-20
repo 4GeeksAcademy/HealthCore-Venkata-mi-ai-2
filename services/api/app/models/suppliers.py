@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class SupplierStatus(str, Enum):
@@ -13,8 +13,13 @@ class SupplierStatus(str, Enum):
 
 
 class Country(str, Enum):
-    US = "US"
+    USA = "USA"
     UK = "UK"
+
+
+class Currency(str, Enum):
+    USD = "USD"
+    GBP = "GBP"
 
 
 class ProductCategory(str, Enum):
@@ -27,12 +32,28 @@ class ProductCategory(str, Enum):
     DIAGNOSTIC_EQUIPMENT = "DIAGNOSTIC_EQUIPMENT"
 
 
+COUNTRY_CURRENCY: dict[Country, Currency] = {
+    Country.USA: Currency.USD,
+    Country.UK: Currency.GBP,
+}
+
+
 class SupplierCreate(BaseModel):
     name: str = Field(min_length=1)
     country: Country
-    product_categories: list[ProductCategory] = Field(min_length=1)
-    contract_rate: float = Field(gt=0)
+    categories: list[ProductCategory] = Field(min_length=1)
+    monthly_rate: float = Field(gt=0)
+    currency: Currency
     status: SupplierStatus
+
+    @model_validator(mode="after")
+    def currency_matches_country(self) -> SupplierCreate:
+        expected = COUNTRY_CURRENCY[self.country]
+        if self.currency != expected:
+            raise ValueError(
+                f"currency must be {expected.value} when country is {self.country.value}"
+            )
+        return self
 
 
 class SupplierResponse(BaseModel):
@@ -41,14 +62,15 @@ class SupplierResponse(BaseModel):
     id: int
     name: str
     country: Country
-    product_categories: list[ProductCategory]
-    contract_rate: float = Field(gt=0)
+    categories: list[ProductCategory]
+    monthly_rate: float = Field(gt=0)
+    currency: Currency
     updated_at: str
     status: SupplierStatus
 
 
 class RateUpdate(BaseModel):
-    contract_rate: float = Field(gt=0)
+    monthly_rate: float = Field(gt=0)
 
 
 class StatusUpdate(BaseModel):

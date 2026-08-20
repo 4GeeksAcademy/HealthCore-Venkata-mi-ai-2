@@ -40,6 +40,8 @@ Format per line:
 
 15 | HC-MS4-PLAN-015 | MS4 | 2026-08-10 | Supplier Directory TinyDB API and Backoffice Implementation | implemented | implementation | [HC-MS4-PLAN-015-20260810-supplier-directory-impl.md](./HC-MS4-PLAN-015-20260810-supplier-directory-impl.md)
 
+16 | HC-MS4-PLAN-016 | MS4 | 2026-08-19 | Supplier Directory Official CONTEXT Domain Fix | implemented | implementation | [HC-MS4-PLAN-016-20260819-supplier-directory-domain-fix.md](./HC-MS4-PLAN-016-20260819-supplier-directory-domain-fix.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

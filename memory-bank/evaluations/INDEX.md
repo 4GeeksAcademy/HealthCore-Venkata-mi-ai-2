@@ -25,3 +25,5 @@ IncidentFileAnalyzer | Company Incident File Analyzer | 2026-08-05 | complete | 
 IncidentFileAnalyzer (main) | Company Incident File Analyzer — main re-eval | 2026-08-05 | complete | 14/14 Pass | [Results/IncidentFileAnalyzer-main.md](./Results/IncidentFileAnalyzer-main.md)
 
 IncidentFileAnalyzer (20260807) | Company Incident File Analyzer — HealthCore domain fix | 2026-08-07 | complete | 14/14 Pass | [Results/IncidentFileAnalyzer-20260807.md](./Results/IncidentFileAnalyzer-20260807.md)
+
+SupplierDirectory (20260819) | Company Supplier Directory — official CONTEXT domain fix | 2026-08-19 | complete | domain Pass | [Results/SupplierDirectory-20260819.md](./Results/SupplierDirectory-20260819.md)

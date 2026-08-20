@@ -36,7 +36,7 @@ Health: http://localhost:8001/health → `{"status":"ok"}`
 - `POST /suppliers` — create (201)
 - `GET /suppliers` — list; optional `country`, `category` (AND when both set)
 - `GET /suppliers/{id}` — detail (404 if missing)
-- `PATCH /suppliers/{id}/rate` — update `contract_rate` + `updated_at`
+- `PATCH /suppliers/{id}/rate` — update `monthly_rate` + `updated_at`
 - `PATCH /suppliers/{id}/status` — `active` | `suspended`
 - `DELETE /suppliers/{id}` — `{"ok": true, "id": ...}`
 

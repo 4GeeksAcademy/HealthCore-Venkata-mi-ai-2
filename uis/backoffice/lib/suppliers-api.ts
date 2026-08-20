@@ -52,12 +52,12 @@ export async function createSupplier(payload: SupplierCreate): Promise<Supplier>
 
 export async function updateSupplierRate(
   id: number,
-  contract_rate: number,
+  monthly_rate: number,
 ): Promise<Supplier> {
   const res = await fetch(`${apiBase()}/suppliers/${id}/rate`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contract_rate }),
+    body: JSON.stringify({ monthly_rate }),
   });
   if (!res.ok) throw new Error(await readError(res));
   return (await res.json()) as Supplier;
