@@ -8,8 +8,8 @@ export default function SuppliersPage() {
           <p className="eyebrow">HealthCore Digital · Procurement</p>
           <h1>Supplier directory</h1>
           <p>
-            Internal clinic supplier registry for US and UK outpatient sites.
-            Contract rates and activation status are managed here for Clinical
+            Internal clinic supplier registry for USA and UK outpatient sites.
+            Monthly rates and activation status are managed here for Clinical
             Operations procurement.
           </p>
         </section>

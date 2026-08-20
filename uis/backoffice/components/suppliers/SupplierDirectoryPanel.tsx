@@ -9,13 +9,14 @@ import {
 } from "@/lib/suppliers-api";
 import {
   PRODUCT_CATEGORIES,
+  currencyForCountry,
   type ProductCategory,
   type Supplier,
   type SupplierCountry,
   type SupplierStatus,
 } from "@/types/supplier";
 
-const COUNTRIES: SupplierCountry[] = ["US", "UK"];
+const COUNTRIES: SupplierCountry[] = ["USA", "UK"];
 const STATUSES: SupplierStatus[] = ["active", "suspended"];
 
 export function SupplierDirectoryPanel() {
@@ -26,9 +27,9 @@ export function SupplierDirectoryPanel() {
   const [categoryFilter, setCategoryFilter] = useState("");
 
   const [name, setName] = useState("");
-  const [country, setCountry] = useState<SupplierCountry>("US");
+  const [country, setCountry] = useState<SupplierCountry>("USA");
   const [categories, setCategories] = useState<ProductCategory[]>([]);
-  const [contractRate, setContractRate] = useState("");
+  const [monthlyRate, setMonthlyRate] = useState("");
   const [status, setStatus] = useState<SupplierStatus>("active");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -47,7 +48,7 @@ export function SupplierDirectoryPanel() {
       });
       setSuppliers(data);
       setRateDrafts(
-        Object.fromEntries(data.map((s) => [s.id, String(s.contract_rate)])),
+        Object.fromEntries(data.map((s) => [s.id, String(s.monthly_rate)])),
       );
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Failed to load suppliers.");
@@ -61,6 +62,7 @@ export function SupplierDirectoryPanel() {
   }, [load]);
 
   const categoryOptions = useMemo(() => PRODUCT_CATEGORIES, []);
+  const createCurrency = currencyForCountry(country);
 
   function toggleCategory(cat: ProductCategory) {
     setCategories((prev) =>
@@ -73,13 +75,13 @@ export function SupplierDirectoryPanel() {
     setFormError(null);
 
     const trimmed = name.trim();
-    const rate = Number(contractRate);
+    const rate = Number(monthlyRate);
     if (!trimmed) {
       setFormError("Name is required.");
       return;
     }
     if (!COUNTRIES.includes(country)) {
-      setFormError("Country must be US or UK.");
+      setFormError("Country must be USA or UK.");
       return;
     }
     if (categories.length === 0) {
@@ -87,7 +89,7 @@ export function SupplierDirectoryPanel() {
       return;
     }
     if (!Number.isFinite(rate) || rate <= 0) {
-      setFormError("Contract rate must be a number greater than zero.");
+      setFormError("Monthly rate must be a number greater than zero.");
       return;
     }
     if (!STATUSES.includes(status)) {
@@ -100,13 +102,14 @@ export function SupplierDirectoryPanel() {
       await createSupplier({
         name: trimmed,
         country,
-        product_categories: categories,
-        contract_rate: rate,
+        categories,
+        monthly_rate: rate,
+        currency: createCurrency,
         status,
       });
       setName("");
       setCategories([]);
-      setContractRate("");
+      setMonthlyRate("");
       setStatus("active");
       await load();
     } catch (err) {
@@ -121,7 +124,7 @@ export function SupplierDirectoryPanel() {
     if (!Number.isFinite(rate) || rate <= 0) {
       setRowError((prev) => ({
         ...prev,
-        [id]: "Contract rate must be greater than zero.",
+        [id]: "Monthly rate must be greater than zero.",
       }));
       return;
     }
@@ -130,7 +133,7 @@ export function SupplierDirectoryPanel() {
     try {
       const updated = await updateSupplierRate(id, rate);
       setSuppliers((prev) => prev.map((s) => (s.id === id ? updated : s)));
-      setRateDrafts((prev) => ({ ...prev, [id]: String(updated.contract_rate) }));
+      setRateDrafts((prev) => ({ ...prev, [id]: String(updated.monthly_rate) }));
     } catch (err) {
       setRowError((prev) => ({
         ...prev,
@@ -209,7 +212,7 @@ export function SupplierDirectoryPanel() {
         <header>
           <h2>Register supplier</h2>
           <p className="muted-text">
-            Required: name, country, categories, contract_rate (&gt; 0), status.
+            Required: name, country, categories, monthly_rate (&gt; 0), currency, status.
           </p>
         </header>
         <form className="stack" onSubmit={onCreate}>
@@ -238,14 +241,14 @@ export function SupplierDirectoryPanel() {
               </select>
             </div>
             <div className="field">
-              <label htmlFor="supplier-rate">Contract rate (USD)</label>
+              <label htmlFor="supplier-rate">Monthly rate ({createCurrency})</label>
               <input
                 id="supplier-rate"
                 type="number"
                 min="0.01"
                 step="0.01"
-                value={contractRate}
-                onChange={(e) => setContractRate(e.target.value)}
+                value={monthlyRate}
+                onChange={(e) => setMonthlyRate(e.target.value)}
                 required
               />
             </div>
@@ -293,7 +296,7 @@ export function SupplierDirectoryPanel() {
         <header>
           <h2>Supplier directory</h2>
           <p className="muted-text">
-            Fields from CONTEXT: name, country, product_categories, contract_rate, status.
+            Fields from CONTEXT: name, country, categories, monthly_rate, currency, status.
           </p>
         </header>
         {loading ? <p className="muted-text">Loading…</p> : null}
@@ -313,7 +316,7 @@ export function SupplierDirectoryPanel() {
                   <th>Name</th>
                   <th>Country</th>
                   <th>Categories</th>
-                  <th>Contract rate</th>
+                  <th>Monthly rate</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -325,9 +328,10 @@ export function SupplierDirectoryPanel() {
                     <tr key={supplier.id}>
                       <td>{supplier.name}</td>
                       <td>{supplier.country}</td>
-                      <td>{supplier.product_categories.join(", ")}</td>
+                      <td>{supplier.categories.join(", ")}</td>
                       <td>
                         <div className="inline-actions">
+                          <span className="muted-text">{supplier.currency}</span>
                           <input
                             type="number"
                             min="0.01"

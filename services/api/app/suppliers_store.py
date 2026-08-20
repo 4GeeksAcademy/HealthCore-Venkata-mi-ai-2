@@ -10,6 +10,7 @@ from tinydb import Query, TinyDB
 
 from app.models.suppliers import (
     Country,
+    Currency,
     ProductCategory,
     SupplierCreate,
     SupplierResponse,
@@ -21,46 +22,124 @@ DB_PATH = DATA_DIR / "suppliers.json"
 
 SEED_SUPPLIERS: list[dict[str, Any]] = [
     {
-        "name": "MediSupply Austin",
-        "country": "US",
-        "product_categories": ["MEDICAL_SUPPLIES", "PPE"],
-        "contract_rate": 12.50,
+        "name": "McKesson",
+        "country": "USA",
+        "categories": ["MEDICAL_SUPPLIES", "PHARMACEUTICALS"],
+        "monthly_rate": 48500.00,
+        "currency": "USD",
         "status": "active",
     },
     {
-        "name": "Lone Star Lab Kits",
-        "country": "US",
-        "product_categories": ["LAB_CONSUMABLES"],
-        "contract_rate": 8.75,
+        "name": "Epic",
+        "country": "USA",
+        "categories": ["IT_EQUIPMENT"],
+        "monthly_rate": 125000.00,
+        "currency": "USD",
         "status": "active",
     },
     {
-        "name": "Thames Diagnostics Ltd",
-        "country": "UK",
-        "product_categories": ["DIAGNOSTIC_EQUIPMENT", "LAB_CONSUMABLES"],
-        "contract_rate": 120.00,
+        "name": "Cardinal Health",
+        "country": "USA",
+        "categories": ["MEDICAL_SUPPLIES"],
+        "monthly_rate": 31200.00,
+        "currency": "USD",
         "status": "active",
     },
     {
-        "name": "Northbridge Facilities Co",
-        "country": "UK",
-        "product_categories": ["FACILITIES"],
-        "contract_rate": 45.00,
+        "name": "Henry Schein",
+        "country": "USA",
+        "categories": ["MEDICAL_SUPPLIES", "PPE"],
+        "monthly_rate": 18450.00,
+        "currency": "USD",
+        "status": "active",
+    },
+    {
+        "name": "Medline",
+        "country": "USA",
+        "categories": ["PPE", "MEDICAL_SUPPLIES"],
+        "monthly_rate": 22100.00,
+        "currency": "USD",
+        "status": "active",
+    },
+    {
+        "name": "Quest Diagnostics",
+        "country": "USA",
+        "categories": ["LAB_CONSUMABLES"],
+        "monthly_rate": 15800.00,
+        "currency": "USD",
+        "status": "active",
+    },
+    {
+        "name": "BD",
+        "country": "USA",
+        "categories": ["DIAGNOSTIC_EQUIPMENT", "LAB_CONSUMABLES"],
+        "monthly_rate": 27600.00,
+        "currency": "USD",
+        "status": "active",
+    },
+    {
+        "name": "Owens and Minor",
+        "country": "USA",
+        "categories": ["MEDICAL_SUPPLIES"],
+        "monthly_rate": 14320.00,
+        "currency": "USD",
+        "status": "active",
+    },
+    {
+        "name": "Stericycle",
+        "country": "USA",
+        "categories": ["FACILITIES"],
+        "monthly_rate": 8900.00,
+        "currency": "USD",
         "status": "suspended",
     },
     {
-        "name": "Gulf Coast Pharma Wholesale",
-        "country": "US",
-        "product_categories": ["PHARMACEUTICALS"],
-        "contract_rate": 22.00,
+        "name": "EMIS Health",
+        "country": "UK",
+        "categories": ["IT_EQUIPMENT"],
+        "monthly_rate": 42000.00,
+        "currency": "GBP",
         "status": "active",
     },
     {
-        "name": "Heathrow Clinic IT Partners",
+        "name": "TPP",
         "country": "UK",
-        "product_categories": ["IT_EQUIPMENT"],
-        "contract_rate": 89.99,
+        "categories": ["IT_EQUIPMENT"],
+        "monthly_rate": 38500.00,
+        "currency": "GBP",
         "status": "active",
+    },
+    {
+        "name": "Phoenix Medical Supplies",
+        "country": "UK",
+        "categories": ["PHARMACEUTICALS"],
+        "monthly_rate": 19600.00,
+        "currency": "GBP",
+        "status": "active",
+    },
+    {
+        "name": "Alliance Healthcare",
+        "country": "UK",
+        "categories": ["PHARMACEUTICALS", "MEDICAL_SUPPLIES"],
+        "monthly_rate": 24800.00,
+        "currency": "GBP",
+        "status": "active",
+    },
+    {
+        "name": "Siemens Healthineers",
+        "country": "UK",
+        "categories": ["DIAGNOSTIC_EQUIPMENT"],
+        "monthly_rate": 54000.00,
+        "currency": "GBP",
+        "status": "active",
+    },
+    {
+        "name": "ISS Healthcare",
+        "country": "UK",
+        "categories": ["FACILITIES"],
+        "monthly_rate": 11200.00,
+        "currency": "GBP",
+        "status": "suspended",
     },
 ]
 
@@ -83,8 +162,9 @@ def _doc_to_response(doc_id: int, doc: dict[str, Any]) -> SupplierResponse:
         id=doc_id,
         name=doc["name"],
         country=Country(doc["country"]),
-        product_categories=[ProductCategory(c) for c in doc["product_categories"]],
-        contract_rate=float(doc["contract_rate"]),
+        categories=[ProductCategory(c) for c in doc["categories"]],
+        monthly_rate=float(doc["monthly_rate"]),
+        currency=Currency(doc["currency"]),
         updated_at=doc["updated_at"],
         status=SupplierStatus(doc["status"]),
     )
@@ -101,7 +181,7 @@ def list_suppliers(
             doc_id = doc.doc_id
             if country is not None and doc.get("country") != country:
                 continue
-            cats = doc.get("product_categories") or []
+            cats = doc.get("categories") or []
             if category is not None and category not in cats:
                 continue
             results.append(_doc_to_response(doc_id, doc))
@@ -127,8 +207,9 @@ def create_supplier(payload: SupplierCreate) -> SupplierResponse:
         record = {
             "name": payload.name,
             "country": payload.country.value,
-            "product_categories": [c.value for c in payload.product_categories],
-            "contract_rate": payload.contract_rate,
+            "categories": [c.value for c in payload.categories],
+            "monthly_rate": payload.monthly_rate,
+            "currency": payload.currency.value,
             "updated_at": utc_now_iso(),
             "status": payload.status.value,
         }
@@ -138,7 +219,7 @@ def create_supplier(payload: SupplierCreate) -> SupplierResponse:
         db.close()
 
 
-def update_rate(supplier_id: int, contract_rate: float) -> SupplierResponse | None:
+def update_rate(supplier_id: int, monthly_rate: float) -> SupplierResponse | None:
     db = get_db()
     try:
         doc = db.get(doc_id=supplier_id)
@@ -146,7 +227,7 @@ def update_rate(supplier_id: int, contract_rate: float) -> SupplierResponse | No
             return None
         updated_at = utc_now_iso()
         db.update(
-            {"contract_rate": contract_rate, "updated_at": updated_at},
+            {"monthly_rate": monthly_rate, "updated_at": updated_at},
             doc_ids=[supplier_id],
         )
         refreshed = db.get(doc_id=supplier_id)
@@ -183,10 +264,21 @@ def delete_supplier(supplier_id: int) -> bool:
         db.close()
 
 
+def _is_legacy_schema(doc: dict[str, Any]) -> bool:
+    """True for pre-syllabus rows (contract_rate / US / product_categories)."""
+    return (
+        "contract_rate" in doc
+        or "product_categories" in doc
+        or doc.get("country") == "US"
+    )
+
+
 def seed_suppliers() -> int:
     """Insert CONTEXT seed rows that are not already present. Returns insert count."""
     db = get_db()
     try:
+        if any(_is_legacy_schema(doc) for doc in db.all()):
+            db.truncate()
         Supplier = Query()
         inserted = 0
         now = utc_now_iso()
