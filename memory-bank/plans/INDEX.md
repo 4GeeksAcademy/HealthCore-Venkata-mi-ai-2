@@ -44,6 +44,16 @@ Format per line:
 
 17 | HC-MS4-PLAN-017 | MS4 | 2026-08-26 | Authentication Master Framework Context Document | implemented | docs | [HC-MS4-PLAN-017-20260826-auth-master-framework-context.md](./HC-MS4-PLAN-017-20260826-auth-master-framework-context.md)
 
+18 | HC-MS4-PLAN-018 | MS4 | 2026-08-27 | Authentication Master Framework Implementation Task Board | planned | planning | [HC-MS4-PLAN-018-20260827-auth-master-framework-implementation-plan.md](./HC-MS4-PLAN-018-20260827-auth-master-framework-implementation-plan.md)
+
+19 | HC-MS4-PLAN-019 | MS4 | 2026-08-27 | Authentication AUTH-01 API Implementation | implemented | implementation | [HC-MS4-PLAN-019-20260827-auth-01-api-implementation.md](./HC-MS4-PLAN-019-20260827-auth-01-api-implementation.md)
+
+20 | HC-MS4-PLAN-020 | MS4 | 2026-08-27 | Authentication AUTH-02 Frontend Flows Implementation | implemented | implementation | [HC-MS4-PLAN-020-20260827-auth-02-frontend-implementation.md](./HC-MS4-PLAN-020-20260827-auth-02-frontend-implementation.md)
+
+21 | HC-MS4-PLAN-021 | MS4 | 2026-08-27 | Authentication AUTH-03 Password Recovery and Change Implementation | implemented | implementation | [HC-MS4-PLAN-021-20260827-auth-03-password-reset-implementation.md](./HC-MS4-PLAN-021-20260827-auth-03-password-reset-implementation.md)
+
+22 | HC-MS4-PLAN-022 | MS4 | 2026-08-27 | Authentication Demo Mode Without Realtime Email | implemented | implementation | [HC-MS4-PLAN-022-20260827-auth-demo-no-realtime-email.md](./HC-MS4-PLAN-022-20260827-auth-demo-no-realtime-email.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

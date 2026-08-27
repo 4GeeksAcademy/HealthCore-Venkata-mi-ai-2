@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import Response
 
+from app.deps.auth import get_current_user
 from app.incident_analysis import AnalysisError, analyze_csv_text
 from app.result_store import store
 
@@ -12,7 +13,10 @@ router = APIRouter(prefix="/api/incidents", tags=["incidents"])
 
 
 @router.post("/analyze")
-async def analyze_incidents(file: UploadFile = File(...)) -> dict:
+async def analyze_incidents(
+    file: UploadFile = File(...),
+    _: dict = Depends(get_current_user),
+) -> dict:
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded.")
 
@@ -45,7 +49,7 @@ async def analyze_incidents(file: UploadFile = File(...)) -> dict:
 
 
 @router.get("/results/export")
-async def export_results() -> Response:
+async def export_results(_: dict = Depends(get_current_user)) -> Response:
     csv_body = store.get_csv()
     if csv_body is None:
         raise HTTPException(

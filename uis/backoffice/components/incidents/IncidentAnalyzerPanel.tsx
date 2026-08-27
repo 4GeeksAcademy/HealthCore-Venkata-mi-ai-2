@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { authedFetch } from "@/lib/authed-fetch";
 
 export type IncidentAnalysisSummary = {
   total_processed: number;
@@ -50,6 +51,7 @@ export function IncidentAnalyzerPanel() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<IncidentAnalysisSummary | null>(null);
 
@@ -59,18 +61,11 @@ export function IncidentAnalyzerPanel() {
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch(`${apiBase()}/api/incidents/analyze`, {
+      const res = await authedFetch(`${apiBase()}/api/incidents/analyze`, {
         method: "POST",
         body,
       });
       const payload = await res.json().catch(() => null);
-      if (!res.ok) {
-        const detail =
-          payload && typeof payload === "object" && "detail" in payload
-            ? String((payload as { detail: unknown }).detail)
-            : `Request failed (${res.status})`;
-        throw new Error(detail);
-      }
       setSummary(payload as IncidentAnalysisSummary);
     } catch (err) {
       setSummary(null);
@@ -78,11 +73,32 @@ export function IncidentAnalyzerPanel() {
         err instanceof Error ? err.message : "Upload failed.";
       const hint =
         message === "Failed to fetch"
-          ? ` Cannot reach the Incident API at ${apiBase()}. Start it with: cd services/api && python -m uvicorn app.main:app --reload --port 8000`
+          ? ` Cannot reach the Incident API at ${apiBase()}. Start it with: cd services/api && python -m uvicorn app.main:app --reload --port 8001`
           : "";
       setError(`${message}.${hint}`);
     } finally {
       setBusy(false);
+    }
+  }, []);
+
+  const onExport = useCallback(async () => {
+    setExporting(true);
+    setError(null);
+    try {
+      const res = await authedFetch(`${apiBase()}/api/incidents/results/export`);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "results.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Export failed.");
+    } finally {
+      setExporting(false);
     }
   }, []);
 
@@ -159,12 +175,14 @@ export function IncidentAnalyzerPanel() {
               }}
             >
               <h2>General metrics</h2>
-              <a
+              <button
+                type="button"
                 className="link-button"
-                href={`${apiBase()}/api/incidents/results/export`}
+                onClick={() => void onExport()}
+                disabled={exporting}
               >
-                Download results CSV
-              </a>
+                {exporting ? "Downloading..." : "Download results CSV"}
+              </button>
             </header>
             <ul>
               <li>

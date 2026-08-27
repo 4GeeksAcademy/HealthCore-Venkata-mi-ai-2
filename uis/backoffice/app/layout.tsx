@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { SessionActions } from "@/components/auth/SessionActions";
 import { branding } from "@/lib/branding";
 import "./globals.css";
 
@@ -34,21 +36,24 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="app-body">
-        <div className="backoffice-topnav">
-          <div className="backoffice-topnav-inner">
-            <Link href="/" className="backoffice-brand">
-              {branding.companyName} Backoffice
-            </Link>
-            <nav aria-label="Backoffice">
-              <Link href="/">Home</Link>
-              <Link href="/ops">Milestone 2 ops</Link>
-              <Link href="/incidents">Incident analysis</Link>
-              <Link href="/suppliers">Suppliers</Link>
-              <Link href="/hiring">Hiring tracker</Link>
-            </nav>
+        <AuthGuard>
+          <div className="backoffice-topnav">
+            <div className="backoffice-topnav-inner">
+              <Link href="/" className="backoffice-brand">
+                {branding.companyName} Backoffice
+              </Link>
+              <nav aria-label="Backoffice">
+                <Link href="/">Home</Link>
+                <Link href="/ops">Milestone 2 ops</Link>
+                <Link href="/incidents">Incident analysis</Link>
+                <Link href="/suppliers">Suppliers</Link>
+                <Link href="/hiring">Hiring tracker</Link>
+              </nav>
+              <SessionActions />
+            </div>
           </div>
-        </div>
-        {children}
+          {children}
+        </AuthGuard>
       </body>
     </html>
   );

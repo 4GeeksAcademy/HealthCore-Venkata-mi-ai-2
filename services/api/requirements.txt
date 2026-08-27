@@ -2,3 +2,7 @@ fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 python-multipart>=0.0.12
 tinydb>=4.8.0
+python-jose[cryptography]
+libpass[bcrypt]
+pydantic-settings
+email-validator
