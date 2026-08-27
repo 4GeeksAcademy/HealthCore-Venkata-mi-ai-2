@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-08-19  
-**Latest stamped plan:** [HC-MS4-PLAN-016](./plans/HC-MS4-PLAN-016-20260819-supplier-directory-domain-fix.md) (`implemented`, MS4, implementation)  
-**Prior completed stamp:** [HC-MS4-PLAN-015](./plans/HC-MS4-PLAN-015-20260810-supplier-directory-impl.md) (`implemented`, MS4, implementation)  
+**Last updated:** 2026-08-26  
+**Latest stamped plan:** [HC-MS4-PLAN-017](./plans/HC-MS4-PLAN-017-20260826-auth-master-framework-context.md) (`implemented`, MS4, docs)  
+**Prior completed stamp:** [HC-MS4-PLAN-016](./plans/HC-MS4-PLAN-016-20260819-supplier-directory-domain-fix.md) (`implemented`, MS4, implementation)  
 **Latest milestone eval:** [MS4_Project_Eval](./evaluations/MS4_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
 
 ## Rubric mapping (MS4)
@@ -22,8 +22,13 @@
 | FastAPI architecture proposal | In review (PLAN-006–009) |
 | Incident File Analyzer | **Domain fixed** (PLAN-012) |
 | Supplier Directory | **Domain fixed** (PLAN-016) — `monthly_rate`, `USA`/`UK` + `USD`/`GBP`, 15 seeds (McKesson, Epic); structure from PLAN-015 kept; eval → [Results/SupplierDirectory-20260819.md](./evaluations/Results/SupplierDirectory-20260819.md) |
+| Auth (AUTH-01/02/03) | **CONTEXT only** (PLAN-017) — [auth_master_framework_Context.md](../docs/Project_Contexts/auth_master_framework_Context.md). No JWT, login UI, or password-reset code yet. |
 
-## Today’s update (2026-08-19)
+## Today’s update (2026-08-26)
+
+**Auth master framework CONTEXT (PLAN-017):** Docs-only. External implementing agents must follow [`docs/Project_Contexts/auth_master_framework_Context.md`](../docs/Project_Contexts/auth_master_framework_Context.md). Three sequential tasks (API, frontend flows, password restore) on one JWT + TinyDB identity contract. No auth code in this stamp.
+
+### Prior (2026-08-19)
 
 **Supplier Directory domain fix (PLAN-016):** Teacher rejected custom `contract_rate` / `US` / six synthetic vendors. API + backoffice now use official `monthly_rate`, currency pairing, `USA`/`UK`, and 15 seeded suppliers. Routes, filters, and patches unchanged. Prior eval [SupplierDirectory-20260810.md](./evaluations/Results/SupplierDirectory-20260810.md) not rewritten.
 
