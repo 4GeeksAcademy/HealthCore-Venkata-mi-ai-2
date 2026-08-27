@@ -71,6 +71,22 @@
   color: #ffffff;
 }
 
+.topnav-logout {
+  border: 1px solid rgba(231, 246, 241, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: #e7f6f1;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+}
+
+.topnav-logout:hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
 a {
   color: inherit;
 }
