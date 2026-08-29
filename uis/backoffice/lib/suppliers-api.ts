@@ -1,5 +1,6 @@
 import type { Supplier, SupplierCreate, SupplierStatus } from "@/types/supplier";
 import { authedFetch } from "@/lib/authed-fetch";
+import { readResponseJson } from "@/lib/user-facing-error";
 
 function apiBase(): string {
   return (
@@ -19,7 +20,7 @@ export async function fetchSuppliers(params?: {
   const res = await authedFetch(`${apiBase()}/suppliers${suffix}`, {
     cache: "no-store",
   });
-  return (await res.json()) as Supplier[];
+  return readResponseJson<Supplier[]>(res);
 }
 
 export async function createSupplier(payload: SupplierCreate): Promise<Supplier> {
@@ -28,7 +29,7 @@ export async function createSupplier(payload: SupplierCreate): Promise<Supplier>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return (await res.json()) as Supplier;
+  return readResponseJson<Supplier>(res);
 }
 
 export async function updateSupplierRate(
@@ -40,7 +41,7 @@ export async function updateSupplierRate(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ monthly_rate }),
   });
-  return (await res.json()) as Supplier;
+  return readResponseJson<Supplier>(res);
 }
 
 export async function updateSupplierStatus(
@@ -52,5 +53,5 @@ export async function updateSupplierStatus(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
   });
-  return (await res.json()) as Supplier;
+  return readResponseJson<Supplier>(res);
 }

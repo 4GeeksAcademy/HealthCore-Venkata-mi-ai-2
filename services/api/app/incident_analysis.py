@@ -105,7 +105,7 @@ def analyze_rows(rows: list[dict[str, str]]) -> AnalysisResult:
                 try:
                     satisfaction_scores.append(float(raw))
                 except ValueError:
-                    pass
+                    invalid_by_type["invalid_satisfaction_score"] += 1
 
     avg: float | None
     if satisfaction_scores:

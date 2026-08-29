@@ -45,8 +45,8 @@ export function CandidateListPage() {
     let active = true;
 
     async function loadRecords() {
+      setRecordsState({ loading: true, error: null, data: null });
       try {
-        setRecordsState({ loading: true, error: null, data: null });
         const result = await getRecords({
           query,
           status,
@@ -65,6 +65,12 @@ export function CandidateListPage() {
             error: getErrorMessage(error),
             data: null,
           });
+        }
+      } finally {
+        if (active) {
+          setRecordsState((current) =>
+            current.loading ? { ...current, loading: false } : current,
+          );
         }
       }
     }
@@ -139,6 +145,8 @@ export function CandidateListPage() {
               error={recordsState.error}
               loadingText="Loading candidates..."
               isEmpty={records.length === 0}
+              onRetry={() => setRefreshKey((currentValue) => currentValue + 1)}
+              homeHref="/"
               emptyState={
                 <div className="empty-state">
                   No {branding.candidatePlural.toLowerCase()} are available for the current view.

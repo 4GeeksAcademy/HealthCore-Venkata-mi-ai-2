@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRecord, listRecords } from "@/lib/mock-store";
+import { readJsonBody } from "@/lib/read-json-body";
 import {
   candidateStageOptions,
   candidateStatusOptions,
@@ -26,7 +27,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const payload = (await request.json()) as Partial<CreateCandidateInput>;
+  const parsed = await readJsonBody<Partial<CreateCandidateInput>>(request);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const payload = parsed.data;
   const validationMessage = validateCandidatePayload(payload);
 
   if (validationMessage) {

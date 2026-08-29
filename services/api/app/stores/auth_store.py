@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from tinydb import Query, TinyDB
 
+from app.core.errors import StorageError
 from app.models.users import UserRole
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -27,13 +29,16 @@ def _normalize_email(email: str) -> str:
 
 
 def _get_db() -> TinyDB:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    db = TinyDB(DB_PATH)
-    # Touch all tables so AUTH-03 can reuse the same store file.
-    db.table(USERS_TABLE).all()
-    db.table(PROFILES_TABLE).all()
-    db.table(RESET_TOKENS_TABLE).all()
-    return db
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        db = TinyDB(DB_PATH)
+        # Touch all tables so AUTH-03 can reuse the same store file.
+        db.table(USERS_TABLE).all()
+        db.table(PROFILES_TABLE).all()
+        db.table(RESET_TOKENS_TABLE).all()
+        return db
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        raise StorageError("Unable to access identity data store") from exc
 
 
 def _serialize_user(doc_id: int, doc: dict[str, Any]) -> dict[str, Any]:
@@ -289,7 +294,10 @@ def consume_reset_token(token_hash: str) -> int | None:
         if token_doc.get("used_at") is not None:
             return None
 
-        expires_at = datetime.fromisoformat(token_doc["expires_at"])
+        try:
+            expires_at = datetime.fromisoformat(token_doc["expires_at"])
+        except (TypeError, ValueError, KeyError):
+            return None
         now = datetime.now(timezone.utc)
         if expires_at <= now:
             return None

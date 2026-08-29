@@ -1,4 +1,9 @@
 import { authedFetch } from "@/lib/authed-fetch";
+import {
+  messageForHttpStatus,
+  readResponseJson,
+  sanitizeApiDetail,
+} from "@/lib/user-facing-error";
 
 function apiBase(): string {
   return (
@@ -14,17 +19,16 @@ async function parseError(res: Response): Promise<string> {
     const body = (await res.json()) as {
       detail?: string | Array<{ msg?: string }>;
     };
-    if (typeof body.detail === "string") return body.detail;
-    if (Array.isArray(body.detail)) {
-      return body.detail
-        .map((item) => item.msg)
-        .filter(Boolean)
-        .join("; ");
+    if (typeof body.detail === "string") {
+      return sanitizeApiDetail(res.status, body.detail);
+    }
+    if (Array.isArray(body.detail) && body.detail.length > 0) {
+      return messageForHttpStatus(res.status);
     }
   } catch {
-    // ignore
+    // Use a status-based message instead of parse or status-code text.
   }
-  return `Request failed (${res.status})`;
+  return messageForHttpStatus(res.status);
 }
 
 export type RegisterPayload = {
@@ -56,30 +60,39 @@ export type AuthMe = {
   profile: Profile;
 };
 
+async function publicFetch(path: string, init: RequestInit): Promise<Response> {
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase()}${path}`, init);
+  } catch {
+    throw new Error("Unable to reach the service. Please try again.");
+  }
+  if (!res.ok) throw new Error(await parseError(res));
+  return res;
+}
+
 export async function login(email: string, password: string): Promise<AuthTokenResponse> {
-  const res = await fetch(`${apiBase()}/auth/login`, {
+  const res = await publicFetch("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) throw new Error(await parseError(res));
-  return (await res.json()) as AuthTokenResponse;
+  return readResponseJson<AuthTokenResponse>(res);
 }
 
 export async function register(payload: RegisterPayload): Promise<void> {
-  const res = await fetch(`${apiBase()}/users`, {
+  await publicFetch("/users", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export async function fetchAuthMe(): Promise<AuthMe> {
   const res = await authedFetch("/auth/me", {
     cache: "no-store",
   });
-  return (await res.json()) as AuthMe;
+  return readResponseJson<AuthMe>(res);
 }
 
 export async function updateProfile(payload: {
@@ -92,25 +105,23 @@ export async function updateProfile(payload: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return (await res.json()) as Profile;
+  return readResponseJson<Profile>(res);
 }
 
 export async function forgotPassword(email: string): Promise<void> {
-  const res = await fetch(`${apiBase()}/auth/forgot-password`, {
+  await publicFetch("/auth/forgot-password", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
-  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  const res = await fetch(`${apiBase()}/auth/reset-password`, {
+  await publicFetch("/auth/reset-password", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, new_password: newPassword }),
   });
-  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {

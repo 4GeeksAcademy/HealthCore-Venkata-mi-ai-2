@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { login } from "@/lib/auth-api";
 import { setAuthToken } from "@/lib/auth-storage";
+import { getUserFacingError } from "@/lib/user-facing-error";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -18,7 +19,9 @@ export default function LoginPage() {
       ? "Password reset complete. Please sign in with your new password."
       : searchParams.get("changed") === "success"
         ? "Password changed successfully."
-        : null;
+        : searchParams.get("reason") === "session"
+          ? "Your session expired or could not be verified. Please sign in again."
+          : null;
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -29,7 +32,7 @@ export default function LoginPage() {
       setAuthToken(result.access_token);
       window.location.href = "/";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      setError(getUserFacingError(err, "Unable to sign in. Please try again."));
     } finally {
       setBusy(false);
     }
@@ -68,7 +71,12 @@ export default function LoginPage() {
             </div>
 
             {infoMessage ? <p className="feedback info">{infoMessage}</p> : null}
-            {error ? <p className="feedback error">{error}</p> : null}
+            {error ? (
+              <div className="feedback error" role="alert">
+                <p>{error}</p>
+                <p>Try again, or contact HealthCore Digital support if this continues.</p>
+              </div>
+            ) : null}
 
             <div className="inline-actions">
               <button type="submit" className="button" disabled={busy}>

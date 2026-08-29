@@ -72,17 +72,22 @@ def main(argv: list[str]) -> int:
 
     path = Path(argv[1])
     if not path.is_file():
-        print(f"File not found: {path}", file=sys.stderr)
+        print("File not found.", file=sys.stderr)
         return 1
 
     try:
         text = path.read_text(encoding="utf-8-sig")
-        result = analyze_csv_text(text)
-    except AnalysisError as exc:
-        print(f"Analysis error: {exc}", file=sys.stderr)
+    except UnicodeDecodeError:
+        print("Could not read file: the CSV must be UTF-8 encoded.", file=sys.stderr)
         return 1
-    except OSError as exc:
-        print(f"Could not read file: {exc}", file=sys.stderr)
+    except OSError:
+        print("Could not read file.", file=sys.stderr)
+        return 1
+
+    try:
+        result = analyze_csv_text(text)
+    except AnalysisError:
+        print("Could not analyze the CSV. Check the file format and try again.", file=sys.stderr)
         return 1
 
     print_summary(result)
@@ -94,7 +99,11 @@ def main(argv: list[str]) -> int:
 
     if answer == "y":
         out = Path.cwd() / "results.csv"
-        out.write_text(results_to_csv_string(result), encoding="utf-8")
+        try:
+            out.write_text(results_to_csv_string(result), encoding="utf-8")
+        except OSError:
+            print("Could not write results.csv.", file=sys.stderr)
+            return 1
         print(f"Wrote {out}")
 
     return 0

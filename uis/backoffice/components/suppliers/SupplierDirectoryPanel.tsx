@@ -7,6 +7,7 @@ import {
   updateSupplierRate,
   updateSupplierStatus,
 } from "@/lib/suppliers-api";
+import { getUserFacingError } from "@/lib/user-facing-error";
 import {
   PRODUCT_CATEGORIES,
   currencyForCountry,
@@ -51,7 +52,7 @@ export function SupplierDirectoryPanel() {
         Object.fromEntries(data.map((s) => [s.id, String(s.monthly_rate)])),
       );
     } catch (err) {
-      setLoadError(err instanceof Error ? err.message : "Failed to load suppliers.");
+      setLoadError(getUserFacingError(err, "Unable to load suppliers. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -113,7 +114,7 @@ export function SupplierDirectoryPanel() {
       setStatus("active");
       await load();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Create failed.");
+      setFormError(getUserFacingError(err, "Unable to create the supplier. Please try again."));
     } finally {
       setSubmitting(false);
     }
@@ -137,7 +138,7 @@ export function SupplierDirectoryPanel() {
     } catch (err) {
       setRowError((prev) => ({
         ...prev,
-        [id]: err instanceof Error ? err.message : "Rate update failed.",
+        [id]: getUserFacingError(err, "Unable to update the rate. Please try again."),
       }));
     } finally {
       setRowBusy((prev) => ({ ...prev, [id]: false }));
@@ -157,8 +158,10 @@ export function SupplierDirectoryPanel() {
     } catch (err) {
       setRowError((prev) => ({
         ...prev,
-        [supplier.id]:
-          err instanceof Error ? err.message : "Status update failed.",
+        [supplier.id]: getUserFacingError(
+          err,
+          "Unable to update status. Please try again.",
+        ),
       }));
     } finally {
       setRowBusy((prev) => ({ ...prev, [supplier.id]: false }));
@@ -301,9 +304,15 @@ export function SupplierDirectoryPanel() {
         </header>
         {loading ? <p className="muted-text">Loading…</p> : null}
         {loadError ? (
-          <p className="status-text" style={{ color: "var(--danger)" }}>
-            {loadError}
-          </p>
+          <div className="feedback error" role="alert">
+            <p>{loadError}</p>
+            <div className="inline-actions">
+              <button type="button" className="button" onClick={() => void load()}>
+                Try again
+              </button>
+            </div>
+            <p>If this continues, contact HealthCore Digital support.</p>
+          </div>
         ) : null}
         {!loading && !loadError && suppliers.length === 0 ? (
           <p className="muted-text">No suppliers match the current filters.</p>

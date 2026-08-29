@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { login, register } from "@/lib/auth-api";
 import { setAuthToken } from "@/lib/auth-storage";
+import { getUserFacingError } from "@/lib/user-facing-error";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -25,7 +26,7 @@ export default function RegisterPage() {
       setAuthToken(result.access_token);
       window.location.href = "/";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed.");
+      setError(getUserFacingError(err, "Unable to create the account. Please try again."));
     } finally {
       setBusy(false);
     }
@@ -90,7 +91,12 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {error ? <p className="feedback error">{error}</p> : null}
+            {error ? (
+              <div className="feedback error" role="alert">
+                <p>{error}</p>
+                <p>Try again, or contact HealthCore Digital support if this continues.</p>
+              </div>
+            ) : null}
 
             <div className="inline-actions">
               <button type="submit" className="button" disabled={busy}>

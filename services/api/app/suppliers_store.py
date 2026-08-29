@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from tinydb import Query, TinyDB
 
+from app.core.errors import StorageError
 from app.models.suppliers import (
     Country,
     Currency,
@@ -149,12 +151,18 @@ def utc_now_iso() -> str:
 
 
 def ensure_data_dir() -> None:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise StorageError("Unable to access supplier data store") from exc
 
 
 def get_db() -> TinyDB:
     ensure_data_dir()
-    return TinyDB(DB_PATH)
+    try:
+        return TinyDB(DB_PATH)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        raise StorageError("Unable to access supplier data store") from exc
 
 
 def _doc_to_response(doc_id: int, doc: dict[str, Any]) -> SupplierResponse:

@@ -13,18 +13,22 @@
     const filePath = languageFiles[lang] || languageFiles.en;
     const response = await fetch(filePath);
     if (!response.ok) {
-      throw new Error("Unable to load language file: " + filePath);
+      throw new Error("Unable to load language file");
     }
 
-    const data = await response.json();
-    translationCache[lang] = data;
-    return data;
+    try {
+      const data = await response.json();
+      translationCache[lang] = data;
+      return data;
+    } catch (_parseError) {
+      throw new Error("Unable to load language file");
+    }
   }
 
   function applyTranslations(dict) {
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       const key = el.getAttribute("data-i18n");
-      if (dict[key]) {
+      if (key && dict?.[key]) {
         el.textContent = dict[key];
       }
     });
@@ -38,7 +42,15 @@
       dict = await loadDictionary(resolvedLang);
     } catch (_) {
       resolvedLang = "en";
-      dict = await loadDictionary("en");
+      try {
+        dict = await loadDictionary("en");
+        if (languageSelect) {
+          languageSelect.title =
+            "Using English because the selected language could not be loaded.";
+        }
+      } catch (_fallback) {
+        return;
+      }
     }
 
     document.documentElement.lang = resolvedLang;
@@ -61,6 +73,10 @@
   const form = document.getElementById("healthcoreForm");
   const successBanner = document.getElementById("formSuccess");
 
+  if (!form || !successBanner) {
+    return;
+  }
+
   const fields = {
     fullName: document.getElementById("fullName"),
     email: document.getElementById("email"),
@@ -78,6 +94,10 @@
   function showError(fieldKey, message) {
     const input = fields[fieldKey];
     const error = errors[fieldKey];
+    if (!input || !error) {
+      return;
+    }
+
     error.textContent = message;
     error.classList.remove("hidden");
     input.setAttribute("aria-invalid", "true");
@@ -88,6 +108,9 @@
   function clearError(fieldKey) {
     const input = fields[fieldKey];
     const error = errors[fieldKey];
+    if (!input || !error) {
+      return;
+    }
     error.textContent = "";
     error.classList.add("hidden");
     input.setAttribute("aria-invalid", "false");
@@ -118,7 +141,11 @@
   };
 
   function validateField(fieldKey) {
-    const value = fields[fieldKey].value.trim();
+    const input = fields[fieldKey];
+    if (!input) {
+      return true;
+    }
+    const value = input.value.trim();
     if (!validators[fieldKey](value)) {
       showError(fieldKey, validationMessages[fieldKey]);
       return false;
@@ -146,8 +173,11 @@
   });
 
   Object.keys(fields).forEach(function (fieldKey) {
-    fields[fieldKey].addEventListener("blur", function () {
-      validateField(fieldKey);
-    });
+    const input = fields[fieldKey];
+    if (input) {
+      input.addEventListener("blur", function () {
+        validateField(fieldKey);
+      });
+    }
   });
 })();

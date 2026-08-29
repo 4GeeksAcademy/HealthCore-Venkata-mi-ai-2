@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ErrorActions } from "@/components/async/ErrorActions";
 
 interface AsyncStateProps {
   loading: boolean;
@@ -7,6 +8,9 @@ interface AsyncStateProps {
   loadingText?: string;
   emptyState?: ReactNode;
   isEmpty?: boolean;
+  onRetry?: () => void;
+  homeHref?: string;
+  supportHint?: string;
 }
 
 export function AsyncState({
@@ -16,6 +20,9 @@ export function AsyncState({
   loadingText = "Loading data...",
   emptyState,
   isEmpty = false,
+  onRetry,
+  homeHref = "/",
+  supportHint = "If this continues, contact HealthCore Digital support.",
 }: AsyncStateProps) {
   if (loading) {
     return (
@@ -28,7 +35,8 @@ export function AsyncState({
   if (error) {
     return (
       <div className="feedback error" role="alert">
-        {error}
+        <p>{error}</p>
+        <ErrorActions onRetry={onRetry} homeHref={homeHref} supportHint={supportHint} />
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { addNote, getRecord, listNotes } from "@/lib/mock-store";
+import { readJsonBody } from "@/lib/read-json-body";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -22,7 +23,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ message: "Candidate not found." }, { status: 404 });
   }
 
-  const payload = (await request.json()) as { content?: string; author?: string };
+  const parsed = await readJsonBody<{ content?: string; author?: string }>(request);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const payload = parsed.data;
 
   if (!payload.content?.trim()) {
     return NextResponse.json({ message: "Note content is required." }, { status: 400 });

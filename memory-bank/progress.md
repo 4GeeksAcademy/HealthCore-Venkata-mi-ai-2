@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-08-27  
-**Latest stamped plan:** [HC-MS4-PLAN-022](./plans/HC-MS4-PLAN-022-20260827-auth-demo-no-realtime-email.md) (`implemented`, MS4, implementation)  
-**Prior completed stamp:** [HC-MS4-PLAN-021](./plans/HC-MS4-PLAN-021-20260827-auth-03-password-reset-implementation.md) (`implemented`, MS4, implementation)  
+**Last updated:** 2026-08-28  
+**Latest stamped plan:** [HC-MS4-PLAN-026](./plans/HC-MS4-PLAN-026-20260828-error-handling-polish.md) (`implemented`, MS4, implementation)  
+**Prior completed stamp:** [HC-MS4-PLAN-025](./plans/HC-MS4-PLAN-025-20260828-error-handling-implementation.md) (`implemented`, MS4, implementation)  
 **Latest milestone eval:** [MS4_Project_Eval](./evaluations/MS4_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
 
 ## Rubric mapping (MS4)
@@ -23,6 +23,18 @@
 | Incident File Analyzer | **Domain fixed** (PLAN-012) |
 | Supplier Directory | **Domain fixed** (PLAN-016) — `monthly_rate`, `USA`/`UK` + `USD`/`GBP`, 15 seeds (McKesson, Epic); structure from PLAN-015 kept; eval → [Results/SupplierDirectory-20260819.md](./evaluations/Results/SupplierDirectory-20260819.md) |
 | Auth (AUTH-01/02/03) | **Implemented** (PLAN-019, PLAN-020, PLAN-021) — [auth_master_framework_Context.md](../docs/Project_Contexts/auth_master_framework_Context.md). API JWT, protected routes, backoffice auth flows, and password recovery/change are in place. |
+| Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |
+| Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
+
+## Today’s update (2026-08-28)
+
+**Error handling skills and context (PLAN-023):** Split ErrorHandling Requirement.txt into audit / frontend / backend / scripts Cursor skills plus shared policy and findings-taxonomy context. HealthCore repo notes kept (UI isolation, FastAPI paths, PHI-safe reporting, demo auth). No UI or API code changes.
+
+**Error handling audit and plan (PLAN-024):** Full-repo audit against the eight taxonomy categories; sequenced implementation plan (API → UI → scripts).
+
+**Error handling implementation (PLAN-025):** FastAPI structured handlers, sanitized backoffice three-state UI with retry/home/support, script `sys.exit(1)` on I/O failure. Evaluation 8/8 Pass (patterns). Lint/tsc skipped (`node_modules` missing).
+
+**Error handling polish (PLAN-026):** Session-expired login banner, wrapped public auth fetch, hiring form CTAs/`finally`, mapped analysis errors, quieter API logs, CLI file-not-found without paths. Demo reset-link logs kept per PLAN-022.
 
 ## Today’s update (2026-08-26)
 

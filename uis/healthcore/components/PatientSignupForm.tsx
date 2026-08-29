@@ -59,7 +59,7 @@ export function PatientSignupForm() {
               setValues((current) => ({ ...current, fullName: event.target.value }))
             }
           />
-          {errors.fullName ? <span className="field-error">{errors.fullName}</span> : null}
+          {errors?.fullName ? <span className="field-error">{errors.fullName}</span> : null}
         </label>
 
         <label htmlFor="email">
@@ -74,7 +74,7 @@ export function PatientSignupForm() {
               setValues((current) => ({ ...current, email: event.target.value }))
             }
           />
-          {errors.email ? <span className="field-error">{errors.email}</span> : null}
+          {errors?.email ? <span className="field-error">{errors.email}</span> : null}
         </label>
 
         <label htmlFor="phone">
@@ -89,7 +89,7 @@ export function PatientSignupForm() {
               setValues((current) => ({ ...current, phone: event.target.value }))
             }
           />
-          {errors.phone ? <span className="field-error">{errors.phone}</span> : null}
+          {errors?.phone ? <span className="field-error">{errors.phone}</span> : null}
         </label>
 
         <label htmlFor="concerns">
@@ -103,7 +103,7 @@ export function PatientSignupForm() {
               setValues((current) => ({ ...current, concerns: event.target.value }))
             }
           />
-          {errors.concerns ? (
+          {errors?.concerns ? (
             <span className="field-error">{errors.concerns}</span>
           ) : null}
         </label>

@@ -54,6 +54,14 @@ Format per line:
 
 22 | HC-MS4-PLAN-022 | MS4 | 2026-08-27 | Authentication Demo Mode Without Realtime Email | implemented | implementation | [HC-MS4-PLAN-022-20260827-auth-demo-no-realtime-email.md](./HC-MS4-PLAN-022-20260827-auth-demo-no-realtime-email.md)
 
+23 | HC-MS4-PLAN-023 | MS4 | 2026-08-28 | Error Handling Requirement Skills and Context Split | implemented | docs | [HC-MS4-PLAN-023-20260828-error-handling-skills.md](./HC-MS4-PLAN-023-20260828-error-handling-skills.md)
+
+24 | HC-MS4-PLAN-024 | MS4 | 2026-08-28 | Error Handling Audit and Layered Implementation Plan | planned | planning | [HC-MS4-PLAN-024-20260828-error-handling-audit-plan.md](./HC-MS4-PLAN-024-20260828-error-handling-audit-plan.md)
+
+25 | HC-MS4-PLAN-025 | MS4 | 2026-08-28 | Error Handling Layered Implementation | implemented | implementation | [HC-MS4-PLAN-025-20260828-error-handling-implementation.md](./HC-MS4-PLAN-025-20260828-error-handling-implementation.md)
+
+26 | HC-MS4-PLAN-026 | MS4 | 2026-08-28 | Error Handling Residual Polish | implemented | implementation | [HC-MS4-PLAN-026-20260828-error-handling-polish.md](./HC-MS4-PLAN-026-20260828-error-handling-polish.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

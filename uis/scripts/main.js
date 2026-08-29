@@ -15,12 +15,16 @@
     const response = await fetch(filePath);
 
     if (!response.ok) {
-      throw new Error("Unable to load language file: " + filePath);
+      throw new Error("Unable to load language file");
     }
 
-    const data = await response.json();
-    translationCache[lang] = data;
-    return data;
+    try {
+      const data = await response.json();
+      translationCache[lang] = data;
+      return data;
+    } catch (_parseError) {
+      throw new Error("Unable to load language file");
+    }
   }
 
   function applyTranslations(dict) {
@@ -42,7 +46,15 @@
       dict = await loadDictionary(resolvedLang);
     } catch (_) {
       resolvedLang = "en";
-      dict = await loadDictionary("en");
+      try {
+        dict = await loadDictionary("en");
+        if (languageSelect) {
+          languageSelect.title =
+            "Using English because the selected language could not be loaded.";
+        }
+      } catch (_fallback) {
+        return;
+      }
     }
 
     document.documentElement.lang = resolvedLang;

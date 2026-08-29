@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { changePassword } from "@/lib/auth-api";
+import { getUserFacingError } from "@/lib/user-facing-error";
 
 export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -29,7 +30,9 @@ export default function ChangePasswordPage() {
       setConfirmPassword("");
       setMessage("Password updated successfully.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Password change failed.");
+      setError(
+        getUserFacingError(err, "Unable to change the password. Please try again."),
+      );
     } finally {
       setBusy(false);
     }
@@ -79,7 +82,12 @@ export default function ChangePasswordPage() {
               />
             </div>
             {message ? <p className="feedback info">{message}</p> : null}
-            {error ? <p className="feedback error">{error}</p> : null}
+            {error ? (
+              <div className="feedback error" role="alert">
+                <p>{error}</p>
+                <p>Try again, or contact HealthCore Digital support if this continues.</p>
+              </div>
+            ) : null}
             <div className="inline-actions">
               <button type="submit" className="button" disabled={busy}>
                 {busy ? "Updating..." : "Change password"}

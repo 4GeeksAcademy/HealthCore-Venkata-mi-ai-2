@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { authedFetch } from "@/lib/authed-fetch";
+import { getUserFacingError, readResponseJson } from "@/lib/user-facing-error";
 
 export type IncidentAnalysisSummary = {
   total_processed: number;
@@ -65,17 +66,19 @@ export function IncidentAnalyzerPanel() {
         method: "POST",
         body,
       });
-      const payload = await res.json().catch(() => null);
-      setSummary(payload as IncidentAnalysisSummary);
+      const payload = await readResponseJson<IncidentAnalysisSummary>(res);
+      if (
+        typeof payload?.total_processed !== "number" ||
+        typeof payload?.total_valid !== "number"
+      ) {
+        throw new Error("Unable to read analysis results. Please try again.");
+      }
+      setSummary(payload);
     } catch (err) {
       setSummary(null);
-      const message =
-        err instanceof Error ? err.message : "Upload failed.";
-      const hint =
-        message === "Failed to fetch"
-          ? ` Cannot reach the Incident API at ${apiBase()}. Start it with: cd services/api && python -m uvicorn app.main:app --reload --port 8001`
-          : "";
-      setError(`${message}.${hint}`);
+      setError(
+        getUserFacingError(err, "Unable to analyze the file. Please try again."),
+      );
     } finally {
       setBusy(false);
     }
@@ -96,7 +99,7 @@ export function IncidentAnalyzerPanel() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Export failed.");
+      setError(getUserFacingError(err, "Unable to export results. Please try again."));
     } finally {
       setExporting(false);
     }
@@ -113,8 +116,7 @@ export function IncidentAnalyzerPanel() {
         <h2>Upload incident CSV</h2>
         <p>
           Drag and drop a CSV matching the Incident File Analyzer CONTEXT, or
-          choose a file. Analysis runs on the FastAPI service at{" "}
-          <code>{apiBase()}</code>.
+          choose a file. Analysis runs on the HealthCore incident service.
         </p>
         <div
           className="incident-dropzone"
@@ -159,7 +161,21 @@ export function IncidentAnalyzerPanel() {
             onChange={(e) => onFileChosen(e.target.files?.[0])}
           />
         </div>
-        {error ? <p className="feedback error">{error}</p> : null}
+        {error ? (
+          <div className="feedback error" role="alert">
+            <p>{error}</p>
+            <div className="inline-actions">
+              <button
+                type="button"
+                className="button"
+                onClick={() => inputRef.current?.click()}
+              >
+                Try again
+              </button>
+            </div>
+            <p>If this continues, contact HealthCore Digital support.</p>
+          </div>
+        ) : null}
       </section>
 
       {summary ? (

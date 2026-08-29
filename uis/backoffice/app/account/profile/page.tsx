@@ -2,6 +2,8 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { fetchAuthMe, updateProfile, type AuthMe } from "@/lib/auth-api";
+import { getUserFacingError } from "@/lib/user-facing-error";
+import { AsyncState } from "@/components/async/AsyncState";
 
 export default function ProfilePage() {
   const [me, setMe] = useState<AuthMe | null>(null);
@@ -12,34 +14,36 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function run() {
       setLoading(true);
       setError(null);
       try {
         const data = await fetchAuthMe();
         if (cancelled) return;
         setMe(data);
-        setName(data.profile.name || "");
-        setPhone(data.profile.phone || "");
-        setAddress(data.profile.address || "");
+        setName(data.profile?.name ?? "");
+        setPhone(data.profile?.phone ?? "");
+        setAddress(data.profile?.address ?? "");
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load profile.");
+          setError(getUserFacingError(err, "Unable to load profile. Please try again."));
+          setMe(null);
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    void load();
+    void run();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadKey]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -53,7 +57,7 @@ export default function ProfilePage() {
       }
       setMessage("Profile updated.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Profile update failed.");
+      setError(getUserFacingError(err, "Unable to update profile. Please try again."));
     } finally {
       setBusy(false);
     }
@@ -69,53 +73,63 @@ export default function ProfilePage() {
         </section>
 
         <section className="section-card">
-          {loading ? <p className="muted-text">Loading profile...</p> : null}
-          {error ? <p className="feedback error">{error}</p> : null}
-          {!loading && me ? (
-            <form className="stack" onSubmit={onSubmit}>
-              <div className="field-grid">
-                <div className="field">
-                  <label htmlFor="profile-email">Email</label>
-                  <input id="profile-email" value={me.email} readOnly />
+          <AsyncState
+            loading={loading}
+            error={error && !me ? error : null}
+            loadingText="Loading profile..."
+            onRetry={() => setReloadKey((key) => key + 1)}
+          >
+            {me ? (
+              <form className="stack" onSubmit={onSubmit}>
+                <div className="field-grid">
+                  <div className="field">
+                    <label htmlFor="profile-email">Email</label>
+                    <input id="profile-email" value={me.email ?? ""} readOnly />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="profile-role">Role</label>
+                    <input id="profile-role" value={me.role ?? ""} readOnly />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="profile-name">Name</label>
+                    <input
+                      id="profile-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="profile-phone">Phone</label>
+                    <input
+                      id="profile-phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="field" style={{ gridColumn: "1 / -1" }}>
+                    <label htmlFor="profile-address">Address</label>
+                    <input
+                      id="profile-address"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="field">
-                  <label htmlFor="profile-role">Role</label>
-                  <input id="profile-role" value={me.role} readOnly />
+                {message ? <p className="feedback info">{message}</p> : null}
+                {error && me ? (
+                  <div className="feedback error" role="alert">
+                    <p>{error}</p>
+                    <p>Try again, or contact HealthCore Digital support if this continues.</p>
+                  </div>
+                ) : null}
+                <div className="inline-actions">
+                  <button type="submit" className="button" disabled={busy}>
+                    {busy ? "Saving..." : "Save profile"}
+                  </button>
                 </div>
-                <div className="field">
-                  <label htmlFor="profile-name">Name</label>
-                  <input
-                    id="profile-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="profile-phone">Phone</label>
-                  <input
-                    id="profile-phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-                <div className="field" style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="profile-address">Address</label>
-                  <input
-                    id="profile-address"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
-                </div>
-              </div>
-              {message ? <p className="feedback info">{message}</p> : null}
-              {error ? <p className="feedback error">{error}</p> : null}
-              <div className="inline-actions">
-                <button type="submit" className="button" disabled={busy}>
-                  {busy ? "Saving..." : "Save profile"}
-                </button>
-              </div>
-            </form>
-          ) : null}
+              </form>
+            ) : null}
+          </AsyncState>
         </section>
       </div>
     </main>

@@ -16,6 +16,7 @@ import { CandidateRecord } from "@/types/candidate";
 export function CandidateDetailPage() {
   const params = useParams<{ id: string }>();
   const recordId = typeof params.id === "string" ? params.id : "";
+  const [reloadKey, setReloadKey] = useState(0);
   const [candidateState, setCandidateState] = useState<AsyncDataState<CandidateRecord>>({
     loading: true,
     error: null,
@@ -30,8 +31,8 @@ export function CandidateDetailPage() {
     let active = true;
 
     async function loadCandidate() {
+      setCandidateState({ loading: true, error: null, data: null });
       try {
-        setCandidateState({ loading: true, error: null, data: null });
         const candidate = await getRecordById(recordId);
 
         if (active) {
@@ -45,6 +46,12 @@ export function CandidateDetailPage() {
             data: null,
           });
         }
+      } finally {
+        if (active) {
+          setCandidateState((current) =>
+            current.loading ? { ...current, loading: false } : current,
+          );
+        }
       }
     }
 
@@ -53,7 +60,7 @@ export function CandidateDetailPage() {
     return () => {
       active = false;
     };
-  }, [recordId]);
+  }, [recordId, reloadKey]);
 
   return (
     <main className="app-shell">
@@ -79,6 +86,8 @@ export function CandidateDetailPage() {
           loading={candidateState.loading}
           error={candidateState.error}
           loadingText="Loading candidate detail..."
+          onRetry={() => setReloadKey((key) => key + 1)}
+          homeHref="/hiring"
         >
           {candidateState.data ? (
             <div className="section-grid">

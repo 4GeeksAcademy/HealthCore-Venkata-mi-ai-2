@@ -38,7 +38,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
 
       if (!token) {
-        router.replace("/login");
+        router.replace("/login?reason=session");
         return;
       }
 
@@ -47,7 +47,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         if (!cancelled) setCheckedPath(pathname);
       } catch {
         if (!cancelled) {
-          router.replace("/login");
+          router.replace("/login?reason=session");
         }
       }
     }

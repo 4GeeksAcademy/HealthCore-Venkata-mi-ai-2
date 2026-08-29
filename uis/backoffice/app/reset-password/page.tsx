@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { resetPassword } from "@/lib/auth-api";
+import { getUserFacingError } from "@/lib/user-facing-error";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
@@ -33,7 +34,12 @@ export default function ResetPasswordPage() {
       await resetPassword(token, newPassword);
       window.location.href = "/login?reset=success";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Reset failed.");
+      setError(
+        getUserFacingError(
+          err,
+          "Unable to reset the password. Request a new link and try again.",
+        ),
+      );
     } finally {
       setBusy(false);
     }

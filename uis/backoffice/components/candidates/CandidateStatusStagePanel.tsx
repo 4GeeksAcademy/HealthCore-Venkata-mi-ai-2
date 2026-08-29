@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import { patchRecord } from "@/lib/records-service";
+import { getErrorMessage } from "@/lib/api-client";
+import { ErrorActions } from "@/components/async/ErrorActions";
 import {
   CandidateRecord,
   candidateStageOptions,
@@ -27,20 +29,28 @@ export function CandidateStatusStagePanel({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    setSubmissionState({ status: "submitting", message: null });
+    let outcome: {
+      status: "idle" | "submitting" | "success" | "error";
+      message: string | null;
+    } = {
+      status: "error",
+      message: "Unable to update status and stage.",
+    };
     try {
-      setSubmissionState({ status: "submitting", message: null });
       const updatedCandidate = await patchRecord(candidate.id, { status, stage });
       onUpdated(updatedCandidate);
-      setSubmissionState({
+      outcome = {
         status: "success",
         message: "Status and stage updated.",
-      });
+      };
     } catch (error) {
-      setSubmissionState({
+      outcome = {
         status: "error",
-        message:
-          error instanceof Error ? error.message : "Unable to update status and stage.",
-      });
+        message: getErrorMessage(error),
+      };
+    } finally {
+      setSubmissionState(outcome);
     }
   }
 
@@ -65,7 +75,13 @@ export function CandidateStatusStagePanel({
 
       {submissionState.status === "error" && submissionState.message ? (
         <div className="feedback error" role="alert">
-          {submissionState.message}
+          <p>{submissionState.message}</p>
+          <ErrorActions
+            homeHref="/hiring"
+            onRetry={() =>
+              setSubmissionState({ status: "idle", message: null })
+            }
+          />
         </div>
       ) : null}
 

@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { AsyncState } from "@/components/async/AsyncState";
+import { ErrorActions } from "@/components/async/ErrorActions";
 import { getErrorMessage } from "@/lib/api-client";
 import { createNote, deleteNote, getNotes } from "@/lib/notes-service";
 import { validateNoteContent } from "@/lib/validators";
@@ -25,14 +26,15 @@ export function CandidateNotesSection({
     status: "idle" | "submitting" | "success" | "error";
     message: string | null;
   }>({ status: "idle", message: null });
+  const [notesReloadKey, setNotesReloadKey] = useState(0);
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
     async function loadNotes() {
+      setNotesState({ loading: true, error: null, data: null });
       try {
-        setNotesState({ loading: true, error: null, data: null });
         const notes = await getNotes(recordId);
 
         if (active) {
@@ -46,6 +48,12 @@ export function CandidateNotesSection({
             data: null,
           });
         }
+      } finally {
+        if (active) {
+          setNotesState((current) =>
+            current.loading ? { ...current, loading: false } : current,
+          );
+        }
       }
     }
 
@@ -54,7 +62,7 @@ export function CandidateNotesSection({
     return () => {
       active = false;
     };
-  }, [recordId]);
+  }, [recordId, notesReloadKey]);
 
   async function handleCreateNote(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -136,7 +144,11 @@ export function CandidateNotesSection({
 
         {noteFeedback.status === "error" && noteFeedback.message ? (
           <div className="feedback error" role="alert">
-            {noteFeedback.message}
+            <p>{noteFeedback.message}</p>
+            <ErrorActions
+              homeHref="/hiring"
+              onRetry={() => setNoteFeedback({ status: "idle", message: null })}
+            />
           </div>
         ) : null}
 
@@ -153,6 +165,8 @@ export function CandidateNotesSection({
         loadingText="Loading notes..."
         isEmpty={(notesState.data ?? []).length === 0}
         emptyState={<div className="empty-state">No notes have been added yet.</div>}
+        onRetry={() => setNotesReloadKey((key) => key + 1)}
+        homeHref="/hiring"
       >
         <ul className="notes-list">
           {(notesState.data ?? []).map((note) => (

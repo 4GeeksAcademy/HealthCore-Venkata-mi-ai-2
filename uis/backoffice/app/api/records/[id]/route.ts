@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRecord, patchRecord, replaceRecord } from "@/lib/mock-store";
+import { readJsonBody } from "@/lib/read-json-body";
 import {
   candidateStageOptions,
   candidateStatusOptions,
@@ -30,7 +31,11 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ message: "Candidate not found." }, { status: 404 });
   }
 
-  const payload = (await request.json()) as Partial<UpdateCandidateInput>;
+  const parsed = await readJsonBody<Partial<UpdateCandidateInput>>(request);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const payload = parsed.data;
   const validationMessage = validateFullPayload(payload);
 
   if (validationMessage) {
@@ -55,7 +60,11 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
-  const payload = (await request.json()) as PatchCandidateInput;
+  const parsed = await readJsonBody<PatchCandidateInput>(request);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const payload = parsed.data;
 
   if (
     payload.status !== undefined &&

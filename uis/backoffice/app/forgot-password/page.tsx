@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { forgotPassword } from "@/lib/auth-api";
+import { getUserFacingError } from "@/lib/user-facing-error";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,12 @@ export default function ForgotPasswordPage() {
       await forgotPassword(email);
       setSubmitted(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Request failed.");
+      setError(
+        getUserFacingError(
+          err,
+          "Unable to send a reset link. Please try again or contact support.",
+        ),
+      );
     } finally {
       setBusy(false);
     }
@@ -52,7 +58,12 @@ export default function ForgotPasswordPage() {
                 If that address is registered, you&apos;ll receive a link shortly.
               </p>
             ) : null}
-            {error ? <p className="feedback error">{error}</p> : null}
+            {error ? (
+              <div className="feedback error" role="alert">
+                <p>{error}</p>
+                <p>Try again, or contact HealthCore Digital support if this continues.</p>
+              </div>
+            ) : null}
 
             <div className="inline-actions">
               <button type="submit" className="button" disabled={submitted || busy}>

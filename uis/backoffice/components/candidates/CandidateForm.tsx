@@ -7,6 +7,8 @@ import {
   candidateStatusOptions,
 } from "@/types/candidate";
 import { FieldErrors, validateCandidateInput } from "@/lib/validators";
+import { getErrorMessage } from "@/lib/api-client";
+import { ErrorActions } from "@/components/async/ErrorActions";
 
 interface CandidateFormProps {
   heading: string;
@@ -65,19 +67,24 @@ export function CandidateForm({
       return;
     }
 
+    setSubmission({ status: "submitting", message: null });
+    let outcome: SubmissionState = {
+      status: "error",
+      message: "Unable to save candidate data.",
+    };
     try {
-      setSubmission({ status: "submitting", message: null });
       await onSubmit(values);
-      setSubmission({
+      outcome = {
         status: "success",
         message: "Changes saved successfully.",
-      });
+      };
     } catch (error) {
-      setSubmission({
+      outcome = {
         status: "error",
-        message:
-          error instanceof Error ? error.message : "Unable to save candidate data.",
-      });
+        message: getErrorMessage(error),
+      };
+    } finally {
+      setSubmission(outcome);
     }
   }
 
@@ -102,7 +109,11 @@ export function CandidateForm({
 
       {submission.status === "error" && submission.message ? (
         <div className="feedback error" role="alert">
-          {submission.message}
+          <p>{submission.message}</p>
+          <ErrorActions
+            homeHref="/hiring"
+            onRetry={() => setSubmission({ status: "idle", message: null })}
+          />
         </div>
       ) : null}
 

@@ -1,4 +1,5 @@
 import { ApiError } from "@/types/api";
+import { messageForHttpStatus, sanitizeApiDetail } from "@/lib/user-facing-error";
 
 const DEFAULT_API_BASE_URL = "https://playground.4geeks.com/tracker/api/v1";
 
@@ -45,11 +46,17 @@ function buildUrl(path: string, query?: Record<string, string | undefined>) {
 async function parseResponse(response: Response) {
   const contentType = response.headers.get("content-type") ?? "";
 
-  if (contentType.includes("application/json")) {
-    return response.json();
+  try {
+    if (contentType.includes("application/json")) {
+      return await response.json();
+    }
+    return await response.text();
+  } catch {
+    throw {
+      status: response.status,
+      message: "Something went wrong. Please try again.",
+    } satisfies ApiError;
   }
-
-  return response.text();
 }
 
 export async function fetchJson<T>(
@@ -66,6 +73,11 @@ export async function fetchJson<T>(
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
+  }).catch(() => {
+    throw {
+      status: 503,
+      message: "Unable to reach the service. Please try again.",
+    } satisfies ApiError;
   });
 
   const payload = await parseResponse(response);
@@ -78,8 +90,8 @@ export async function fetchJson<T>(
         payload !== null &&
         "message" in payload &&
         typeof payload.message === "string"
-          ? payload.message
-          : `Request failed with status ${response.status}.`,
+          ? sanitizeApiDetail(response.status, payload.message)
+          : messageForHttpStatus(response.status),
       details: payload,
     };
 
@@ -96,8 +108,10 @@ export function getErrorMessage(error: unknown) {
     "message" in error &&
     typeof error.message === "string"
   ) {
-    return error.message;
+    const status =
+      "status" in error && typeof error.status === "number" ? error.status : 500;
+    return sanitizeApiDetail(status, error.message);
   }
 
-  return "An unexpected error occurred.";
+  return "Something went wrong. Please try again.";
 }

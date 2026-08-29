@@ -23,8 +23,11 @@ def create_user(payload: RegisterRequest) -> UserWithProfileResponse:
             phone=payload.phone,
             address=payload.address,
         )
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists",
+        )
 
     return UserWithProfileResponse(**created)
 
@@ -68,8 +71,11 @@ def update_user(
             is_active=payload.is_active,
             role=payload.role.value if payload.role is not None else None,
         )
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists",
+        )
 
     if updated is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

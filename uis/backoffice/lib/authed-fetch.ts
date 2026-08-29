@@ -1,4 +1,5 @@
 import { clearAuthToken, getAuthToken } from "@/lib/auth-storage";
+import { messageForHttpStatus, sanitizeApiDetail } from "@/lib/user-facing-error";
 
 function apiBase(): string {
   return (
@@ -23,17 +24,16 @@ async function parseError(res: Response): Promise<string> {
     const payload = (await res.json()) as {
       detail?: string | Array<{ msg?: string }>;
     };
-    if (typeof payload.detail === "string") return payload.detail;
-    if (Array.isArray(payload.detail)) {
-      return payload.detail
-        .map((item) => item.msg)
-        .filter(Boolean)
-        .join("; ");
+    if (typeof payload.detail === "string") {
+      return sanitizeApiDetail(res.status, payload.detail);
+    }
+    if (Array.isArray(payload.detail) && payload.detail.length > 0) {
+      return messageForHttpStatus(res.status);
     }
   } catch {
-    // ignore parse errors and use status fallback
+    // Use a status-based message instead of parse or status-code text.
   }
-  return `Request failed (${res.status})`;
+  return messageForHttpStatus(res.status);
 }
 
 function handleUnauthorized(): void {
@@ -60,10 +60,15 @@ export async function authedFetch(
   const headers = new Headers(init.headers ?? {});
   headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(url, {
-    ...init,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers,
+    });
+  } catch {
+    throw new ApiError("Unable to reach the service. Please try again.", 503);
+  }
 
   if (!response.ok) {
     const message = await parseError(response);

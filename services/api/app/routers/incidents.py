@@ -11,6 +11,21 @@ from app.result_store import store
 
 router = APIRouter(prefix="/api/incidents", tags=["incidents"])
 
+_SAFE_ANALYSIS_DETAILS = frozenset(
+    {
+        "File is empty.",
+        "CSV has no header row.",
+        "CSV contains no data rows.",
+    }
+)
+
+
+def _analysis_detail(exc: AnalysisError) -> str:
+    message = str(exc)
+    if message in _SAFE_ANALYSIS_DETAILS or message.startswith("Incorrect CSV format:"):
+        return message
+    return "Could not analyze this file. Check the CSV format and try again."
+
 
 @router.post("/analyze")
 async def analyze_incidents(
@@ -27,7 +42,13 @@ async def analyze_incidents(
             detail="Incorrect format: upload a .csv file.",
         )
 
-    raw = await file.read()
+    try:
+        raw = await file.read()
+    except OSError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not read the uploaded file.",
+        ) from exc
     if not raw:
         raise HTTPException(status_code=400, detail="File is empty.")
 
@@ -42,7 +63,7 @@ async def analyze_incidents(
     try:
         result = analyze_csv_text(text)
     except AnalysisError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(status_code=400, detail=_analysis_detail(exc)) from exc
 
     store.save(result)
     return result.to_dict()
@@ -54,10 +75,7 @@ async def export_results(_: dict = Depends(get_current_user)) -> Response:
     if csv_body is None:
         raise HTTPException(
             status_code=404,
-            detail=(
-                "No analysis results available. "
-                "Upload a CSV via POST /api/incidents/analyze first."
-            ),
+            detail="No analysis results available. Upload a CSV first.",
         )
     return Response(
         content=csv_body,
