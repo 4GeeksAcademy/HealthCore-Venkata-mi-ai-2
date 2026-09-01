@@ -1,2 +1,14 @@
 services/api/data/suppliers.json
 services/api/data/auth.json
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+uis/backoffice/coverage/
+
+# Python bytecode
+**/__pycache__/
+*.pyc

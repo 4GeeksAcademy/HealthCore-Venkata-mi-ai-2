@@ -62,6 +62,8 @@ Format per line:
 
 26 | HC-MS4-PLAN-026 | MS4 | 2026-08-28 | Error Handling Residual Polish | implemented | implementation | [HC-MS4-PLAN-026-20260828-error-handling-polish.md](./HC-MS4-PLAN-026-20260828-error-handling-polish.md)
 
+27 | HC-MS4-PLAN-027 | MS4 | 2026-08-31 | Unit Testing Auth Pytest Jest and Backlog Suites | implemented | implementation | [HC-MS4-PLAN-027-20260831-unit-testing.md](./HC-MS4-PLAN-027-20260831-unit-testing.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

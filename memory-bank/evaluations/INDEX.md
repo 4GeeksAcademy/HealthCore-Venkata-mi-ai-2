@@ -29,3 +29,5 @@ IncidentFileAnalyzer (20260807) | Company Incident File Analyzer — HealthCore 
 SupplierDirectory (20260819) | Company Supplier Directory — official CONTEXT domain fix | 2026-08-19 | complete | domain Pass | [Results/SupplierDirectory-20260819.md](./Results/SupplierDirectory-20260819.md)
 
 ErrorHandling (20260828) | Error handling patterns (frontend / backend / scripts) | 2026-08-28 | complete | 8/8 Pass | [Results/ErrorHandling-20260828.md](./Results/ErrorHandling-20260828.md)
+
+UnitTesting (20260831) | Unit testing (pytest auth + Jest utilities) | 2026-08-31 | complete | 8/8 Pass | [Results/UnitTesting-20260831.md](./Results/UnitTesting-20260831.md)

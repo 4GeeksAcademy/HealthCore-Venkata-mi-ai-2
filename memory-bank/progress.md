@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-08-28  
-**Latest stamped plan:** [HC-MS4-PLAN-026](./plans/HC-MS4-PLAN-026-20260828-error-handling-polish.md) (`implemented`, MS4, implementation)  
-**Prior completed stamp:** [HC-MS4-PLAN-025](./plans/HC-MS4-PLAN-025-20260828-error-handling-implementation.md) (`implemented`, MS4, implementation)  
+**Last updated:** 2026-08-31  
+**Latest stamped plan:** [HC-MS4-PLAN-027](./plans/HC-MS4-PLAN-027-20260831-unit-testing.md) (`implemented`, MS4, implementation)  
+**Prior completed stamp:** [HC-MS4-PLAN-026](./plans/HC-MS4-PLAN-026-20260828-error-handling-polish.md) (`implemented`, MS4, implementation)  
 **Latest milestone eval:** [MS4_Project_Eval](./evaluations/MS4_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
 
 ## Rubric mapping (MS4)
@@ -25,6 +25,13 @@
 | Auth (AUTH-01/02/03) | **Implemented** (PLAN-019, PLAN-020, PLAN-021) — [auth_master_framework_Context.md](../docs/Project_Contexts/auth_master_framework_Context.md). API JWT, protected routes, backoffice auth flows, and password recovery/change are in place. |
 | Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |
 | Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
+| Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
+
+## Today’s update (2026-08-31)
+
+**Unit testing (PLAN-027):** Root `TESTING.md` with planned happy/edge/failure cases, FastAPI pytest in `services/api/tests/` (isolated TinyDB), Jest in `uis/backoffice/__tests__/`. Auth module 91% (≥70%), suppliers+incidents 81% (≥50%). No product bugs found.
+
+**Unit testing evaluation:** Rubric 8/8 Pass — [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md). `python -m uv run pytest` from repo root: 36 passed.
 
 ## Today’s update (2026-08-28)
 
@@ -75,4 +82,8 @@ python -m uvicorn app.main:app --reload --port 8001
 # UIs
 cd uis/healthcore && npm run dev    # http://localhost:3000
 cd uis/backoffice && npm run dev    # http://localhost:3001  (/suppliers, /incidents → API :8001)
+
+# Tests — see TESTING.md
+cd services/api && python -m pip install -r requirements-dev.txt && python -m pytest
+cd uis/backoffice && npm test
 ```
