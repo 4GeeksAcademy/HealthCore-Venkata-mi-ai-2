@@ -64,6 +64,16 @@ Format per line:
 
 27 | HC-MS4-PLAN-027 | MS4 | 2026-08-31 | Unit Testing Auth Pytest Jest and Backlog Suites | implemented | implementation | [HC-MS4-PLAN-027-20260831-unit-testing.md](./HC-MS4-PLAN-027-20260831-unit-testing.md)
 
+28 | HC-MS5-PLAN-028 | MS5 | 2026-09-09 | MS5 Inventory Backoffice Context Document | implemented | docs | [HC-MS5-PLAN-028-20260909-inventory-backoffice-context.md](./HC-MS5-PLAN-028-20260909-inventory-backoffice-context.md)
+
+29 | HC-MS5-PLAN-029 | MS5 | 2026-09-09 | MS5 Inventory CONTEXT Evaluation Rubric and Samples | implemented | docs | [HC-MS5-PLAN-029-20260909-inventory-context-eval-samples.md](./HC-MS5-PLAN-029-20260909-inventory-context-eval-samples.md)
+
+30 | HC-MS5-PLAN-030 | MS5 | 2026-09-09 | MS5 Inventory API and Backoffice Implementation | implemented | implementation | [HC-MS5-PLAN-030-20260909-inventory-backoffice-impl.md](./HC-MS5-PLAN-030-20260909-inventory-backoffice-impl.md)
+
+31 | HC-MS5-PLAN-031 | MS5 | 2026-09-09 | MS5 Inventory CONTEXT How to Run | implemented | docs | [HC-MS5-PLAN-031-20260909-inventory-context-how-to-run.md](./HC-MS5-PLAN-031-20260909-inventory-context-how-to-run.md)
+
+32 | HC-MS5-PLAN-032 | MS5 | 2026-09-09 | Project Env Ignore Note and MS5 Re-run Evaluation | implemented | docs | [HC-MS5-PLAN-032-20260909-env-ignore-and-ms5-rerun.md](./HC-MS5-PLAN-032-20260909-env-ignore-and-ms5-rerun.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

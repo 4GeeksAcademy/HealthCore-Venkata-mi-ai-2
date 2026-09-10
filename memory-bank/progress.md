@@ -1,9 +1,9 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-08-31  
-**Latest stamped plan:** [HC-MS4-PLAN-027](./plans/HC-MS4-PLAN-027-20260831-unit-testing.md) (`implemented`, MS4, implementation)  
-**Prior completed stamp:** [HC-MS4-PLAN-026](./plans/HC-MS4-PLAN-026-20260828-error-handling-polish.md) (`implemented`, MS4, implementation)  
-**Latest milestone eval:** [MS4_Project_Eval](./evaluations/MS4_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
+**Last updated:** 2026-09-09  
+**Latest stamped plan:** [HC-MS5-PLAN-032](./plans/HC-MS5-PLAN-032-20260909-env-ignore-and-ms5-rerun.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-031](./plans/HC-MS5-PLAN-031-20260909-inventory-context-how-to-run.md) (`implemented`, MS5, docs)  
+**Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
 
 ## Rubric mapping (MS4)
 
@@ -17,7 +17,8 @@
 |------|--------|
 | Milestone 2 `src/utils/` | Present + **integrated into backoffice UI** |
 | Public site `uis/healthcore` | Done (rubric “website”) |
-| Backoffice | Done — welcome, `/ops`, `/hiring`, `/incidents`, **`/suppliers`** |
+| Backoffice | Done — welcome, `/ops`, `/hiring`, `/incidents`, `/suppliers`, **`/inventory`** |
+| MS5 inventory backoffice | **Implemented** (PLAN-030) — stock, inbound, outbound, order history; eval → [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (**8/8 Pass**) |
 | MS4 evaluation | **complete PASS** |
 | FastAPI architecture proposal | In review (PLAN-006–009) |
 | Incident File Analyzer | **Domain fixed** (PLAN-012) |
@@ -26,6 +27,18 @@
 | Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |
 | Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
+
+## Today’s update (2026-09-09)
+
+**Env ignore note + MS5 re-run (PLAN-032):** Project-level “never commit `.env` files” added to [`README.md`](../README.md) and [`AGENTS.md`](../AGENTS.md). Re-ran MS5: pytest 43, Jest 15, lint/tsc pass, live API and backoffice 200. Eval still **8/8 Pass**.
+
+**MS5 inventory CONTEXT how to run (PLAN-031):** Docs-only. Expanded runbook in [`CONTEXT-MS5-inventory-backoffice.md`](../docs/Project_Contexts/CONTEXT-MS5-inventory-backoffice.md) (API seed + JWT, backoffice inventory URLs, tests, public site isolation).
+
+**MS5 inventory implementation (PLAN-030):** TinyDB `/inventory` API plus four authenticated backoffice views. Central `inventory-api.ts`, outbound available-stock display, readable 400s. Pytest 43 passed; Jest 15 passed. Eval 8/8 Pass — [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md).
+
+**MS5 inventory CONTEXT eval + samples (PLAN-029):** Docs-only. Official eight-item rubric and sample JSON (products, inbound/outbound, 400 insufficient stock, empty arrays, 401) added to [`CONTEXT-MS5-inventory-backoffice.md`](../docs/Project_Contexts/CONTEXT-MS5-inventory-backoffice.md). No inventory UI code.
+
+**MS5 inventory backoffice CONTEXT (PLAN-028):** Docs-only. Implementing agents must follow [`docs/Project_Contexts/CONTEXT-MS5-inventory-backoffice.md`](../docs/Project_Contexts/CONTEXT-MS5-inventory-backoffice.md). Four authenticated views (stock, inbound, outbound with available stock before submit, order history) reuse AUTH-02 JWT + `AuthGuard` from [`auth_master_framework_Context.md`](../docs/Project_Contexts/auth_master_framework_Context.md). No inventory UI or API code in this stamp.
 
 ## Today’s update (2026-08-31)
 
@@ -74,14 +87,14 @@
 ## Run
 
 ```bash
-# API (incidents + suppliers)
+# API (incidents + suppliers + inventory)
 cd services/api && python -m pip install -r requirements.txt
 python seed.py
 python -m uvicorn app.main:app --reload --port 8001
 
 # UIs
 cd uis/healthcore && npm run dev    # http://localhost:3000
-cd uis/backoffice && npm run dev    # http://localhost:3001  (/suppliers, /incidents → API :8001)
+cd uis/backoffice && npm run dev    # http://localhost:3001  (/suppliers, /incidents, /inventory → API :8001)
 
 # Tests — see TESTING.md
 cd services/api && python -m pip install -r requirements-dev.txt && python -m pytest

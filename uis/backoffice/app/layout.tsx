@@ -47,6 +47,7 @@ export default function RootLayout({
                 <Link href="/ops">Milestone 2 ops</Link>
                 <Link href="/incidents">Incident analysis</Link>
                 <Link href="/suppliers">Suppliers</Link>
+                <Link href="/inventory">Inventory</Link>
                 <Link href="/hiring">Hiring tracker</Link>
               </nav>
               <SessionActions />

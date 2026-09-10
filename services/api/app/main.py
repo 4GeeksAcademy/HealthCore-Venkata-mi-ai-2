@@ -1,4 +1,4 @@
-"""HealthCore API — Incident Analyzer + Supplier Directory."""
+"""HealthCore API — Incident Analyzer + Supplier Directory + Inventory."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from app.core.errors import StorageError
 from app.routers.auth import router as auth_router
 from app.routers.incidents import router as incidents_router
+from app.routers.inventory import router as inventory_router
 from app.routers.profiles import router as profiles_router
 from app.routers.suppliers import router as suppliers_router
 from app.routers.users import router as users_router
@@ -36,6 +37,7 @@ app.add_middleware(
 
 app.include_router(incidents_router)
 app.include_router(suppliers_router)
+app.include_router(inventory_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(profiles_router)

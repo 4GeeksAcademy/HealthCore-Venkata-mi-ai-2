@@ -31,6 +31,9 @@ export default function BackofficeWelcomePage() {
             <Link className="link-button secondary" href="/suppliers">
               Open supplier directory
             </Link>
+            <Link className="link-button secondary" href="/inventory">
+              Open clinic inventory
+            </Link>
             <Link className="link-button secondary" href="/hiring">
               Open {branding.appName}
             </Link>

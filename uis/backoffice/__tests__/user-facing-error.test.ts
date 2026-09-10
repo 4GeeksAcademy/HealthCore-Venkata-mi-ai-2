@@ -12,6 +12,12 @@ describe("sanitizeApiDetail", () => {
     );
   });
 
+  test("passes through inventory insufficient-stock 400 details", () => {
+    expect(
+      sanitizeApiDetail(400, "Insufficient stock. Available: 12. Requested: 20."),
+    ).toBe("Insufficient stock. Available: 12. Requested: 20.");
+  });
+
   test("replaces unknown details with safe status copy", () => {
     expect(sanitizeApiDetail(500, "Traceback (most recent call last)")).toBe(
       "Something went wrong. Please try again.",

@@ -1,5 +1,16 @@
 services/api/data/suppliers.json
 services/api/data/auth.json
+services/api/data/inventory.json
+
+# Local secrets and env templates — never commit
+.env
+.env.local
+.env.example
+.env*.local
+**/.env
+**/.env.local
+**/.env.example
+**/env.example
 
 # Test / coverage artifacts
 .pytest_cache/

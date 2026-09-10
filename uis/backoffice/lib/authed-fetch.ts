@@ -6,6 +6,7 @@ function apiBase(): string {
     process.env.NEXT_PUBLIC_AUTH_API_URL?.replace(/\/$/, "") ||
     process.env.NEXT_PUBLIC_SUPPLIERS_API_URL?.replace(/\/$/, "") ||
     process.env.NEXT_PUBLIC_INCIDENTS_API_URL?.replace(/\/$/, "") ||
+    process.env.NEXT_PUBLIC_INVENTORY_API_URL?.replace(/\/$/, "") ||
     "http://localhost:8001"
   );
 }

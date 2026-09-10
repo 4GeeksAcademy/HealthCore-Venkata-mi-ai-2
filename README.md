@@ -9,6 +9,14 @@ _Base template for transversal projects in the AI Engineering Career Program —
 
 ---
 
+## Never commit `.env` files
+
+**Do not commit or push any `.env` file.** That includes `.env`, `.env.local`, `.env.example`, and `env.example`.
+
+Put secrets, tokens, and local API URLs only in ignored local env files. They are listed in the root `.gitignore`. If git ever tracks one, remove it from the index (`git rm --cached`) and keep the working copy on disk.
+
+---
+
 ## Purpose
 
 This repository is the **starter template** for transversal projects. You will work on real company scenarios (Brasaland, TrackFlow, Nexova), building deliverables that map to course milestones (Web, Programming, Backend, Telemetry, RAG, Agents, Workflows, Real-time).

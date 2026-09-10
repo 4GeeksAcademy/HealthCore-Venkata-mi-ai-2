@@ -64,7 +64,8 @@ Root ops utilities remain on `node:test` (`npm run test:src` from the repo root)
 | Security helpers | `services/api/tests/test_security.py` | Password hash/verify and JWT decode decisions |
 | Suppliers (API-042) | `services/api/tests/test_suppliers.py` | Directory CRUD/filter rules after AUTH-01 protection |
 | Incidents (API-042) | `services/api/tests/test_incidents.py` | CSV analyze/export accept/reject rules |
-| Frontend utils (FE-019) | `uis/backoffice/__tests__/` | Hiring validators, safe error copy, token storage |
+| Frontend utils (FE-019) | `uis/backoffice/__tests__/` | Hiring validators, safe error copy, token storage, inventory low-stock |
+| Inventory | `services/api/tests/test_inventory.py` | Stock list, inbound/outbound, insufficient-stock 400, empty arrays, JWT |
 
 ---
 
@@ -145,6 +146,17 @@ AUTH-03 routes are included so the auth module can meet the 70% coverage bar.
 | Failure | Non-`.csv` or missing required columns | Format rejected |
 | Failure | Export with no prior analyze | No results available |
 
+### Inventory (`/inventory`)
+
+| Tier | Case | Business assertion |
+|---|---|---|
+| Happy | Seeded catalog + authenticated list | Products include `name`, `sku`, `stock`, `threshold`; gloves are below threshold |
+| Happy | Inbound delivery | Stock increases; order records `type=inbound` and `created_by` |
+| Happy | Outbound within stock | Stock decreases; order records `type=outbound` |
+| Edge | Empty catalog / empty orders | `[]` — no error |
+| Failure | Outbound quantity above available | **400** `Insufficient stock. Available: 12. Requested: 20.` and stock is unchanged |
+| Failure | No token | Access denied |
+
 ### FE-019 — frontend utilities
 
 | Function | Happy | Failure |
@@ -152,6 +164,8 @@ AUTH-03 routes are included so the auth module can meet the 70% coverage bar.
 | `validateCandidateInput` | Complete hiring row produces no field errors | Missing name/email/position or invalid URL is rejected |
 | `validateNoteContent` | Non-empty note is accepted | Blank / whitespace-only note is rejected |
 | `sanitizeApiDetail` / `getUserFacingError` | Known API detail (e.g. invalid credentials) is shown | Unknown detail is replaced with safe status copy |
+| `sanitizeApiDetail` (inventory 400) | `Insufficient stock. Available: 12. Requested: 20.` is shown as-is | Tracebacks stay hidden |
+| `isLowStock` | Stock below threshold is low; at/above is OK | — |
 | `getAuthToken` / `setAuthToken` / `clearAuthToken` | Token round-trips through storage | Cleared storage returns no token |
 
 ---
@@ -206,7 +220,7 @@ Intentional gaps: TinyDB `StorageError` paths, `list_users` GET, and profile-mis
 
 ### Jest (FE-019)
 
-`cd uis/backoffice && npm test` — 3 suites, 12 tests passed.
+`cd uis/backoffice && npm test` — 3 suites, 12 tests passed (2026-08-31).
 
 | File | Stmts |
 |---|---|
@@ -214,3 +228,13 @@ Intentional gaps: TinyDB `StorageError` paths, `list_users` GET, and profile-mis
 | `lib/user-facing-error.ts` | 71.42% |
 | `lib/validators.ts` | 90% |
 | **All collected files** | **79.48%** |
+
+### Inventory (2026-09-09)
+
+Recorded after MS5 inventory implementation. Full suite: **43 passed** (`python -m pytest` from repo root). Jest: **4 suites, 15 tests passed**.
+
+| Suite | Result |
+|---|---|
+| `tests/test_inventory.py` | 7 passed (list + JWT, inbound stock, outbound stock, insufficient-stock 400, history, empty arrays) |
+| Jest `sanitizeApiDetail` inventory 400 | Passes through `Insufficient stock. Available: 12. Requested: 20.` |
+| Jest `isLowStock` | Below threshold is low; at/above is OK |

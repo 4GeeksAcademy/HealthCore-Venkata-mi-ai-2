@@ -441,6 +441,16 @@ textarea {
   color: var(--warning);
 }
 
+.stock-ok {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.stock-low {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
 .detail-list {
   display: grid;
   gap: 0.75rem;

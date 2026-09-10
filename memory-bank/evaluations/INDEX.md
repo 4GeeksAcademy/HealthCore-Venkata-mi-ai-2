@@ -12,6 +12,8 @@ Format per line:
 
 MS4 | Milestone 4 Project Evaluation | 2026-07-22 | complete | [MS4_Project_Eval.md](./MS4_Project_Eval.md)
 
+MS5 | Milestone 5 Project Evaluation | 2026-09-09 | complete | [MS5_Project_Eval.md](./MS5_Project_Eval.md)
+
 ## Task results (`Results/`)
 
 Task-level rubric evaluations (not full milestone closes). Format:
@@ -31,3 +33,5 @@ SupplierDirectory (20260819) | Company Supplier Directory — official CONTEXT d
 ErrorHandling (20260828) | Error handling patterns (frontend / backend / scripts) | 2026-08-28 | complete | 8/8 Pass | [Results/ErrorHandling-20260828.md](./Results/ErrorHandling-20260828.md)
 
 UnitTesting (20260831) | Unit testing (pytest auth + Jest utilities) | 2026-08-31 | complete | 8/8 Pass | [Results/UnitTesting-20260831.md](./Results/UnitTesting-20260831.md)
+
+InventoryBackoffice (20260909) | Inventory backoffice (stock / inbound / outbound / history) | 2026-09-09 | complete | 8/8 Pass | [Results/InventoryBackoffice-20260909.md](./Results/InventoryBackoffice-20260909.md)

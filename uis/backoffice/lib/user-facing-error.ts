@@ -22,6 +22,7 @@ const SAFE_API_DETAILS = new Set([
   "Candidate not found.",
   "Note not found.",
   "Note content is required.",
+  "Product not found.",
   "Request body must be valid JSON.",
   "Full name is required.",
   "Email is required.",
@@ -30,6 +31,13 @@ const SAFE_API_DETAILS = new Set([
   "A valid status is required.",
   "A valid stage is required.",
 ]);
+
+const INSUFFICIENT_STOCK_DETAIL =
+  /^Insufficient stock\. Available: \d+\. Requested: \d+\.$/;
+
+export function isSafeInventoryDetail(detail: string): boolean {
+  return detail === "Product not found." || INSUFFICIENT_STOCK_DETAIL.test(detail);
+}
 
 export function messageForHttpStatus(status: number): string {
   if (status === 400) {
@@ -57,7 +65,7 @@ export function messageForHttpStatus(status: number): string {
 }
 
 export function sanitizeApiDetail(status: number, detail: string | undefined): string {
-  if (detail && SAFE_API_DETAILS.has(detail)) {
+  if (detail && (SAFE_API_DETAILS.has(detail) || isSafeInventoryDetail(detail))) {
     return detail;
   }
   return messageForHttpStatus(status);
@@ -81,7 +89,7 @@ export function getUserFacingError(error: unknown, fallback: string): string {
   if (error instanceof Error) {
     const message = error.message;
     if (
-      SAFE_API_DETAILS.has(message) &&
+      (SAFE_API_DETAILS.has(message) || isSafeInventoryDetail(message)) &&
       !/Request failed|Unexpected token|Failed to fetch|status \d+/i.test(message)
     ) {
       return message;

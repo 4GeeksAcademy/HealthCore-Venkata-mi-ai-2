@@ -27,6 +27,8 @@ Run these **four steps in order** before any Git commit:
 3. **State Sync** — Update [`memory-bank/progress.md`](memory-bank/progress.md) to match reality. If an implementation phase completed, perform the **Post-Implementation Plan Save** below. If a milestone’s scoped work is complete, also write/update the milestone evaluation.
 4. **Change Logging** — Write a PHI-safe commit message (no patient names, member IDs, or clinical free text). Summarize HealthCore business intent (billing, no-shows, CME, hiring, public site, backoffice).
 
+**Never commit `.env` files** (`.env`, `.env.local`, `.env.example`, `env.example`) or tokens / local API URLs. Confirm they stay gitignored before staging.
+
 ---
 
 ## Post-Implementation Plan Save
@@ -85,3 +87,4 @@ Allowed without extra confirmation: updating `memory-bank/progress.md`, appendin
 - Internal app: `uis/backoffice` — Digital staff tools (welcome + hiring tracker).
 - Never share layouts between public and backoffice.
 - Treat sample IDs (`HC-*`, `CLM-*`, …) as synthetic; never invent real PHI.
+- Never commit `.env` files or credentials. Secrets stay in local ignored env files only.
