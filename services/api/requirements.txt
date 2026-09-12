@@ -6,3 +6,5 @@ python-jose[cryptography]
 libpass[bcrypt]
 pydantic-settings
 email-validator
+sqlmodel>=0.0.22
+psycopg2-binary

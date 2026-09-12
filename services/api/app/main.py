@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -10,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.errors import StorageError
+from app.database import init_dual_stores
 from app.routers.auth import router as auth_router
 from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
@@ -19,9 +21,17 @@ from app.routers.users import router as users_router
 
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    init_dual_stores()
+    yield
+
+
 app = FastAPI(
     title="HealthCore Digital API",
     version="1.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(

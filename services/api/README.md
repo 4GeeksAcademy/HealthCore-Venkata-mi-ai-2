@@ -4,6 +4,7 @@ FastAPI service for:
 
 - CSV incident analysis (shared with `scripts/analyze.py`)
 - Clinic supplier directory (TinyDB)
+- Clinic inventory (SQLModel / Supabase; auth remains TinyDB)
 
 ## Setup
 
@@ -22,11 +23,12 @@ Minimum `.env` values for auth:
 - `ACCESS_TOKEN_EXPIRE_MINUTES` (default `30`)
 - `RESET_TOKEN_EXPIRE_MINUTES` (default `30`)
 - `BACKOFFICE_PUBLIC_URL` (default `http://localhost:3001`)
+- `DATABASE_URL` — Supabase Transaction pooler URI for inventory (never commit)
+
+Seeder writes `data/suppliers.json` and SQLModel inventory rows (stock = inbound − outbound). Re-runs do not duplicate SKUs.
 
 Demo note: forgot-password runs in demo mode and does not send real outbound email.
 The reset link is written to API logs for local testing.
-
-Seeder writes `data/suppliers.json` and prints `Inserted N supplier(s).` Re-runs do not duplicate rows.
 
 ## Run
 
@@ -69,3 +71,14 @@ Health: http://localhost:8001/health → `{"status":"ok"}`
 - `DELETE /suppliers/{id}` — `{"ok": true, "id": ...}` (requires Bearer token)
 
 Field names and enums must match `docs/Project_Contexts/SupplierDirectory_TinyDb_API.md`.
+
+### Inventory
+
+All require Bearer token. Contract: `docs/Project_Contexts/CONTEXT-inventory-orm-dual-database.md`.
+
+- `GET /inventory/products` — list with computed `current_stock`
+- `POST /inventory/products` — create (stock starts at 0)
+- `GET /inventory/products/{id}` — one product + `current_stock`
+- `POST /inventory/orders/inbound` — add stock
+- `POST /inventory/orders/outbound` — remove stock (400 if insufficient)
+- `GET /inventory/orders` — inbound + outbound with `user_uuid`

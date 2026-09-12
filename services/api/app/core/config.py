@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     jwt_secret_key: str
+    database_url: str
     access_token_expire_minutes: int = 30
     reset_token_expire_minutes: int = 30
     backoffice_public_url: str = "http://localhost:3001"

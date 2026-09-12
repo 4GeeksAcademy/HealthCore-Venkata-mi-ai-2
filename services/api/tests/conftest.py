@@ -1,4 +1,4 @@
-"""Shared pytest fixtures. Each test gets an isolated TinyDB — never the live data files."""
+"""Shared pytest fixtures. Isolated TinyDB + isolated SQLite inventory — never live stores."""
 
 from __future__ import annotations
 
@@ -11,12 +11,13 @@ from fastapi.testclient import TestClient
 os.environ["JWT_SECRET_KEY"] = "unit-test-jwt-secret-do-not-use-live"
 os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 os.environ.setdefault("RESET_TOKEN_EXPIRE_MINUTES", "30")
+os.environ["DATABASE_URL"] = "sqlite://"
 
 from app.core.config import get_settings  # noqa: E402
+from app.database import reset_engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.result_store import store as incident_result_store  # noqa: E402
 from app.stores import auth_store  # noqa: E402
-from app import inventory_store  # noqa: E402
 from app import suppliers_store  # noqa: E402
 
 TEST_JWT_SECRET = "unit-test-jwt-secret-do-not-use-live"
@@ -30,21 +31,20 @@ def _isolate_persistence(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     auth_dir.mkdir()
     suppliers_dir = tmp_path / "suppliers"
     suppliers_dir.mkdir()
-    inventory_dir = tmp_path / "inventory"
-    inventory_dir.mkdir()
 
     monkeypatch.setenv("JWT_SECRET_KEY", TEST_JWT_SECRET)
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
     monkeypatch.setattr(auth_store, "DATA_DIR", auth_dir)
     monkeypatch.setattr(auth_store, "DB_PATH", auth_dir / "auth.json")
     monkeypatch.setattr(suppliers_store, "DATA_DIR", suppliers_dir)
     monkeypatch.setattr(suppliers_store, "DB_PATH", suppliers_dir / "suppliers.json")
-    monkeypatch.setattr(inventory_store, "DATA_DIR", inventory_dir)
-    monkeypatch.setattr(inventory_store, "DB_PATH", inventory_dir / "inventory.json")
 
     get_settings.cache_clear()
+    reset_engine()
     incident_result_store._summary = None
     incident_result_store._csv = None
     yield
+    reset_engine()
     get_settings.cache_clear()
 
 
