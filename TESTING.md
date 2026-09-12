@@ -35,7 +35,7 @@ From the **repository root** (same suite):
 python -m pytest
 ```
 
-Tests use a temporary TinyDB. They never write `services/api/data/auth.json` or `services/api/data/suppliers.json`.
+Tests use a temporary TinyDB for auth/suppliers and isolated SQLite for inventory. They never write `services/api/data/auth.json`, `services/api/data/suppliers.json`, or a live Supabase database.
 
 ### TypeScript (Jest)
 
@@ -65,7 +65,7 @@ Root ops utilities remain on `node:test` (`npm run test:src` from the repo root)
 | Suppliers (API-042) | `services/api/tests/test_suppliers.py` | Directory CRUD/filter rules after AUTH-01 protection |
 | Incidents (API-042) | `services/api/tests/test_incidents.py` | CSV analyze/export accept/reject rules |
 | Frontend utils (FE-019) | `uis/backoffice/__tests__/` | Hiring validators, safe error copy, token storage, inventory low-stock |
-| Inventory | `services/api/tests/test_inventory.py` | Stock list, inbound/outbound, insufficient-stock 400, empty arrays, JWT |
+| Inventory | `services/api/tests/test_inventory.py` | Computed `current_stock`, inbound/outbound, insufficient-stock 400, JWT, seed 12/80 |
 
 ---
 
@@ -150,8 +150,8 @@ AUTH-03 routes are included so the auth module can meet the 70% coverage bar.
 
 | Tier | Case | Business assertion |
 |---|---|---|
-| Happy | Seeded catalog + authenticated list | Products include `name`, `sku`, `stock`, `threshold`; gloves are below threshold |
-| Happy | Inbound delivery | Stock increases; order records `type=inbound` and `created_by` |
+| Happy | Seeded catalog + authenticated list | Products include `name`, `sku`, `current_stock`, `threshold`; gloves are below threshold |
+| Happy | Inbound delivery | Stock increases; order records `type=inbound`, `user_uuid`, and TinyDB `created_by` email |
 | Happy | Outbound within stock | Stock decreases; order records `type=outbound` |
 | Edge | Empty catalog / empty orders | `[]` — no error |
 | Failure | Outbound quantity above available | **400** `Insufficient stock. Available: 12. Requested: 20.` and stock is unchanged |

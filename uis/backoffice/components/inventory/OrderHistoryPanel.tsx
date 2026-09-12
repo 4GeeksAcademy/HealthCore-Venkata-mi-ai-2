@@ -85,7 +85,7 @@ export function OrderHistoryPanel() {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id}>
+              <tr key={`${order.type}-${order.id}`}>
                 <td>{order.product_name}</td>
                 <td>
                   <span

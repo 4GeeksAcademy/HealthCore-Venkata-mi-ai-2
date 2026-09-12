@@ -76,3 +76,16 @@ Full suite re-executed after the project-level “never commit `.env` files” n
 | Live backoffice `:3001` | 200 |
 
 Official eight-item rubric: **still 8/8 Pass**. Verdict unchanged.
+
+---
+
+## Re-run (2026-09-11) — ORM-first alignment
+
+UI mapped to SQLModel paths and fields. History `created_by` is TinyDB email from the API (dual-store read), not a Postgres column.
+
+| Check | Result |
+|---|---|
+| `python -m pytest` (repo root) | **46 passed** (10 inventory) |
+| `uis/backoffice` lint / `tsc --noEmit` | Pass |
+| `uis/backoffice` `npm test` | **18 passed** |
+| Rubric | **8/8 Pass** |

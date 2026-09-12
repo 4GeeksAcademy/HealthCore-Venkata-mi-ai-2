@@ -1,9 +1,9 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-09  
-**Latest stamped plan:** [HC-MS5-PLAN-032](./plans/HC-MS5-PLAN-032-20260909-env-ignore-and-ms5-rerun.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-031](./plans/HC-MS5-PLAN-031-20260909-inventory-context-how-to-run.md) (`implemented`, MS5, docs)  
-**Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**)
+**Last updated:** 2026-09-11  
+**Latest stamped plan:** [HC-MS5-PLAN-038](./plans/HC-MS5-PLAN-038-20260911-backoffice-root-suspense-turbopack.md) (`implemented`, MS5, implementation)  
+**Prior completed stamp:** [HC-MS5-PLAN-037](./plans/HC-MS5-PLAN-037-20260911-orm-first-backoffice-alignment.md) (`implemented`, MS5, implementation)  
+**Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Rubric mapping (MS4)
 
@@ -18,7 +18,8 @@
 | Milestone 2 `src/utils/` | Present + **integrated into backoffice UI** |
 | Public site `uis/healthcore` | Done (rubric “website”) |
 | Backoffice | Done — welcome, `/ops`, `/hiring`, `/incidents`, `/suppliers`, **`/inventory`** |
-| MS5 inventory backoffice | **Implemented** (PLAN-030) — stock, inbound, outbound, order history; eval → [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (**8/8 Pass**) |
+| MS5 inventory backoffice | **Implemented** (PLAN-030, aligned PLAN-037) — consumes ORM API; eval → [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (**8/8 Pass**) |
+| Inventory ORM + dual DB | **Implemented first** (PLAN-034–037) — SQLModel/Supabase inventory, TinyDB auth; eval → [Results/InventoryORM-20260911.md](./evaluations/Results/InventoryORM-20260911.md) (**12/12 Pass**) |
 | MS4 evaluation | **complete PASS** |
 | FastAPI architecture proposal | In review (PLAN-006–009) |
 | Incident File Analyzer | **Domain fixed** (PLAN-012) |
@@ -27,6 +28,22 @@
 | Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |
 | Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
+
+## Today’s update (2026-09-11)
+
+**Runtime overlay (PLAN-038):** Root layout wraps AuthGuard in Suspense. Turbopack root pinned to the monorepo so `@hc` ops imports resolve. Pytest 46, Jest 18, `next build` pass.
+
+**ORM-first alignment (PLAN-037):** Canonical order is dual-database API, then MS5 backoffice. Orders keep `user_uuid` in SQLModel; HTTP adds TinyDB `created_by` email for history. Both evals re-run: ORM **12/12**, MS5 UI **8/8**. Pytest 46, Jest 18.
+
+**Inventory ORM eval re-run:** Rubric 12/12 Pass. Pytest 46, inventory 10, Jest 15. Live API: gloves/pads stock 12/80, outbound 9999 → 400 with no stock change, orders have `user_uuid` and `product_name`. Write-up: [Results/InventoryORM-20260911.md](./evaluations/Results/InventoryORM-20260911.md).
+
+**Backoffice Issue overlay (PLAN-036):** Login and reset-password now wrap `useSearchParams` in `Suspense`. Order history rows use `${type}-${id}` so inbound and outbound ids do not collide. Lint/tsc pass.
+
+**Inventory Table Editor labels (PLAN-035):** Postgres tables renamed to `medical_supply`, `inbound_order`, `outbound_order`. Orders store `product_name` and `sku`. Combined view `inventory_order`. Startup migration keeps seed rows if SQLModel had already created empty snake_case tables. Pytest 46.
+
+**Inventory ORM dual-database implementation (PLAN-034):** TinyDB remains auth-only. Inventory uses SQLModel (`MedicalSupply`, inbound/outbound orders), computed `current_stock`, TinyDB `user_uuid`, routes under `/inventory/orders/*`. Pytest 45, Jest 15, lint/tsc pass. Eval 12/12 Pass — [Results/InventoryORM-20260911.md](./evaluations/Results/InventoryORM-20260911.md).
+
+**Inventory ORM dual-database CONTEXT (PLAN-033):** Docs-only. Implementing agents must follow [`docs/Project_Contexts/CONTEXT-inventory-orm-dual-database.md`](../docs/Project_Contexts/CONTEXT-inventory-orm-dual-database.md). TinyDB stays for auth; Supabase/SQLModel for inventory; `current_stock` computed; `user_uuid` from TinyDB; routes under `/inventory/orders/*`.
 
 ## Today’s update (2026-09-09)
 
@@ -89,6 +106,7 @@
 ```bash
 # API (incidents + suppliers + inventory)
 cd services/api && python -m pip install -r requirements.txt
+# Set DATABASE_URL (Supabase pooler) and JWT_SECRET_KEY in .env — do not commit
 python seed.py
 python -m uvicorn app.main:app --reload --port 8001
 

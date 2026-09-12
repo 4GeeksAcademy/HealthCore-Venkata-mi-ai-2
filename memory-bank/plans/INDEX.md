@@ -74,6 +74,18 @@ Format per line:
 
 32 | HC-MS5-PLAN-032 | MS5 | 2026-09-09 | Project Env Ignore Note and MS5 Re-run Evaluation | implemented | docs | [HC-MS5-PLAN-032-20260909-env-ignore-and-ms5-rerun.md](./HC-MS5-PLAN-032-20260909-env-ignore-and-ms5-rerun.md)
 
+33 | HC-MS5-PLAN-033 | MS5 | 2026-09-11 | Inventory ORM Dual Database Context Document | implemented | docs | [HC-MS5-PLAN-033-20260911-inventory-orm-dual-db-context.md](./HC-MS5-PLAN-033-20260911-inventory-orm-dual-db-context.md)
+
+34 | HC-MS5-PLAN-034 | MS5 | 2026-09-11 | Inventory ORM Dual Database Implementation | implemented | implementation | [HC-MS5-PLAN-034-20260911-inventory-orm-dual-db-impl.md](./HC-MS5-PLAN-034-20260911-inventory-orm-dual-db-impl.md)
+
+35 | HC-MS5-PLAN-035 | MS5 | 2026-09-11 | Inventory Table Editor Readable Names and Product Labels | implemented | implementation | [HC-MS5-PLAN-035-20260911-inventory-table-editor-labels.md](./HC-MS5-PLAN-035-20260911-inventory-table-editor-labels.md)
+
+36 | HC-MS5-PLAN-036 | MS5 | 2026-09-11 | Backoffice Login Suspense and Order History Keys | implemented | implementation | [HC-MS5-PLAN-036-20260911-backoffice-login-suspense-order-keys.md](./HC-MS5-PLAN-036-20260911-backoffice-login-suspense-order-keys.md)
+
+37 | HC-MS5-PLAN-037 | MS5 | 2026-09-11 | ORM-First Sequence Alignment and Dual Eval Re-run | implemented | implementation | [HC-MS5-PLAN-037-20260911-orm-first-backoffice-alignment.md](./HC-MS5-PLAN-037-20260911-orm-first-backoffice-alignment.md)
+
+38 | HC-MS5-PLAN-038 | MS5 | 2026-09-11 | Backoffice Root Suspense and Turbopack Root | implemented | implementation | [HC-MS5-PLAN-038-20260911-backoffice-root-suspense-turbopack.md](./HC-MS5-PLAN-038-20260911-backoffice-root-suspense-turbopack.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

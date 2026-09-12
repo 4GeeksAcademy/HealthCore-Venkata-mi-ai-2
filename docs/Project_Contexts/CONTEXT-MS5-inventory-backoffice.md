@@ -4,8 +4,16 @@
 **Unit:** HealthCore Digital  
 **Document type:** Assignment CONTEXT (views, auth reuse, error handling, and evaluation)  
 **Audience:** External implementing agent  
-**Status:** CONTEXT only — **do not treat this file as implemented inventory UI**  
+**Status:** Implemented in `uis/backoffice`. Consumes the live **Inventory ORM dual-database** API.  
+**Prerequisite (must ship first):** [`CONTEXT-inventory-orm-dual-database.md`](./CONTEXT-inventory-orm-dual-database.md)  
 **Milestone:** MS5
+
+Canonical sequence for this repo:
+
+1. **Inventory ORM dual-database** — TinyDB auth + SQLModel/Supabase inventory (`current_stock`, `user_uuid`, `/inventory/orders/*`).
+2. **This file** — four authenticated backoffice views on that API.
+
+Do **not** invent a TinyDB inventory store for the UI. Confirm paths in `http://localhost:8001/docs`.
 
 This CONTEXT is the **single source of truth** for the Milestone 5 inventory section of `uis/backoffice`. Field names, routes, and payloads used by the UI must match the **live inventory API**. Identity, token storage, and route-guard behaviour must match [`auth_master_framework_Context.md`](./auth_master_framework_Context.md). Company framing comes from [`CONTEXT-healthcore-briefing.en.md`](./CONTEXT-healthcore-briefing.en.md). Existing backoffice API patterns come from [`SupplierDirectory_TinyDb_API.md`](./SupplierDirectory_TinyDb_API.md) and [`IncidentFileAnalyzer.md`](./IncidentFileAnalyzer.md).
 
@@ -29,14 +37,14 @@ You are building an **internal operations tool** for HealthCore Digital staff, n
    - [`auth_master_framework_Context.md`](./auth_master_framework_Context.md) — JWT Bearer, `localStorage`, client `AuthGuard`, 401 → `/login`
    - [`SupplierDirectory_TinyDb_API.md`](./SupplierDirectory_TinyDb_API.md) — backoffice FastAPI client pattern
    - [`IncidentFileAnalyzer.md`](./IncidentFileAnalyzer.md) — existing protected backoffice module on the same API
-7. Confirm the live `/inventory` endpoints in the running API OpenAPI (`http://localhost:8001/docs`). This repo does not yet contain an inventory CONTEXT for the backend.
+7. Confirm the live `/inventory` endpoints in the running API OpenAPI (`http://localhost:8001/docs`). The backend contract is [`CONTEXT-inventory-orm-dual-database.md`](./CONTEXT-inventory-orm-dual-database.md) — that API must exist before this UI.
 
 ### How to ship
 
 | Step | Scope |
 |------|--------|
-| This file | Docs only — locks the MS5 UI contract |
-| Later implementation stamp | Four inventory views + one API module in `uis/backoffice` |
+| This file | UI contract — four views after the ORM API exists |
+| Implementation | `uis/backoffice` inventory pages + `lib/inventory-api.ts` mapping ORM wire fields |
 
 After implementation that ships files: lint/typecheck per `AGENTS.md`, append a new stamp under `memory-bank/plans/` (next sequence after the current INDEX maximum), update `INDEX.md` and `progress.md`. Do **not** rewrite this CONTEXT except with explicit human confirmation.
 
@@ -44,7 +52,7 @@ After implementation that ships files: lint/typecheck per `AGENTS.md`, append a 
 
 ## Business framing
 
-The backend team shipped the inventory API — authenticated `/inventory` endpoints, documented, live. Operations staff who manage stock day to day still have no interface. Until one exists in the backoffice, the API is unusable without a REST client.
+The backend team shipped the inventory API (**SQLModel / Supabase** products and orders; TinyDB JWT auth) — authenticated `/inventory` endpoints, documented, live. Operations staff who manage stock day to day still have no interface. Until one exists in the backoffice, the API is unusable without a REST client.
 
 **From:** Operations Manager  
 **To:** Technology Unit (James Osei, HealthCore Digital)
@@ -119,7 +127,7 @@ Four views, all authenticated, all talking to the live inventory API.
 - Include `NEXT_PUBLIC_INVENTORY_API_URL` in the same base-URL fallback chain used by `authed-fetch.ts` / `auth-api.ts` if the inventory host is the HealthCore FastAPI (`:8001`).
 - On **400**, extract a human-readable message and surface it in the form or page.
 
-Use the sample paths and bodies in **Samples** below. Confirm against live OpenAPI; map path aliases if needed, but keep the sample fields (`name`, `sku`, `stock`, `threshold`, `product_id`, `quantity`, `notes`, `type`, `product_name`, `created_at`, `created_by`).
+Use the sample paths and bodies in **Samples** below. Confirm against live OpenAPI. Map ORM wire fields to display fields in `inventory-api.ts` (`current_stock` → `stock`, TinyDB email `created_by` plus `user_uuid`). Do **not** drop evaluated display fields (`name`, `sku`, `stock`, `threshold`, `product_id`, `quantity`, `notes`, `type`, `product_name`, `created_at`, `created_by`).
 
 ### 1. Product / stock page
 
@@ -167,32 +175,34 @@ Suggested route: `/inventory/orders`.
 
 ## Samples
 
-These samples lock the **UI contract**. Confirm path names against the live inventory OpenAPI (`http://localhost:8001/docs`). If the API uses different path names, map them in `inventory-api.ts` — do **not** drop fields required by evaluation. Synthetic clinic-supply data only; no PHI.
+These samples lock the **UI display contract**. The live API is the ORM dual-database assignment. Confirm path names against OpenAPI (`http://localhost:8001/docs`). Map wire fields in `inventory-api.ts` — do **not** drop fields required by evaluation. Synthetic clinic-supply data only; no PHI.
 
-Suggested API paths (confirm in `/docs`):
+Live API paths (ORM CONTEXT):
 
 | Action | Method and path |
 |--------|-----------------|
 | List products | `GET /inventory/products` |
-| Create inbound order | `POST /inventory/inbound` |
-| Create outbound order | `POST /inventory/outbound` |
+| Create inbound order | `POST /inventory/orders/inbound` |
+| Create outbound order | `POST /inventory/orders/outbound` |
 | List orders | `GET /inventory/orders` |
 
-All of the above require `Authorization: Bearer <jwt>`. Missing or invalid token → **401**.
+Do **not** call `/inventory/inbound` or `/inventory/outbound` (those were a stand-in TinyDB API). All of the above require `Authorization: Bearer <jwt>`. Missing or invalid token → **401**.
 
 ### Product (stock row)
 
-Fields the product page must display: `name`, `sku`, `stock`, `threshold`.
+Fields the product page must display: `name`, `sku`, **current stock**, and `threshold`.
 
-Low stock = `stock` **below** `threshold`. OK stock = `stock` **at or above** `threshold`.
+The live JSON field is **`current_stock`** (computed inbound − outbound). The backoffice may map that onto a local `stock` property for rendering. Low stock = current stock **below** `threshold`. OK stock = **at or above** `threshold`.
+
+Wire (`GET /inventory/products`):
 
 ```json
 {
   "id": 1,
   "name": "Nitrile exam gloves (box of 100)",
   "sku": "HC-PPE-GLV-100",
-  "stock": 12,
-  "threshold": 24
+  "threshold": 24,
+  "current_stock": 12
 }
 ```
 
@@ -201,8 +211,8 @@ Low stock = `stock` **below** `threshold`. OK stock = `stock` **at or above** `t
   "id": 2,
   "name": "Alcohol prep pads (box of 200)",
   "sku": "HC-CLN-PAD-200",
-  "stock": 80,
-  "threshold": 30
+  "threshold": 30,
+  "current_stock": 80
 }
 ```
 
@@ -216,15 +226,15 @@ Product 1 is **low** (12 < 24). Product 2 is **OK** (80 ≥ 30).
     "id": 1,
     "name": "Nitrile exam gloves (box of 100)",
     "sku": "HC-PPE-GLV-100",
-    "stock": 12,
-    "threshold": 24
+    "threshold": 24,
+    "current_stock": 12
   },
   {
     "id": 2,
     "name": "Alcohol prep pads (box of 200)",
     "sku": "HC-CLN-PAD-200",
-    "stock": 80,
-    "threshold": 30
+    "threshold": 30,
+    "current_stock": 80
   }
 ]
 ```
@@ -237,7 +247,7 @@ Product 1 is **low** (12 < 24). Product 2 is **OK** (80 ≥ 30).
 
 Render an empty state. Do not crash or show a blank broken table.
 
-### Valid inbound body — `POST /inventory/inbound`
+### Valid inbound body — `POST /inventory/orders/inbound`
 
 ```json
 {
@@ -249,22 +259,24 @@ Render an empty state. Do not crash or show a blank broken table.
 
 ### Inbound success — 201
 
+`user_uuid` is stored on the SQLModel row. `created_by` is the TinyDB staff email resolved at read time (not a Postgres column).
+
 ```json
 {
   "id": 101,
   "product_id": 1,
   "product_name": "Nitrile exam gloves (box of 100)",
   "quantity": 40,
-  "type": "inbound",
   "notes": "McKesson delivery — Austin clinic restock",
   "created_at": "2026-09-09T12:05:00+00:00",
+  "user_uuid": "1",
   "created_by": "ops.manager@healthcore.example"
 }
 ```
 
-UI: show a confirmation message, then redirect to the product page. Stock for SKU `HC-PPE-GLV-100` becomes `52` (12 + 40).
+UI: show a confirmation message, then redirect to the product page. Stock for SKU `HC-PPE-GLV-100` becomes `52` (12 + 40). The client may add `type: "inbound"` for the history model.
 
-### Valid outbound body — `POST /inventory/outbound`
+### Valid outbound body — `POST /inventory/orders/outbound`
 
 Before submit, the form must already show available stock for the selected product (here: **12** for product `1`).
 
@@ -284,9 +296,9 @@ Before submit, the form must already show available stock for the selected produ
   "product_id": 1,
   "product_name": "Nitrile exam gloves (box of 100)",
   "quantity": 6,
-  "type": "outbound",
   "notes": "Manchester clinic weekly consumption",
   "created_at": "2026-09-09T12:20:00+00:00",
+  "user_uuid": "1",
   "created_by": "ops.manager@healthcore.example"
 }
 ```
@@ -329,6 +341,7 @@ Each row must show product name, type (`inbound` / `outbound`), quantity, date, 
     "type": "inbound",
     "notes": "McKesson delivery — Austin clinic restock",
     "created_at": "2026-09-09T12:05:00+00:00",
+    "user_uuid": "1",
     "created_by": "ops.manager@healthcore.example"
   },
   {
@@ -339,6 +352,7 @@ Each row must show product name, type (`inbound` / `outbound`), quantity, date, 
     "type": "outbound",
     "notes": "Manchester clinic weekly consumption",
     "created_at": "2026-09-09T12:20:00+00:00",
+    "user_uuid": "1",
     "created_by": "ops.manager@healthcore.example"
   }
 ]
@@ -402,21 +416,21 @@ Official assignment rubric. A generic UI that misses any item below will not be 
 - Do not rewrite [`auth_master_framework_Context.md`](./auth_master_framework_Context.md), [`SupplierDirectory_TinyDb_API.md`](./SupplierDirectory_TinyDb_API.md), or [`IncidentFileAnalyzer.md`](./IncidentFileAnalyzer.md).
 - Do not modify root [`CONTEXT.md`](../../CONTEXT.md), [`CONTEXT_temp.md`](../../CONTEXT_temp.md), [`memory-bank/projectbrief.md`](../../memory-bank/projectbrief.md), or [`memory-bank/techContext.md`](../../memory-bank/techContext.md).
 - Do not rewrite prior `memory-bank/plans/HC-*.md` stamps or milestone evals.
-- Do not invent product/order field names that contradict the live inventory OpenAPI.
+- Do not invent product/order field names that contradict the live inventory OpenAPI (`current_stock`, `user_uuid`, `/inventory/orders/*`).
 - Do not commit `.env`, `.env.local`, API keys, or real PHI.
-- Do not treat this CONTEXT as shipped UI. Implementation is a later stamp.
+- Do not restore TinyDB `inventory_store.py` as the live inventory API.
 
 ---
 
 ## Agent instructions
 
-1. Read this CONTEXT and the four sibling files in `docs/Project_Contexts/` before writing inventory UI.
-2. Confirm live `/inventory` paths in FastAPI `/docs`. Use the **Samples** payloads in this CONTEXT (`name`, `sku`, `stock`, `threshold`, inbound/outbound `product_id` + `quantity` + `notes`). Map path aliases if the API differs; do not drop evaluated fields.
+1. Read [`CONTEXT-inventory-orm-dual-database.md`](./CONTEXT-inventory-orm-dual-database.md) first, then this CONTEXT and the four sibling files in `docs/Project_Contexts/` before writing inventory UI.
+2. Confirm live `/inventory` paths in FastAPI `/docs`. Use ORM paths (`/inventory/orders/inbound`, `/inventory/orders/outbound`). Display `current_stock` as stock; show TinyDB email as creator via `created_by` while keeping `user_uuid` on the wire.
 3. Build only in `uis/backoffice`. Reuse `AuthGuard`, `auth-storage`, `authed-fetch`, and `user-facing-error`.
 4. Centralize inventory HTTP in one module. Send Bearer tokens. Surface 400 messages as readable text.
 5. Outbound form must display available stock for the selected product before submit.
 6. Leave `uis/healthcore` unchanged.
-7. After shipping UI files, append a new plan stamp; do not rewrite this CONTEXT or prior stamps.
+7. After shipping UI files, append a new plan stamp; do not rewrite prior stamps.
 8. PHI-safe commit messages: no patient names, member IDs, clinical free text, passwords, or tokens.
 
 ---
@@ -425,11 +439,11 @@ Official assignment rubric. A generic UI that misses any item below will not be 
 
 Start the API first, then the backoffice. Inventory pages call `http://localhost:8001`. Sign in on `/login` before opening inventory — unauthenticated visits redirect to login.
 
-Never commit `.env`, `.env.local`, or generated TinyDB files (`services/api/data/inventory.json`, `auth.json`, `suppliers.json`).
+Never commit `.env`, `.env.local`, or generated TinyDB files (`services/api/data/auth.json`, `suppliers.json`). Live inventory is SQLModel/Supabase (`DATABASE_URL`), not `inventory.json`.
 
 ### 1. Seed and start the API (port `8001`)
 
-Put secrets **only** in `services/api/.env` (create it from `.env.example`). Do not put key values in markdown, scripts, PowerShell history notes, or git. Do not commit or push `.env`.
+Put secrets **only** in `services/api/.env` (JWT keys plus `DATABASE_URL` Transaction pooler URI). Do not put key values in markdown, scripts, PowerShell history notes, or git. Do not commit or push `.env`.
 
 Windows PowerShell:
 
@@ -470,8 +484,8 @@ Checks:
 | Method | Path |
 |--------|------|
 | `GET` | `/inventory/products` |
-| `POST` | `/inventory/inbound` |
-| `POST` | `/inventory/outbound` |
+| `POST` | `/inventory/orders/inbound` |
+| `POST` | `/inventory/orders/outbound` |
 | `GET` | `/inventory/orders` |
 
 All four require `Authorization: Bearer <jwt>`. No token → **401**.

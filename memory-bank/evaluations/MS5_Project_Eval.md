@@ -113,3 +113,20 @@ Re-tested after the project-level env-file policy note (`README.md`, `AGENTS.md`
 | Live API `/health` and backoffice `:3001` | 200 |
 
 **Rubric tally (re-run):** 8 / 8 Pass. Verdict remains **COMPLETE — PASS**.
+
+---
+
+## Re-run (2026-09-11) — ORM-first alignment
+
+The UI now consumes the dual-database API that should have shipped first. Paths: `POST /inventory/orders/inbound|outbound`. Wire `current_stock` maps to displayed stock. Order history shows TinyDB `created_by` email; SQLModel still stores `user_uuid`.
+
+| Check | Result |
+|-------|--------|
+| `python -m pytest` | **46 passed** (10 inventory) |
+| Backoffice lint / `tsc --noEmit` | Pass (coverage-report warning only) |
+| Backoffice Jest | **18 passed** (mapper `current_stock` / `created_by`) |
+| Central client | `lib/inventory-api.ts` → `/inventory/orders/*` |
+| Creator column | TinyDB email, not numeric `user_uuid` |
+| Public site inventory UI | None |
+
+Official eight-item rubric: **8 / 8 Pass**. Verdict remains **COMPLETE — PASS**. Live inventory store is SQLModel/Supabase, not TinyDB `inventory.json`.

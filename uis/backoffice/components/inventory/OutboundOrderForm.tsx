@@ -139,8 +139,8 @@ export function OutboundOrderForm() {
             required
           >
             {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name} ({product.sku})
+              <option key={product.id} value={String(product.id)}>
+                {product.name} · {product.sku} · stock {product.stock}
               </option>
             ))}
           </select>
