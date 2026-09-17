@@ -1,21 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
-import { Suspense } from "react";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import { SessionActions } from "@/components/auth/SessionActions";
-import { branding } from "@/lib/branding";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -32,45 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="app-body">
-        <Suspense
-          fallback={
-            <main className="app-shell">
-              <div className="page-frame">
-                <section className="section-card">
-                  <p className="muted-text" role="status">
-                    Loading backoffice…
-                  </p>
-                </section>
-              </div>
-            </main>
-          }
-        >
-          <AuthGuard>
-            <div className="backoffice-topnav">
-              <div className="backoffice-topnav-inner">
-                <Link href="/" className="backoffice-brand">
-                  {branding.companyName} Backoffice
-                </Link>
-                <nav aria-label="Backoffice">
-                  <Link href="/">Home</Link>
-                  <Link href="/ops">Milestone 2 ops</Link>
-                  <Link href="/incidents">Incident analysis</Link>
-                  <Link href="/suppliers">Suppliers</Link>
-                  <Link href="/inventory">Inventory</Link>
-                  <Link href="/hiring">Hiring tracker</Link>
-                </nav>
-                <SessionActions />
-              </div>
-            </div>
-            {children}
-          </AuthGuard>
-        </Suspense>
-      </body>
+    <html lang="en" className="h-full antialiased">
+      <body className="app-body">{children}</body>
     </html>
   );
 }

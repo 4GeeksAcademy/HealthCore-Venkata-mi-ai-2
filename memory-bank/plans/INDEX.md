@@ -94,6 +94,16 @@ Format per line:
 
 42 | HC-MS5-PLAN-042 | MS5 | 2026-09-16 | MS5 Container Runbook Browse After Compose Up | implemented | docs | [HC-MS5-PLAN-042-20260916-container-runbook-browse.md](./HC-MS5-PLAN-042-20260916-container-runbook-browse.md)
 
+43 | HC-MS5-PLAN-043 | MS5 | 2026-09-16 | Backoffice Login Lighthouse Performance | implemented | implementation | [HC-MS5-PLAN-043-20260916-backoffice-login-perf.md](./HC-MS5-PLAN-043-20260916-backoffice-login-perf.md)
+
+44 | HC-MS5-PLAN-044 | MS5 | 2026-09-16 | Backoffice Home Lighthouse Performance | implemented | implementation | [HC-MS5-PLAN-044-20260916-backoffice-home-perf.md](./HC-MS5-PLAN-044-20260916-backoffice-home-perf.md)
+
+45 | HC-MS5-PLAN-045 | MS5 | 2026-09-16 | Backoffice Home Reduce Client JS For Lighthouse | implemented | implementation | [HC-MS5-PLAN-045-20260916-backoffice-home-js.md](./HC-MS5-PLAN-045-20260916-backoffice-home-js.md)
+
+46 | HC-MS5-PLAN-046 | MS5 | 2026-09-16 | Milestone 2 Ops Dashboard Lighthouse Performance | implemented | implementation | [HC-MS5-PLAN-046-20260916-ops-dashboard-perf.md](./HC-MS5-PLAN-046-20260916-ops-dashboard-perf.md)
+
+47 | HC-MS5-PLAN-047 | MS5 | 2026-09-16 | Rename Milestone 2 Ops Labels To Operations | implemented | implementation | [HC-MS5-PLAN-047-20260916-ops-label-operations.md](./HC-MS5-PLAN-047-20260916-ops-label-operations.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

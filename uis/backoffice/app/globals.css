@@ -18,8 +18,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "Segoe UI Mono", monospace;
 }
 
 * {
@@ -30,7 +30,7 @@
   min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   margin: 0;
 }
 
@@ -166,6 +166,26 @@ textarea {
 .section-card header {
   display: grid;
   gap: 0.4rem;
+}
+
+.ops-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.ops-metric-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 220px;
+}
+
+.ops-metric-card details {
+  margin-top: 0.35rem;
+}
+
+.ops-metric-card summary {
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .stack {

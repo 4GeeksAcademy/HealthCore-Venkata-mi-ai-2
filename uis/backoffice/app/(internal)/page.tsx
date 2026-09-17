@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Milestone2OpsPanel } from "@/components/ops/Milestone2OpsPanel";
+import { HomeOpsSummary } from "@/components/ops/HomeOpsSummary";
 import { branding } from "@/lib/branding";
 
 export default function BackofficeWelcomePage() {
@@ -18,29 +18,29 @@ export default function BackofficeWelcomePage() {
         <section className="section-card">
           <h2>Available modules</h2>
           <p>
-            Monday ops metrics use Milestone 2 TypeScript from <code>src/utils</code>.
+            Monday operations metrics use TypeScript utilities from <code>src/utils</code>.
             Hiring support remains available for Diane Foster&apos;s pipeline.
           </p>
           <div className="inline-actions" style={{ marginTop: "1rem" }}>
-            <Link className="link-button" href="/ops">
-              Open Milestone 2 ops metrics
+            <Link className="link-button" href="/ops" prefetch={false}>
+              Open Operations
             </Link>
-            <Link className="link-button secondary" href="/incidents">
+            <Link className="link-button secondary" href="/incidents" prefetch={false}>
               Open incident analysis
             </Link>
-            <Link className="link-button secondary" href="/suppliers">
+            <Link className="link-button secondary" href="/suppliers" prefetch={false}>
               Open supplier directory
             </Link>
-            <Link className="link-button secondary" href="/inventory">
+            <Link className="link-button secondary" href="/inventory" prefetch={false}>
               Open clinic inventory
             </Link>
-            <Link className="link-button secondary" href="/hiring">
+            <Link className="link-button secondary" href="/hiring" prefetch={false}>
               Open {branding.appName}
             </Link>
           </div>
         </section>
 
-        <Milestone2OpsPanel />
+        <HomeOpsSummary />
 
         <section className="section-card">
           <h2>Who this serves</h2>

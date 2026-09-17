@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
 **Last updated:** 2026-09-16  
-**Latest stamped plan:** [HC-MS5-PLAN-042](./plans/HC-MS5-PLAN-042-20260916-container-runbook-browse.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-041](./plans/HC-MS5-PLAN-041-20260914-container-compose-impl.md) (`implemented`, MS5, implementation)  
+**Latest stamped plan:** [HC-MS5-PLAN-047](./plans/HC-MS5-PLAN-047-20260916-ops-label-operations.md) (`implemented`, MS5, implementation)  
+**Prior completed stamp:** [HC-MS5-PLAN-046](./plans/HC-MS5-PLAN-046-20260916-ops-dashboard-perf.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Rubric mapping (MS4)
@@ -31,6 +31,16 @@
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
 
 ## Today’s update (2026-09-16)
+
+**Operations label (PLAN-047):** User-facing “Milestone 2 ops” copy is now **Operations** (nav, `/ops` heading, home CTAs). URL remains `/ops`.
+
+**Ops dashboard performance (PLAN-046):** `/ops` uses a server internal layout (nav not a client shell). Headline denial / no-show / CME numbers stay visible; long lists are in `<details>`. Re-run Lighthouse on http://localhost:3001/ops after a hard refresh.
+
+**Backoffice home JS (PLAN-045):** Welcome page server-renders a slim Monday ops snapshot (same `src/utils` numbers) instead of client-loading the full ops panel. Geist webfont removed. `/ops` still has the full panel. Re-run Lighthouse on http://localhost:3001/ after a hard refresh.
+
+**Backoffice home performance (PLAN-044):** Authenticated `/` no longer waits on “Loading session” to paint. `fetchAuthMe` still runs. Home defers Milestone 2 ops JS (`dynamic`, `ssr: false`); `/ops` still has the full panel. Nav prefetch off. Re-run Lighthouse on http://localhost:3001/ after login.
+
+**Backoffice login performance (PLAN-043):** Public auth routes no longer wait on “Loading session”. Login heading is server-rendered; unused Geist Mono removed; chrome omitted on `/login`. Protected routes still use JWT + `/auth/me`. Re-run Lighthouse on http://localhost:3001/login after Next is Ready.
 
 **Container browse runbook (PLAN-042):** Docs-only. [`CONTEXT-MS5-container.md`](../docs/Project_Contexts/CONTEXT-MS5-container.md) How to run now states: after containers are up, use a host browser on localhost 3000/3001/8001; Docker Desktop is not the website; `/health` JSON may look blank; troubleshooting for virtualization and `docker` not on PATH.
 

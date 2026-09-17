@@ -63,6 +63,6 @@ export function buildMilestone2OpsSnapshot(): Milestone2OpsSnapshot {
     })),
     asOfDate: OPS_AS_OF_DATE,
     weekEndingDate: OPS_WEEK_ENDING,
-    source: "Milestone 2 src/utils (transformations) + synthetic sample data",
+    source: "Operations src/utils (transformations) + synthetic sample data",
   };
 }
