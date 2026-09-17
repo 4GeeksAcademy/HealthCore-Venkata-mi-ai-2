@@ -18,3 +18,10 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [CONTEXT-MS5-inventory-backoffice.md](./Project_Contexts/CONTEXT-MS5-inventory-backoffice.md) — **next:** MS5 inventory backoffice UI on that API
 - [CONTEXT-MS5-container.md](./Project_Contexts/CONTEXT-MS5-container.md) — MS5 / ticket `#infra-40` development Docker Compose
 
+## Audits
+
+- [audit.md](./audit.md) — Lighthouse before/after for public site and backoffice, with root causes
+- [report.md](./report.md) — Corrections plus measurable scores
+- [lighthouse/](./lighthouse/) — Committed Lighthouse screenshots
+- [EVALUATION.md](./EVALUATION.md) — Latest 2026-09-16 session rubric score (overwrite on re-eval the same day)
+

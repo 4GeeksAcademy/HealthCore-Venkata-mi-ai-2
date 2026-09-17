@@ -35,3 +35,5 @@ ErrorHandling (20260828) | Error handling patterns (frontend / backend / scripts
 UnitTesting (20260831) | Unit testing (pytest auth + Jest utilities) | 2026-08-31 | complete | 8/8 Pass | [Results/UnitTesting-20260831.md](./Results/UnitTesting-20260831.md)
 
 InventoryORM (20260911) | Inventory ORM dual database (TinyDB auth + SQLModel) | 2026-09-11 | complete | 12/12 Pass | [Results/InventoryORM-20260911.md](./Results/InventoryORM-20260911.md)
+
+FrontendPerformance (20260916) | Frontend performance assignment rubric | 2026-09-16 | complete | 7/7 Pass | [../../docs/EVALUATION.md](../../docs/EVALUATION.md)

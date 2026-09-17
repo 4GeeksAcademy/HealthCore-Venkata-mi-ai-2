@@ -104,6 +104,16 @@ Format per line:
 
 47 | HC-MS5-PLAN-047 | MS5 | 2026-09-16 | Rename Milestone 2 Ops Labels To Operations | implemented | implementation | [HC-MS5-PLAN-047-20260916-ops-label-operations.md](./HC-MS5-PLAN-047-20260916-ops-label-operations.md)
 
+48 | HC-MS5-PLAN-048 | MS5 | 2026-09-16 | Save Backoffice Frontend Performance Audit Markdown | implemented | docs | [HC-MS5-PLAN-048-20260916-frontend-perf-audit-md.md](./HC-MS5-PLAN-048-20260916-frontend-perf-audit-md.md)
+
+49 | HC-MS5-PLAN-049 | MS5 | 2026-09-16 | Save Backoffice Frontend Performance Corrections Report | implemented | docs | [HC-MS5-PLAN-049-20260916-frontend-perf-report-md.md](./HC-MS5-PLAN-049-20260916-frontend-perf-report-md.md)
+
+50 | HC-MS5-PLAN-050 | MS5 | 2026-09-16 | Install Web Performance Skills For Coding Agents | implemented | docs | [HC-MS5-PLAN-050-20260916-web-performance-skills.md](./HC-MS5-PLAN-050-20260916-web-performance-skills.md)
+
+51 | HC-MS5-PLAN-051 | MS5 | 2026-09-16 | Save Frontend Performance Rubric Evaluation For Session | implemented | docs | [HC-MS5-PLAN-051-20260916-frontend-perf-eval.md](./HC-MS5-PLAN-051-20260916-frontend-perf-eval.md)
+
+52 | HC-MS5-PLAN-052 | MS5 | 2026-09-16 | Close Frontend Performance Rubric Fails And Re-evaluate | implemented | implementation | [HC-MS5-PLAN-052-20260916-frontend-perf-eval-rerun.md](./HC-MS5-PLAN-052-20260916-frontend-perf-eval-rerun.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

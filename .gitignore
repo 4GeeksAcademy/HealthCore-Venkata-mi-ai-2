@@ -23,3 +23,9 @@ uis/backoffice/coverage/
 # Python bytecode
 **/__pycache__/
 *.pyc
+
+# Lighthouse CLI temp + full JSON (keep PNG screenshots + scores.json)
+docs/lighthouse/.tmp/
+docs/lighthouse/.chrome*/
+docs/lighthouse/*.json
+!docs/lighthouse/scores.json

@@ -1,7 +1,19 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ServiceCard } from "@/components/ServiceCard";
-import { PatientSignupForm } from "@/components/PatientSignupForm";
 import { services, siteBrand } from "@/lib/site-content";
+
+const PatientSignupForm = dynamic(
+  () =>
+    import("@/components/PatientSignupForm").then((mod) => mod.PatientSignupForm),
+  {
+    loading: () => (
+      <p className="section-lead" role="status">
+        Loading patient sign-up…
+      </p>
+    ),
+  },
+);
 
 export default function HomePage() {
   const featured = services.slice(0, 3);

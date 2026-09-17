@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
 **Last updated:** 2026-09-16  
-**Latest stamped plan:** [HC-MS5-PLAN-047](./plans/HC-MS5-PLAN-047-20260916-ops-label-operations.md) (`implemented`, MS5, implementation)  
-**Prior completed stamp:** [HC-MS5-PLAN-046](./plans/HC-MS5-PLAN-046-20260916-ops-dashboard-perf.md) (`implemented`, MS5, implementation)  
+**Latest stamped plan:** [HC-MS5-PLAN-052](./plans/HC-MS5-PLAN-052-20260916-frontend-perf-eval-rerun.md) (`implemented`, MS5, implementation)  
+**Prior completed stamp:** [HC-MS5-PLAN-051](./plans/HC-MS5-PLAN-051-20260916-frontend-perf-eval.md) (`implemented`, MS5, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Rubric mapping (MS4)
@@ -31,6 +31,16 @@
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
 
 ## Today’s update (2026-09-16)
+
+**Frontend performance eval (PLAN-052):** Rubric re-run **7/7 Pass**. Latest session file: [`docs/EVALUATION.md`](../docs/EVALUATION.md) (overwrites same-day). Lab screenshots: [`docs/lighthouse/`](../docs/lighthouse/).
+
+**Frontend performance eval (PLAN-051):**
+
+**Web performance skills (PLAN-050):** addyosmani `core-web-vitals` + `performance` and Cloudflare `web-perf` installed under `.cursor/skills/`, `.agents/skills/`, and `.claude/skills/`. HealthCore wrapper: `healthcore-web-performance`. Listed in `AGENTS.md`.
+
+**Frontend performance report (PLAN-049):** Code corrections for login, home, and Operations Lighthouse work saved at [`docs/report.md`](../docs/report.md).
+
+**Frontend performance audit (PLAN-048):** Before/after Lighthouse notes saved at [`docs/audit.md`](../docs/audit.md). After-score table is blank until a re-run.
 
 **Operations label (PLAN-047):** User-facing “Milestone 2 ops” copy is now **Operations** (nav, `/ops` heading, home CTAs). URL remains `/ops`.
 

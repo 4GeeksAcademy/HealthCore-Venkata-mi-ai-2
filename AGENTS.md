@@ -88,3 +88,20 @@ Allowed without extra confirmation: updating `memory-bank/progress.md`, appendin
 - Never share layouts between public and backoffice.
 - Treat sample IDs (`HC-*`, `CLM-*`, …) as synthetic; never invent real PHI.
 - Never commit `.env` files or credentials. Secrets stay in local ignored env files only.
+
+---
+
+## Web performance skills
+
+When the request involves Lighthouse, page speed, Core Web Vitals (LCP, INP, CLS), or frontend performance, **read and follow** these skills before changing UI code:
+
+| Skill | Cursor | Any agent (Codex / generic) | Claude Code |
+|-------|--------|-----------------------------|-------------|
+| `core-web-vitals` | [`.cursor/skills/core-web-vitals/SKILL.md`](.cursor/skills/core-web-vitals/SKILL.md) | [`.agents/skills/core-web-vitals/SKILL.md`](.agents/skills/core-web-vitals/SKILL.md) | [`.claude/skills/core-web-vitals/SKILL.md`](.claude/skills/core-web-vitals/SKILL.md) |
+| `performance` | [`.cursor/skills/performance/SKILL.md`](.cursor/skills/performance/SKILL.md) | [`.agents/skills/performance/SKILL.md`](.agents/skills/performance/SKILL.md) | [`.claude/skills/performance/SKILL.md`](.claude/skills/performance/SKILL.md) |
+| `web-perf` | [`.cursor/skills/web-perf/SKILL.md`](.cursor/skills/web-perf/SKILL.md) | [`.agents/skills/web-perf/SKILL.md`](.agents/skills/web-perf/SKILL.md) | [`.claude/skills/web-perf/SKILL.md`](.claude/skills/web-perf/SKILL.md) |
+| HealthCore wrapper | [`.cursor/skills/healthcore-web-performance/SKILL.md`](.cursor/skills/healthcore-web-performance/SKILL.md) | [`.agents/skills/healthcore-web-performance/SKILL.md`](.agents/skills/healthcore-web-performance/SKILL.md) | [`.claude/skills/healthcore-web-performance/SKILL.md`](.claude/skills/healthcore-web-performance/SKILL.md) |
+
+Index: [`.agents/skills/web-performance-skills.md`](.agents/skills/web-performance-skills.md).
+
+HealthCore extras: keep public and backoffice layouts isolated; do not invent Lighthouse scores; `next dev` is not `next start`. See [`docs/audit.md`](docs/audit.md) and [`docs/report.md`](docs/report.md).

@@ -2,15 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { clearAuthToken, getAuthToken } from "@/lib/auth-storage";
+import { clearAuthToken } from "@/lib/auth-storage";
+import { useAuthToken } from "@/hooks/useAuthToken";
 
 export function SessionActions() {
   const pathname = usePathname();
-  const token = getAuthToken();
+  const { token, ready } = useAuthToken();
 
   function logout() {
     clearAuthToken();
     window.location.href = "/login";
+  }
+
+  if (!ready) {
+    return (
+      <div
+        className="inline-actions"
+        aria-hidden="true"
+        style={{ minHeight: "2.25rem", minWidth: "12rem" }}
+      />
+    );
   }
 
   if (!token) {

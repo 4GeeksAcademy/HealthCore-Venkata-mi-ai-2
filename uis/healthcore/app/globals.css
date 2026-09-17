@@ -18,7 +18,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-source-sans);
+  --font-sans: "Segoe UI", system-ui, sans-serif;
 }
 
 * {
@@ -34,7 +34,7 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-source-sans), "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
 }
 
 a {
