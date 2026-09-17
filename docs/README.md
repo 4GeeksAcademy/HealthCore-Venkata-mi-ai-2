@@ -16,4 +16,5 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [auth_master_framework_Context.md](./Project_Contexts/auth_master_framework_Context.md) — AUTH-01 / AUTH-02 / AUTH-03
 - [CONTEXT-inventory-orm-dual-database.md](./Project_Contexts/CONTEXT-inventory-orm-dual-database.md) — **first:** inventory ORM + TinyDB/Supabase dual database
 - [CONTEXT-MS5-inventory-backoffice.md](./Project_Contexts/CONTEXT-MS5-inventory-backoffice.md) — **next:** MS5 inventory backoffice UI on that API
+- [CONTEXT-MS5-container.md](./Project_Contexts/CONTEXT-MS5-container.md) — MS5 / ticket `#infra-40` development Docker Compose
 

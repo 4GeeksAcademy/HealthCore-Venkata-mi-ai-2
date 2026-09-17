@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-11  
-**Latest stamped plan:** [HC-MS5-PLAN-038](./plans/HC-MS5-PLAN-038-20260911-backoffice-root-suspense-turbopack.md) (`implemented`, MS5, implementation)  
-**Prior completed stamp:** [HC-MS5-PLAN-037](./plans/HC-MS5-PLAN-037-20260911-orm-first-backoffice-alignment.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-09-16  
+**Latest stamped plan:** [HC-MS5-PLAN-042](./plans/HC-MS5-PLAN-042-20260916-container-runbook-browse.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-041](./plans/HC-MS5-PLAN-041-20260914-container-compose-impl.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Rubric mapping (MS4)
@@ -17,6 +17,7 @@
 |------|--------|
 | Milestone 2 `src/utils/` | Present + **integrated into backoffice UI** |
 | Public site `uis/healthcore` | Done (rubric “website”) |
+| MS5 containerization (`#infra-40`) | **Implemented** (PLAN-041) — Compose verified on host; browse runbook in CONTEXT (PLAN-042) |
 | Backoffice | Done — welcome, `/ops`, `/hiring`, `/incidents`, `/suppliers`, **`/inventory`** |
 | MS5 inventory backoffice | **Implemented** (PLAN-030, aligned PLAN-037) — consumes ORM API; eval → [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (**8/8 Pass**) |
 | Inventory ORM + dual DB | **Implemented first** (PLAN-034–037) — SQLModel/Supabase inventory, TinyDB auth; eval → [Results/InventoryORM-20260911.md](./evaluations/Results/InventoryORM-20260911.md) (**12/12 Pass**) |
@@ -28,6 +29,18 @@
 | Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |
 | Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
+
+## Today’s update (2026-09-16)
+
+**Container browse runbook (PLAN-042):** Docs-only. [`CONTEXT-MS5-container.md`](../docs/Project_Contexts/CONTEXT-MS5-container.md) How to run now states: after containers are up, use a host browser on localhost 3000/3001/8001; Docker Desktop is not the website; `/health` JSON may look blank; troubleshooting for virtualization and `docker` not on PATH.
+
+## Today’s update (2026-09-14)
+
+**Development Compose implementation (PLAN-041):** Ticket `#infra-40` files shipped — `uis/Dockerfile` + `start.sh`, `services/Dockerfile` (`uv pip install --system "-r"` + uvicorn `--reload`), both `.dockerignore` files, root `docker-compose.yml` (`ui`/`api`, network `healthcore`), backoffice `/hc-api` rewrite to `http://api:8001`, gitignored root `.env`. Docker CLI was not installed here, so `docker compose up` was not run. Follow the runbook in [`CONTEXT-MS5-container.md`](../docs/Project_Contexts/CONTEXT-MS5-container.md).
+
+**Container CONTEXT audit (PLAN-040):** Docs-only. Re-read `#infra-40` against [`CONTEXT-MS5-container.md`](../docs/Project_Contexts/CONTEXT-MS5-container.md). Tightened in/out of scope (no seed-on-boot, no extra Compose services, no new error UI). Replaced Alpine `wget` samples with `node fetch`. Added post-implementation runbook: Docker Desktop download → engine check → root `.env` → `docker compose up --build`. Docker files still not implemented.
+
+**Development containerization CONTEXT (PLAN-039):** Docs-only. Implementing agents must follow [`docs/Project_Contexts/CONTEXT-MS5-container.md`](../docs/Project_Contexts/CONTEXT-MS5-container.md) for ticket `#infra-40`. One UI container (`uis/healthcore` on 3000 + `uis/backoffice` on 3001), FastAPI `--reload` as Compose service `api` on 8001, named network `healthcore`, root `.env`, `/hc-api` rewrite to `http://api:8001`. No Dockerfiles or `docker-compose.yml` in that stamp.
 
 ## Today’s update (2026-09-11)
 

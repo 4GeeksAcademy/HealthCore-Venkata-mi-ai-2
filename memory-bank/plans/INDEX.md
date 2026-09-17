@@ -86,6 +86,14 @@ Format per line:
 
 38 | HC-MS5-PLAN-038 | MS5 | 2026-09-11 | Backoffice Root Suspense and Turbopack Root | implemented | implementation | [HC-MS5-PLAN-038-20260911-backoffice-root-suspense-turbopack.md](./HC-MS5-PLAN-038-20260911-backoffice-root-suspense-turbopack.md)
 
+39 | HC-MS5-PLAN-039 | MS5 | 2026-09-14 | MS5 Development Containerization Context Document | implemented | docs | [HC-MS5-PLAN-039-20260914-container-context.md](./HC-MS5-PLAN-039-20260914-container-context.md)
+
+40 | HC-MS5-PLAN-040 | MS5 | 2026-09-14 | MS5 Container CONTEXT Audit Scope Runbook | implemented | docs | [HC-MS5-PLAN-040-20260914-container-context-audit.md](./HC-MS5-PLAN-040-20260914-container-context-audit.md)
+
+41 | HC-MS5-PLAN-041 | MS5 | 2026-09-14 | MS5 Development Docker Compose Implementation | implemented | implementation | [HC-MS5-PLAN-041-20260914-container-compose-impl.md](./HC-MS5-PLAN-041-20260914-container-compose-impl.md)
+
+42 | HC-MS5-PLAN-042 | MS5 | 2026-09-16 | MS5 Container Runbook Browse After Compose Up | implemented | docs | [HC-MS5-PLAN-042-20260916-container-runbook-browse.md](./HC-MS5-PLAN-042-20260916-container-runbook-browse.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

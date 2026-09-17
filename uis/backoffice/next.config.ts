@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  async rewrites() {
+    const internal =
+      process.env.HEALTHCORE_API_INTERNAL_URL?.replace(/\/$/, "") ||
+      "http://api:8001";
+    return [{ source: "/hc-api/:path*", destination: `${internal}/:path*` }];
+  },
 };
 
 export default nextConfig;

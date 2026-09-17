@@ -1,0 +1,48 @@
+services:
+  api:
+    build:
+      context: ./services
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./services/api:/app
+    networks:
+      - healthcore
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  ui:
+    build:
+      context: ./uis
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./uis/healthcore:/workspace/uis/healthcore
+      - ./uis/backoffice:/workspace/uis/backoffice
+      - ./src:/workspace/src
+      - ui_healthcore_node_modules:/workspace/uis/healthcore/node_modules
+      - ui_backoffice_node_modules:/workspace/uis/backoffice/node_modules
+    command: ["/workspace/uis/start.sh"]
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - healthcore
+
+networks:
+  healthcore:
+    name: healthcore
+
+volumes:
+  ui_healthcore_node_modules:
+  ui_backoffice_node_modules:
