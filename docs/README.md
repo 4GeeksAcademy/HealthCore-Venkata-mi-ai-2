@@ -17,9 +17,12 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [CONTEXT-inventory-orm-dual-database.md](./Project_Contexts/CONTEXT-inventory-orm-dual-database.md) — **first:** inventory ORM + TinyDB/Supabase dual database
 - [CONTEXT-MS5-inventory-backoffice.md](./Project_Contexts/CONTEXT-MS5-inventory-backoffice.md) — **next:** MS5 inventory backoffice UI on that API
 - [CONTEXT-MS5-container.md](./Project_Contexts/CONTEXT-MS5-container.md) — MS5 / ticket `#infra-40` development Docker Compose
+- [CONTEXT-backend-serialization-audit.md](./Project_Contexts/CONTEXT-backend-serialization-audit.md) — FastAPI `response_model` / auth email policy
 
 ## Audits
 
+- [serialization-audit.md](./serialization-audit.md) — API route → Pydantic schema map (CSV export excepted)
+- Serialization eval (2026-09-18, **6/6 Pass**) — [Results/BackendSerialization-20260918.md](../memory-bank/evaluations/Results/BackendSerialization-20260918.md)
 - [audit.md](./audit.md) — Lighthouse before/after for public site and backoffice, with root causes
 - [report.md](./report.md) — Corrections plus measurable scores
 - [lighthouse/](./lighthouse/) — Committed Lighthouse screenshots

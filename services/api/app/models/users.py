@@ -32,11 +32,16 @@ class AccessTokenResponse(BaseModel):
 
 
 class UserResponse(BaseModel):
+    """Staff user JSON without email (register, list, get, put)."""
+
     id: int
-    email: EmailStr
     is_active: bool
     role: UserRole
     created_at: str
+
+
+class UserDeleteAck(BaseModel):
+    ok: bool = True
 
 
 class ProfileResponse(BaseModel):

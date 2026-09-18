@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.inventory.models import InboundOrder, MedicalSupply, OutboundOrder
 from app.inventory.service import seed_inventory
+from tests.conftest import STAFF_EMAIL
 
 
 def test_inventory_tables_use_readable_names() -> None:
@@ -84,7 +85,7 @@ def test_inbound_increases_stock_and_records_user_uuid(
     assert body["quantity"] == 40
     assert body["product_name"] == "Nitrile exam gloves (box of 100)"
     assert body["user_uuid"] == str(registered_user["user"]["id"])
-    assert body["created_by"] == registered_user["user"]["email"]
+    assert body["created_by"] == STAFF_EMAIL
 
     refreshed = client.get("/inventory/products", headers=auth_headers).json()
     gloves = next(row for row in refreshed if row["id"] == product_id)
@@ -174,7 +175,7 @@ def test_order_history_lists_inbound_and_outbound(
     assert all(row["product_name"] for row in rows)
     staff_rows = [row for row in rows if row["notes"] in {"Delivery", "Use"}]
     assert all(row["user_uuid"] == str(registered_user["user"]["id"]) for row in staff_rows)
-    assert all(row["created_by"] == registered_user["user"]["email"] for row in staff_rows)
+    assert all(row["created_by"] == STAFF_EMAIL for row in staff_rows)
 
 
 def test_empty_catalog_and_orders_return_empty_lists(

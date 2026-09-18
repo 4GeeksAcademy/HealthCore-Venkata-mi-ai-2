@@ -24,7 +24,7 @@ def test_register_creates_active_user_with_profile(client: TestClient) -> None:
     user = body["user"]
     profile = body["profile"]
 
-    assert user["email"] == STAFF_EMAIL
+    assert "email" not in user
     assert user["role"] == "user"
     assert user["is_active"] is True
     assert "hashed_password" not in user

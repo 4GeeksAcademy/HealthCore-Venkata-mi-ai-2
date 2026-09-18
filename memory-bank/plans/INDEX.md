@@ -114,6 +114,10 @@ Format per line:
 
 52 | HC-MS5-PLAN-052 | MS5 | 2026-09-16 | Close Frontend Performance Rubric Fails And Re-evaluate | implemented | implementation | [HC-MS5-PLAN-052-20260916-frontend-perf-eval-rerun.md](./HC-MS5-PLAN-052-20260916-frontend-perf-eval-rerun.md)
 
+53 | HC-MS5-PLAN-053 | MS5 | 2026-09-18 | Backend Serialization Audit Context And Response Models | implemented | implementation | [HC-MS5-PLAN-053-20260918-backend-serialization-audit.md](./HC-MS5-PLAN-053-20260918-backend-serialization-audit.md)
+
+54 | HC-MS5-PLAN-054 | MS5 | 2026-09-18 | Save Backend Serialization Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-054-20260918-backend-serialization-eval.md](./HC-MS5-PLAN-054-20260918-backend-serialization-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

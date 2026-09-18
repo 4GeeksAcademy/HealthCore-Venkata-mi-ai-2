@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.errors import StorageError
 from app.database import init_dual_stores
+from app.models.health import HealthResponse
 from app.routers.auth import router as auth_router
 from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
@@ -87,6 +88,6 @@ async def unhandled_error_handler(_request: Request, exc: Exception) -> JSONResp
     )
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+@app.get("/health", response_model=HealthResponse)
+def health() -> HealthResponse:
+    return HealthResponse(status="ok")

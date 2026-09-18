@@ -6,7 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.security import hash_password
 from app.deps.auth import get_current_user
-from app.models.users import RegisterRequest, UserResponse, UserRole, UserUpdateRequest, UserWithProfileResponse
+from app.models.users import (
+    RegisterRequest,
+    UserDeleteAck,
+    UserResponse,
+    UserRole,
+    UserUpdateRequest,
+    UserWithProfileResponse,
+)
 from app.stores import auth_store
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -83,8 +90,8 @@ def update_user(
     return UserResponse(**updated)
 
 
-@router.delete("/{user_id}", response_model=dict[str, bool])
-def delete_user(user_id: int, current_user: dict = Depends(get_current_user)) -> dict[str, bool]:
+@router.delete("/{user_id}", response_model=UserDeleteAck)
+def delete_user(user_id: int, current_user: dict = Depends(get_current_user)) -> UserDeleteAck:
     is_admin = current_user["role"] == UserRole.admin.value
     is_owner = current_user["id"] == user_id
 
@@ -95,4 +102,4 @@ def delete_user(user_id: int, current_user: dict = Depends(get_current_user)) ->
     if not removed:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    return {"ok": True}
+    return UserDeleteAck(ok=True)

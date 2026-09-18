@@ -1,8 +1,8 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-16  
-**Latest stamped plan:** [HC-MS5-PLAN-052](./plans/HC-MS5-PLAN-052-20260916-frontend-perf-eval-rerun.md) (`implemented`, MS5, implementation)  
-**Prior completed stamp:** [HC-MS5-PLAN-051](./plans/HC-MS5-PLAN-051-20260916-frontend-perf-eval.md) (`implemented`, MS5, docs)  
+**Last updated:** 2026-09-18  
+**Latest stamped plan:** [HC-MS5-PLAN-054](./plans/HC-MS5-PLAN-054-20260918-backend-serialization-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-053](./plans/HC-MS5-PLAN-053-20260918-backend-serialization-audit.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Rubric mapping (MS4)
@@ -10,6 +10,12 @@
 - `uis/website` → **`uis/healthcore`**
 - Milestone 2 in backoffice → **`src/utils`** TypeScript (denial / no-show / CME) visible on **`/ops`** and home panel  
   (hiring tracker is separate — not Milestone 2)
+
+## Today’s update (2026-09-18)
+
+**Backend serialization eval (PLAN-054):** Official rubric **6/6 Pass**, saved after human confirm: [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md).
+
+**Backend serialization (PLAN-053):** CONTEXT at [`docs/Project_Contexts/CONTEXT-backend-serialization-audit.md`](../docs/Project_Contexts/CONTEXT-backend-serialization-audit.md). Audit table at [`docs/serialization-audit.md`](../docs/serialization-audit.md). `GET /health`, incidents analyze, and `DELETE /users` now use Pydantic models. Register / user list JSON omit email; `/auth/me` and inventory `created_by` keep email. CSV export stays a file download.
 
 ## Current state
 
@@ -29,6 +35,7 @@
 | Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |
 | Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
+| Backend serialization audit | **Implemented** (PLAN-053–054) — CONTEXT + audit + `response_model` gaps closed; eval → [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md) (**6/6 Pass**) |
 
 ## Today’s update (2026-09-16)
 

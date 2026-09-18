@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi.testclient import TestClient
 from jose import jwt
 
-from tests.conftest import TEST_JWT_SECRET
+from tests.conftest import STAFF_EMAIL, TEST_JWT_SECRET
 
 
 def test_me_returns_staff_and_profile_for_valid_token(
@@ -18,7 +18,7 @@ def test_me_returns_staff_and_profile_for_valid_token(
     assert response.status_code == 200
     body = response.json()
     assert body["id"] == registered_user["user"]["id"]
-    assert body["email"] == registered_user["user"]["email"]
+    assert body["email"] == STAFF_EMAIL
     assert body["role"] == "user"
     assert body["is_active"] is True
     assert body["profile"]["user_id"] == body["id"]

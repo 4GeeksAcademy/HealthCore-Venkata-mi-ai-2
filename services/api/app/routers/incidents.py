@@ -7,6 +7,7 @@ from fastapi.responses import Response
 
 from app.deps.auth import get_current_user
 from app.incident_analysis import AnalysisError, analyze_csv_text
+from app.models.incidents import IncidentAnalyzeResponse
 from app.result_store import store
 
 router = APIRouter(prefix="/api/incidents", tags=["incidents"])
@@ -27,11 +28,11 @@ def _analysis_detail(exc: AnalysisError) -> str:
     return "Could not analyze this file. Check the CSV format and try again."
 
 
-@router.post("/analyze")
+@router.post("/analyze", response_model=IncidentAnalyzeResponse)
 async def analyze_incidents(
     file: UploadFile = File(...),
     _: dict = Depends(get_current_user),
-) -> dict:
+) -> IncidentAnalyzeResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded.")
 
@@ -66,11 +67,16 @@ async def analyze_incidents(
         raise HTTPException(status_code=400, detail=_analysis_detail(exc)) from exc
 
     store.save(result)
-    return result.to_dict()
+    return IncidentAnalyzeResponse.model_validate(result.to_dict())
 
 
-@router.get("/results/export")
+@router.get(
+    "/results/export",
+    response_class=Response,
+    responses={200: {"content": {"text/csv": {}}}},
+)
 async def export_results(_: dict = Depends(get_current_user)) -> Response:
+    """CSV download — documented exception: no JSON response_model."""
     csv_body = store.get_csv()
     if csv_body is None:
         raise HTTPException(
