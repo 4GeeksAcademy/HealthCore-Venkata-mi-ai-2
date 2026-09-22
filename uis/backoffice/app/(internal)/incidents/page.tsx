@@ -1,10 +1,24 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { IncidentAnalyzerPanel } from "@/components/incidents/IncidentAnalyzerPanel";
 
 export const metadata: Metadata = {
   title: "Incident analysis",
 };
+
+const IncidentAnalyzerPanel = dynamic(
+  () =>
+    import("@/components/incidents/IncidentAnalyzerPanel").then(
+      (mod) => mod.IncidentAnalyzerPanel,
+    ),
+  {
+    loading: () => (
+      <p className="muted-text" role="status">
+        Loading incident analyzer…
+      </p>
+    ),
+  },
+);
 
 export default function IncidentsPage() {
   return (

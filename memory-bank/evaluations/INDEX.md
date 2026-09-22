@@ -39,3 +39,5 @@ InventoryORM (20260911) | Inventory ORM dual database (TinyDB auth + SQLModel) |
 FrontendPerformance (20260916) | Frontend performance assignment rubric | 2026-09-16 | complete | 7/7 Pass | [../../docs/EVALUATION.md](../../docs/EVALUATION.md)
 
 BackendSerialization (20260918) | Backend serialization audit (`response_model` / auth email) | 2026-09-18 | complete | 6/6 Pass | [Results/BackendSerialization-20260918.md](./Results/BackendSerialization-20260918.md)
+
+Caching (20260921) | Performance optimisation caching (lazy load / useMemo / TTL) | 2026-09-21 | complete | 8/8 Pass (re-run) | [Results/Caching-20260921.md](./Results/Caching-20260921.md)

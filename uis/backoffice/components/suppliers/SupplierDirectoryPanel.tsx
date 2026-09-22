@@ -7,6 +7,7 @@ import {
   updateSupplierRate,
   updateSupplierStatus,
 } from "@/lib/suppliers-api";
+import { summarizeSupplierDirectory } from "@/lib/supplier-directory-metrics";
 import { getUserFacingError } from "@/lib/user-facing-error";
 import {
   PRODUCT_CATEGORIES,
@@ -62,7 +63,10 @@ export function SupplierDirectoryPanel() {
     void load();
   }, [load]);
 
-  const categoryOptions = useMemo(() => PRODUCT_CATEGORIES, []);
+  const directorySummary = useMemo(
+    () => summarizeSupplierDirectory(suppliers),
+    [suppliers],
+  );
   const createCurrency = currencyForCountry(country);
 
   function toggleCategory(cat: ProductCategory) {
@@ -201,7 +205,7 @@ export function SupplierDirectoryPanel() {
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
               <option value="">All categories</option>
-              {categoryOptions.map((c) => (
+              {PRODUCT_CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
@@ -273,7 +277,7 @@ export function SupplierDirectoryPanel() {
           <fieldset className="field">
             <legend>Product categories</legend>
             <div className="inline-actions">
-              {categoryOptions.map((cat) => (
+              {PRODUCT_CATEGORIES.map((cat) => (
                 <label key={cat} className="pill" style={{ cursor: "pointer" }}>
                   <input
                     type="checkbox"
@@ -301,6 +305,13 @@ export function SupplierDirectoryPanel() {
           <p className="muted-text">
             Fields from CONTEXT: name, country, categories, monthly_rate, currency, status.
           </p>
+          {!loading && !loadError && directorySummary.total > 0 ? (
+            <p className="muted-text">
+              {directorySummary.activeCount} active / {directorySummary.suspendedCount}{" "}
+              suspended · USA monthly {directorySummary.usaMonthlyUsd.toFixed(2)} USD · UK
+              monthly {directorySummary.ukMonthlyGbp.toFixed(2)} GBP
+            </p>
+          ) : null}
         </header>
         {loading ? <p className="muted-text">Loading…</p> : null}
         {loadError ? (

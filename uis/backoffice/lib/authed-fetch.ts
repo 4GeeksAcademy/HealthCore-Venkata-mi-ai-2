@@ -11,6 +11,18 @@ function apiBase(): string {
   );
 }
 
+export function resolveApiUrl(path: string, base: string = apiBase()): string {
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+  const normalizedBase = base.replace(/\/$/, "");
+  if (path === normalizedBase || path.startsWith(`${normalizedBase}/`)) {
+    return path;
+  }
+  const suffix = path.startsWith("/") ? path : `/${path}`;
+  return `${normalizedBase}${suffix}`;
+}
+
 export class ApiError extends Error {
   status: number;
 
@@ -57,7 +69,7 @@ export async function authedFetch(
     throw new ApiError("Authentication required", 401);
   }
 
-  const url = path.startsWith("http") ? path : `${apiBase()}${path}`;
+  const url = resolveApiUrl(path);
   const headers = new Headers(init.headers ?? {});
   headers.set("Authorization", `Bearer ${token}`);
 

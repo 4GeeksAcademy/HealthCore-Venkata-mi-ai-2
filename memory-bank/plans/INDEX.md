@@ -118,6 +118,12 @@ Format per line:
 
 54 | HC-MS5-PLAN-054 | MS5 | 2026-09-18 | Save Backend Serialization Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-054-20260918-backend-serialization-eval.md](./HC-MS5-PLAN-054-20260918-backend-serialization-eval.md)
 
+55 | HC-MS5-PLAN-055 | MS5 | 2026-09-21 | Performance Optimisation Caching Implementation | implemented | implementation | [HC-MS5-PLAN-055-20260921-caching-optimisation.md](./HC-MS5-PLAN-055-20260921-caching-optimisation.md)
+
+56 | HC-MS5-PLAN-056 | MS5 | 2026-09-21 | Save Caching Optimisation Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-056-20260921-caching-eval.md](./HC-MS5-PLAN-056-20260921-caching-eval.md)
+
+57 | HC-MS5-PLAN-057 | MS5 | 2026-09-21 | Re-run Caching Rubric Evaluation After Live Page Check | implemented | docs | [HC-MS5-PLAN-057-20260921-caching-eval-rerun.md](./HC-MS5-PLAN-057-20260921-caching-eval-rerun.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

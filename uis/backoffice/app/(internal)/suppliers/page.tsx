@@ -1,4 +1,18 @@
-import { SupplierDirectoryPanel } from "@/components/suppliers/SupplierDirectoryPanel";
+import dynamic from "next/dynamic";
+
+const SupplierDirectoryPanel = dynamic(
+  () =>
+    import("@/components/suppliers/SupplierDirectoryPanel").then(
+      (mod) => mod.SupplierDirectoryPanel,
+    ),
+  {
+    loading: () => (
+      <p className="muted-text" role="status">
+        Loading supplier directory…
+      </p>
+    ),
+  },
+);
 
 export default function SuppliersPage() {
   return (

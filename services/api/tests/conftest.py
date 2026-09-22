@@ -14,6 +14,7 @@ os.environ.setdefault("RESET_TOKEN_EXPIRE_MINUTES", "30")
 os.environ["DATABASE_URL"] = "sqlite://"
 
 from app.core.config import get_settings  # noqa: E402
+from app.core.response_cache import response_cache  # noqa: E402
 from app.database import reset_engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.result_store import store as incident_result_store  # noqa: E402
@@ -41,10 +42,12 @@ def _isolate_persistence(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     get_settings.cache_clear()
     reset_engine()
+    response_cache.clear()
     incident_result_store._summary = None
     incident_result_store._csv = None
     yield
     reset_engine()
+    response_cache.clear()
     get_settings.cache_clear()
 
 

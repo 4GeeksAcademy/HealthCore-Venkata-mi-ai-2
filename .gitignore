@@ -19,6 +19,7 @@ services/api/data/inventory.json
 htmlcov/
 coverage.xml
 uis/backoffice/coverage/
+services/api/.profile-cache-tmp/
 
 # Python bytecode
 **/__pycache__/

@@ -18,8 +18,12 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [CONTEXT-MS5-inventory-backoffice.md](./Project_Contexts/CONTEXT-MS5-inventory-backoffice.md) — **next:** MS5 inventory backoffice UI on that API
 - [CONTEXT-MS5-container.md](./Project_Contexts/CONTEXT-MS5-container.md) — MS5 / ticket `#infra-40` development Docker Compose
 - [CONTEXT-backend-serialization-audit.md](./Project_Contexts/CONTEXT-backend-serialization-audit.md) — FastAPI `response_model` / auth email policy
+- [Performance_Optimisation_Caching.md](./Project_Contexts/Performance_Optimisation_Caching.md) — lazy load, `useMemo`, FastAPI TTL cache
 
 ## Audits
+
+- [CACHING_REPORT.md](./CACHING_REPORT.md) — caching decisions, TTLs, invalidation, what was not cached
+- Caching eval (2026-09-21, **8/8 Pass**, re-run) — [Results/Caching-20260921.md](../memory-bank/evaluations/Results/Caching-20260921.md)
 
 - [serialization-audit.md](./serialization-audit.md) — API route → Pydantic schema map (CSV export excepted)
 - Serialization eval (2026-09-18, **6/6 Pass**) — [Results/BackendSerialization-20260918.md](../memory-bank/evaluations/Results/BackendSerialization-20260918.md)

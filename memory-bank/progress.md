@@ -1,9 +1,17 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-18  
-**Latest stamped plan:** [HC-MS5-PLAN-054](./plans/HC-MS5-PLAN-054-20260918-backend-serialization-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-053](./plans/HC-MS5-PLAN-053-20260918-backend-serialization-audit.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-09-21  
+**Latest stamped plan:** [HC-MS5-PLAN-057](./plans/HC-MS5-PLAN-057-20260921-caching-eval-rerun.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-056](./plans/HC-MS5-PLAN-056-20260921-caching-eval.md) (`implemented`, MS5, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-09-21)
+
+**Caching eval re-run (PLAN-057):** Official rubric still **8/8 Pass**. Same-day file overwritten (only one result): [Results/Caching-20260921.md](./evaluations/Results/Caching-20260921.md). Live Chrome: `/incidents` CSV 100/94/6; `/suppliers` 15 vendors after `/hc-api` join fix.
+
+**Caching eval (PLAN-056):** First same-day save **8/8 Pass**; superseded in-place by PLAN-057 overwrite of the same Results file.
+
+**Caching implementation (PLAN-055):** CONTEXT at [`docs/Project_Contexts/Performance_Optimisation_Caching.md`](../docs/Project_Contexts/Performance_Optimisation_Caching.md). Report at [`docs/CACHING_REPORT.md`](../docs/CACHING_REPORT.md). In-process TTL cache on `GET /suppliers` (60s) and `GET /inventory/products` (30s) with write invalidation. Outbound stock checks stay on live SQL. Backoffice lazy-loads incident analyzer and supplier directory; `useMemo` on directory spend/status and low-stock ranking. Load seeder + timing middleware. Pytest **55 passed**.
 
 ## Rubric mapping (MS4)
 
@@ -36,6 +44,7 @@
 | Error handling implementation | **Implemented** (PLAN-024–026) — eval → [Results/ErrorHandling-20260828.md](./evaluations/Results/ErrorHandling-20260828.md) |
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
 | Backend serialization audit | **Implemented** (PLAN-053–054) — CONTEXT + audit + `response_model` gaps closed; eval → [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md) (**6/6 Pass**) |
+| Caching (lazy load + TTL) | **Implemented** (PLAN-055–056) — suppliers + inventory product lists; eval → [Results/Caching-20260921.md](./evaluations/Results/Caching-20260921.md) (**8/8 Pass**) |
 
 ## Today’s update (2026-09-16)
 

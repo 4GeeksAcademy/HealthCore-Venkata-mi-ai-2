@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlmodel import Session, select
 
+from app.core.response_cache import (
+    PRODUCTS_KEY,
+    PRODUCTS_TTL_SECONDS,
+    invalidate_products,
+    read_cached_rows,
+    store_cached_rows,
+)
 from app.database import get_db
 from app.deps.auth import get_current_user
 from app.inventory.models import InboundOrder, MedicalSupply, OutboundOrder
@@ -37,10 +44,20 @@ def _user_uuid(user: dict) -> str:
 
 @router.get("/products", response_model=list[MedicalSupplyResponse])
 def get_products(
+    response: Response,
     _: dict = Depends(get_current_user),
     session: Session = Depends(get_db),
 ) -> list[MedicalSupplyResponse]:
-    return list_supplies(session)
+    cached = read_cached_rows(response, PRODUCTS_KEY)
+    if cached is not None:
+        return [MedicalSupplyResponse.model_validate(row) for row in cached]
+    rows = list_supplies(session)
+    store_cached_rows(
+        PRODUCTS_KEY,
+        [row.model_dump(mode="json") for row in rows],
+        PRODUCTS_TTL_SECONDS,
+    )
+    return rows
 
 
 @router.post("/products", response_model=MedicalSupplyResponse, status_code=status.HTTP_201_CREATED)
@@ -64,6 +81,7 @@ def create_product(
         session.rollback()
         raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
     assert row.id is not None
+    invalidate_products()
     return MedicalSupplyResponse(
         id=row.id,
         name=row.name,
@@ -115,6 +133,7 @@ def post_inbound(
         session.rollback()
         raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
     assert row.id is not None
+    invalidate_products()
     return InboundOrderResponse(
         id=row.id,
         product_id=row.product_id,
@@ -140,6 +159,7 @@ def post_outbound(
     product = session.get(MedicalSupply, payload.product_id)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found.")
+    # Live SQL totals — never the GET /products cache — so stale listings cannot over-issue.
     available = current_stock_for(session, payload.product_id)
     if payload.quantity > available:
         raise HTTPException(
@@ -163,6 +183,7 @@ def post_outbound(
         session.rollback()
         raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
     assert row.id is not None
+    invalidate_products()
     return OutboundOrderResponse(
         id=row.id,
         product_id=row.product_id,

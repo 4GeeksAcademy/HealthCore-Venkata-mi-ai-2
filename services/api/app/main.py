@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
@@ -21,6 +22,7 @@ from app.routers.suppliers import router as suppliers_router
 from app.routers.users import router as users_router
 
 logger = logging.getLogger(__name__)
+timing_logger = logging.getLogger("api.timing")
 
 
 @asynccontextmanager
@@ -52,6 +54,22 @@ app.include_router(inventory_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(profiles_router)
+
+
+@app.middleware("http")
+async def timing_middleware(request: Request, call_next):
+    """Log method, path, status, and duration. Path only — no query or auth headers."""
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = (time.perf_counter() - start) * 1000
+    timing_logger.info(
+        "%s %s → %s | %.1fms",
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration_ms,
+    )
+    return response
 
 
 @app.exception_handler(StorageError)
