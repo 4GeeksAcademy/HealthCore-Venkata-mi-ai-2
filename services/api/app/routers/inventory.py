@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+import json
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlmodel import Session, select
 
@@ -26,12 +30,14 @@ from app.inventory.schemas import (
     OutboundOrderResponse,
 )
 from app.inventory.service import (
+    DIRECT_STOCK_EDIT_DETAIL,
     current_stock_for,
     get_supply,
     insufficient_stock_detail,
     iso_timestamp,
     list_orders,
     list_supplies,
+    threshold_crossed,
     utc_now,
 )
 
@@ -61,11 +67,23 @@ def get_products(
 
 
 @router.post("/products", response_model=MedicalSupplyResponse, status_code=status.HTTP_201_CREATED)
-def create_product(
-    payload: MedicalSupplyCreate,
+async def create_product(
+    request: Request,
     _: dict = Depends(get_current_user),
     session: Session = Depends(get_db),
 ) -> MedicalSupplyResponse:
+    try:
+        raw = await request.json()
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=422, detail="Request body must be a JSON object.")
+    if not isinstance(raw, dict):
+        raise HTTPException(status_code=422, detail="Request body must be a JSON object.")
+    if "stock" in raw or "current_stock" in raw:
+        raise HTTPException(status_code=400, detail=DIRECT_STOCK_EDIT_DETAIL)
+    try:
+        payload = MedicalSupplyCreate.model_validate(raw)
+    except ValidationError as exc:
+        raise RequestValidationError(exc.errors())
     existing = session.exec(select(MedicalSupply).where(MedicalSupply.sku == payload.sku)).first()
     if existing is not None:
         raise HTTPException(status_code=400, detail="SKU already exists.")
@@ -160,11 +178,11 @@ def post_outbound(
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found.")
     # Live SQL totals — never the GET /products cache — so stale listings cannot over-issue.
-    available = current_stock_for(session, payload.product_id)
-    if payload.quantity > available:
+    previous_stock = current_stock_for(session, payload.product_id)
+    if payload.quantity > previous_stock:
         raise HTTPException(
             status_code=400,
-            detail=insufficient_stock_detail(available, payload.quantity),
+            detail=insufficient_stock_detail(previous_stock, payload.quantity),
         )
     row = OutboundOrder(
         product_id=payload.product_id,
@@ -184,6 +202,7 @@ def post_outbound(
         raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
     assert row.id is not None
     invalidate_products()
+    current_stock = current_stock_for(session, payload.product_id)
     return OutboundOrderResponse(
         id=row.id,
         product_id=row.product_id,
@@ -193,6 +212,7 @@ def post_outbound(
         created_at=iso_timestamp(row.created_at),
         user_uuid=row.user_uuid,
         created_by=str(user.get("email") or row.user_uuid),
+        threshold_crossed=threshold_crossed(previous_stock, current_stock, product.threshold),
     )
 
 

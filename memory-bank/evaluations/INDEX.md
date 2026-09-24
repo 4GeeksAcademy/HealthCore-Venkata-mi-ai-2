@@ -41,3 +41,5 @@ FrontendPerformance (20260916) | Frontend performance assignment rubric | 2026-0
 BackendSerialization (20260918) | Backend serialization audit (`response_model` / auth email) | 2026-09-18 | complete | 6/6 Pass | [Results/BackendSerialization-20260918.md](./Results/BackendSerialization-20260918.md)
 
 Caching (20260921) | Performance optimisation caching (lazy load / useMemo / TTL) | 2026-09-21 | complete | 8/8 Pass (re-run) | [Results/Caching-20260921.md](./Results/Caching-20260921.md)
+
+TelemetryPlan (20260923) | Telemetry plan (catalogue, envelope, stream vs batch) | 2026-09-23 | complete | 10/10 Pass | [Results/TelemetryPlan-20260923.md](./Results/TelemetryPlan-20260923.md)

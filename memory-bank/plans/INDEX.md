@@ -124,6 +124,16 @@ Format per line:
 
 57 | HC-MS5-PLAN-057 | MS5 | 2026-09-21 | Re-run Caching Rubric Evaluation After Live Page Check | implemented | docs | [HC-MS5-PLAN-057-20260921-caching-eval-rerun.md](./HC-MS5-PLAN-057-20260921-caching-eval-rerun.md)
 
+58 | HC-MS5-PLAN-058 | MS5 | 2026-09-23 | HealthCore Telemetry Plan Context Document | implemented | docs | [HC-MS5-PLAN-058-20260923-telemetry-plan-context.md](./HC-MS5-PLAN-058-20260923-telemetry-plan-context.md)
+
+59 | HC-MS5-PLAN-059 | MS5 | 2026-09-23 | Inventory Direct Stock Rejection And Threshold Cross | implemented | implementation | [HC-MS5-PLAN-059-20260923-inventory-telemetry-gaps.md](./HC-MS5-PLAN-059-20260923-inventory-telemetry-gaps.md)
+
+60 | HC-MS5-PLAN-060 | MS5 | 2026-09-23 | HealthCore Telemetry Plan And Event Schemas | implemented | docs | [HC-MS5-PLAN-060-20260923-telemetry-plan-design.md](./HC-MS5-PLAN-060-20260923-telemetry-plan-design.md)
+
+61 | HC-MS5-PLAN-061 | MS5 | 2026-09-23 | Add Backoffice Page Load Telemetry Event | implemented | docs | [HC-MS5-PLAN-061-20260923-page-load-telemetry.md](./HC-MS5-PLAN-061-20260923-page-load-telemetry.md)
+
+62 | HC-MS5-PLAN-062 | MS5 | 2026-09-23 | Save Telemetry Plan Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-062-20260923-telemetry-plan-eval.md](./HC-MS5-PLAN-062-20260923-telemetry-plan-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

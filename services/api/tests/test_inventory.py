@@ -110,7 +110,9 @@ def test_outbound_decreases_stock(
     )
 
     assert created.status_code == 201
-    assert created.json()["user_uuid"]
+    body = created.json()
+    assert body["user_uuid"]
+    assert body["threshold_crossed"] is False
 
     refreshed = client.get("/inventory/products", headers=auth_headers).json()
     gloves = next(row for row in refreshed if row["id"] == product_id)
@@ -136,6 +138,7 @@ def test_outbound_rejects_quantity_above_available_stock(
 
     assert rejected.status_code == 400
     assert rejected.json()["detail"] == "Insufficient stock. Available: 12. Requested: 20."
+    assert "threshold_crossed" not in rejected.json()
 
     unchanged = client.get("/inventory/products", headers=auth_headers).json()
     gloves = next(row for row in unchanged if row["id"] == product_id)
@@ -188,3 +191,55 @@ def test_empty_catalog_and_orders_return_empty_lists(
     assert products.json() == []
     assert orders.status_code == 200
     assert orders.json() == []
+
+
+def test_create_product_rejects_direct_stock_fields(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    rejected = client.post(
+        "/inventory/products",
+        json={
+            "name": "Gauze pads",
+            "sku": "HC-PPE-GAU-010",
+            "threshold": 8,
+            "current_stock": 40,
+            "stock": 40,
+        },
+        headers=auth_headers,
+    )
+    assert rejected.status_code == 400
+    assert rejected.json()["detail"] == (
+        "Stock cannot be modified directly. Register an inbound or outbound order."
+    )
+    listed = client.get("/inventory/products", headers=auth_headers)
+    assert listed.status_code == 200
+    assert all(row["sku"] != "HC-PPE-GAU-010" for row in listed.json())
+
+
+def test_outbound_threshold_crossed_only_on_downward_cross(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    seed_inventory()
+    products = client.get("/inventory/products", headers=auth_headers).json()
+    pads_id = next(row["id"] for row in products if row["sku"] == "HC-CLN-PAD-200")
+
+    stayed_above = client.post(
+        "/inventory/orders/outbound",
+        json={"product_id": pads_id, "quantity": 10, "notes": "Still above threshold"},
+        headers=auth_headers,
+    )
+    assert stayed_above.status_code == 201
+    assert stayed_above.json()["threshold_crossed"] is False
+
+    crossed = client.post(
+        "/inventory/orders/outbound",
+        json={"product_id": pads_id, "quantity": 41, "notes": "Crosses restock line"},
+        headers=auth_headers,
+    )
+    assert crossed.status_code == 201
+    assert crossed.json()["threshold_crossed"] is True
+
+    refreshed = client.get("/inventory/products", headers=auth_headers).json()
+    pads = next(row for row in refreshed if row["id"] == pads_id)
+    assert pads["current_stock"] == 29
+    assert pads["current_stock"] < pads["threshold"]

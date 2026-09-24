@@ -1,9 +1,21 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-21  
-**Latest stamped plan:** [HC-MS5-PLAN-057](./plans/HC-MS5-PLAN-057-20260921-caching-eval-rerun.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-056](./plans/HC-MS5-PLAN-056-20260921-caching-eval.md) (`implemented`, MS5, docs)  
+**Last updated:** 2026-09-23  
+**Latest stamped plan:** [HC-MS5-PLAN-062](./plans/HC-MS5-PLAN-062-20260923-telemetry-plan-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-061](./plans/HC-MS5-PLAN-061-20260923-page-load-telemetry.md) (`implemented`, MS5, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-09-23)
+
+**Telemetry plan eval (PLAN-062):** Official rubric **10/10 Pass**, saved after human confirm: [Results/TelemetryPlan-20260923.md](./evaluations/Results/TelemetryPlan-20260923.md). Same-day re-evals overwrite that file only. Does not close MS5.
+
+**Page load event (PLAN-061):** Identified event `page_load_recorded` added to the telemetry plan and schema. Still no emitters.
+
+**Telemetry plan (PLAN-060):** Design only. Catalogue and draft-07 schemas at [`docs/telemetry/telemetry-plan.md`](../docs/telemetry/telemetry-plan.md) and [`docs/telemetry/event-schemas.json`](../docs/telemetry/event-schemas.json). No emitters.
+
+**Inventory telemetry gaps (PLAN-059):** `POST /inventory/products` returns 400 when the raw JSON contains `stock` or `current_stock` and does not insert. Successful outbound JSON includes `threshold_crossed` from live before/after stock. Pytest **57 passed**.
+
+**Telemetry plan CONTEXT (PLAN-058):** Brief at [`docs/Project_Contexts/CONTEXT-telemetry-plan.md`](../docs/Project_Contexts/CONTEXT-telemetry-plan.md).
 
 ## Today’s update (2026-09-21)
 
@@ -45,6 +57,7 @@
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
 | Backend serialization audit | **Implemented** (PLAN-053–054) — CONTEXT + audit + `response_model` gaps closed; eval → [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md) (**6/6 Pass**) |
 | Caching (lazy load + TTL) | **Implemented** (PLAN-055–056) — suppliers + inventory product lists; eval → [Results/Caching-20260921.md](./evaluations/Results/Caching-20260921.md) (**8/8 Pass**) |
+| Telemetry plan | **Designed** (PLAN-060–061); eval **10/10 Pass** (PLAN-062); no emitters yet |
 
 ## Today’s update (2026-09-16)
 

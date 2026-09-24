@@ -58,6 +58,7 @@ class OutboundOrderResponse(BaseModel):
     created_at: str
     user_uuid: str
     created_by: str
+    threshold_crossed: bool
 
 
 class InventoryOrderResponse(BaseModel):

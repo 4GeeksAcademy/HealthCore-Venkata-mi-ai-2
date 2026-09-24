@@ -19,6 +19,13 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [CONTEXT-MS5-container.md](./Project_Contexts/CONTEXT-MS5-container.md) — MS5 / ticket `#infra-40` development Docker Compose
 - [CONTEXT-backend-serialization-audit.md](./Project_Contexts/CONTEXT-backend-serialization-audit.md) — FastAPI `response_model` / auth email policy
 - [Performance_Optimisation_Caching.md](./Project_Contexts/Performance_Optimisation_Caching.md) — lazy load, `useMemo`, FastAPI TTL cache
+- [CONTEXT-telemetry-plan.md](./Project_Contexts/CONTEXT-telemetry-plan.md) — telemetry brief; gaps closed; design in `docs/telemetry/`
+
+## Telemetry
+
+- [telemetry-plan.md](./telemetry/telemetry-plan.md) — event catalogue, envelope, stream vs batch, exclusions
+- [event-schemas.json](./telemetry/event-schemas.json) — JSON Schema draft-07 for the envelope and property allowlists
+- Telemetry plan eval (2026-09-23, **10/10 Pass**) — [Results/TelemetryPlan-20260923.md](../memory-bank/evaluations/Results/TelemetryPlan-20260923.md)
 
 ## Audits
 

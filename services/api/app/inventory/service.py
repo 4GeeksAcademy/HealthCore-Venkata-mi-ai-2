@@ -69,6 +69,16 @@ def insufficient_stock_detail(available: int, requested: int) -> str:
     return f"Insufficient stock. Available: {available}. Requested: {requested}."
 
 
+DIRECT_STOCK_EDIT_DETAIL = (
+    "Stock cannot be modified directly. Register an inbound or outbound order."
+)
+
+
+def threshold_crossed(previous: int, current: int, threshold: int) -> bool:
+    """True only when stock moves from at-or-above the restock line to below it."""
+    return previous >= threshold and current < threshold
+
+
 def _sum_qty(session: Session, model: type[InboundOrder] | type[OutboundOrder], product_id: int) -> int:
     total = session.exec(
         select(func.coalesce(func.sum(model.quantity), 0)).where(model.product_id == product_id)
