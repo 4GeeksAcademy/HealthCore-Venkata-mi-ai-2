@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getAuthToken } from "@/lib/auth-storage";
 import { isBackofficePublicPath } from "@/lib/public-routes";
+import { track } from "@/lib/telemetry";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,6 +29,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
 
       if (!token) {
+        track("session_expired", { reason: "token_missing" });
         router.replace("/login?reason=session");
         return;
       }

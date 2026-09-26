@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AsyncState } from "@/components/async/AsyncState";
+import { ProductCreateForm } from "@/components/inventory/ProductCreateForm";
 import { fetchInventoryProducts } from "@/lib/inventory-api";
 import { buildStockInsights } from "@/lib/inventory-stock-metrics";
 import { getUserFacingError } from "@/lib/user-facing-error";
@@ -71,6 +72,8 @@ export function ProductStockPanel() {
           quantity.
         </p>
       ) : null}
+
+      <ProductCreateForm onCreated={() => void load()} />
 
       <AsyncState
         loading={loading}

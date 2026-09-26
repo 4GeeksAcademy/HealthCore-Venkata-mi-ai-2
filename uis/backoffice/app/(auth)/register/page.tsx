@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { login, register } from "@/lib/auth-api";
+import { login, register, trackLoginSucceeded } from "@/lib/auth-api";
+import { useTrackedFlow } from "@/lib/use-tracked-flow";
 import { setAuthToken } from "@/lib/auth-storage";
 import { getUserFacingError } from "@/lib/user-facing-error";
 
@@ -14,6 +15,7 @@ export default function RegisterPage() {
   const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const finishFlow = useTrackedFlow("register");
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -24,6 +26,8 @@ export default function RegisterPage() {
       await register({ email, password, name, phone, address });
       const result = await login(email, password);
       setAuthToken(result.access_token);
+      trackLoginSucceeded(result.access_token);
+      finishFlow();
       window.location.href = "/";
     } catch (err) {
       setError(getUserFacingError(err, "Unable to create the account. Please try again."));

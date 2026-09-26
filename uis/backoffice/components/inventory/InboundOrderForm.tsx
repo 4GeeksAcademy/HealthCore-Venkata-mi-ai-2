@@ -7,6 +7,9 @@ import {
   createInboundOrder,
   fetchInventoryProducts,
 } from "@/lib/inventory-api";
+import { trackInventoryFailure } from "@/lib/inventory-telemetry";
+import { track } from "@/lib/telemetry";
+import { useTrackedFlow } from "@/lib/use-tracked-flow";
 import { getUserFacingError } from "@/lib/user-facing-error";
 import type { InventoryProduct } from "@/types/inventory";
 
@@ -20,6 +23,7 @@ export function InboundOrderForm() {
   const [notes, setNotes] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const finishFlow = useTrackedFlow("inbound_order");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -84,14 +88,27 @@ export function InboundOrderForm() {
     }
 
     setSubmitting(true);
+    const sku = products.find((product) => product.id === parsedProductId)?.sku ?? "";
     try {
-      await createInboundOrder({
+      const created = await createInboundOrder({
         product_id: parsedProductId,
         quantity: parsedQuantity,
         notes: notes.trim(),
       });
+      finishFlow();
+      track("inbound_order_created", {
+        order_id: created.id,
+        product_id: created.product_id,
+        sku,
+        quantity: created.quantity,
+      });
       router.push("/inventory?notice=inbound");
     } catch (err) {
+      trackInventoryFailure("POST /inventory/orders/inbound", err, {
+        product_id: parsedProductId,
+        sku,
+        quantity: parsedQuantity,
+      });
       setFormError(
         getUserFacingError(
           err,

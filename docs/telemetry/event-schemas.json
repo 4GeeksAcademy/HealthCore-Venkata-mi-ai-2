@@ -57,7 +57,8 @@
         "api_request_failed",
         "frontend_error_captured",
         "incident_analysis_completed",
-        "supplier_record_changed"
+        "supplier_record_changed",
+        "web_vital_recorded"
       ]
     },
     "schemaVersion": {
@@ -296,6 +297,17 @@
     },
     {
       "if": {
+        "properties": { "event_type": { "const": "web_vital_recorded" } },
+        "required": ["event_type"]
+      },
+      "then": {
+        "properties": {
+          "properties": { "$ref": "#/definitions/webVitalRecorded" }
+        }
+      }
+    },
+    {
+      "if": {
         "properties": { "event_type": { "const": "supplier_record_changed" } },
         "required": ["event_type"]
       },
@@ -524,6 +536,16 @@
         "total_valid": { "type": "integer", "minimum": 0 },
         "total_invalid": { "type": "integer", "minimum": 0 },
         "duration_ms": { "type": "number", "minimum": 0 }
+      }
+    },
+    "webVitalRecorded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "path"],
+      "properties": {
+        "name": { "type": "string", "enum": ["LCP", "INP", "CLS", "FCP", "TTFB"] },
+        "value": { "type": "number" },
+        "path": { "$ref": "#/definitions/sectionPath" }
       }
     },
     "supplierRecordChanged": {

@@ -1,9 +1,23 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-23  
-**Latest stamped plan:** [HC-MS5-PLAN-062](./plans/HC-MS5-PLAN-062-20260923-telemetry-plan-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-061](./plans/HC-MS5-PLAN-061-20260923-page-load-telemetry.md) (`implemented`, MS5, docs)  
+**Last updated:** 2026-09-25  
+**Latest stamped plan:** [HC-MS5-PLAN-068](./plans/HC-MS5-PLAN-068-20260925-telemetry-capture-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-067](./plans/HC-MS5-PLAN-067-20260925-telemetry-endpoint-env.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-09-25)
+
+**Telemetry capture eval (PLAN-068):** Official rubric **12/12 Pass**, saved after human confirm: [Results/TelemetryCapture-20260925.md](./evaluations/Results/TelemetryCapture-20260925.md). Same-day re-evals overwrite that file only. Does not replace the 2026-09-23 plan eval. Does not close MS5.
+
+**Telemetry URL (PLAN-067):** `track()` reads only `NEXT_PUBLIC_TELEMETRY_ENDPOINT`. The value is still `/hc-api/telemetry/events`. Event names, allowlists, login, and inventory flows are unchanged.
+
+**Backoffice dev origin (PLAN-066):** `allowedDevOrigins` includes `127.0.0.1`. Without it, Next blocked the page scripts, so Register and Login reloaded the form instead of submitting. UI container restarted.
+
+**Telemetry stub GET (PLAN-065):** Opening `/hc-api/telemetry/events` in the browser is a GET. It returns a 200 HTML page so the address is visible. Batches remain POST and are still not stored.
+
+**Frontend telemetry capture (PLAN-064):** Stub `POST /telemetry/events` returns `{ "received": N }` and does not persist. Backoffice `track()` in `uis/backoffice/lib/telemetry.ts` batches every 10 seconds or 20 events and flushes with `sendBeacon` on hide. Mandatory and identified events from the approved plan are wired, plus `web_vital_recorded`. Pytest telemetry + inventory **14 passed**. A batch posted to `http://127.0.0.1:3001/hc-api/telemetry/events` returned **200** `{"received":1}`. Does not close MS5.
+
+**Frontend telemetry capture CONTEXT (PLAN-063):** Docs only. Brief at [`docs/Project_Contexts/CONTEXT-telemetry-frontend-capture.md`](../docs/Project_Contexts/CONTEXT-telemetry-frontend-capture.md).
 
 ## Today’s update (2026-09-23)
 
@@ -57,7 +71,7 @@
 | Unit testing | **Implemented** (PLAN-027) — [`TESTING.md`](../TESTING.md). Eval → [Results/UnitTesting-20260831.md](./evaluations/Results/UnitTesting-20260831.md) (**8/8 Pass**) |
 | Backend serialization audit | **Implemented** (PLAN-053–054) — CONTEXT + audit + `response_model` gaps closed; eval → [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md) (**6/6 Pass**) |
 | Caching (lazy load + TTL) | **Implemented** (PLAN-055–056) — suppliers + inventory product lists; eval → [Results/Caching-20260921.md](./evaluations/Results/Caching-20260921.md) (**8/8 Pass**) |
-| Telemetry plan | **Designed** (PLAN-060–061); eval **10/10 Pass** (PLAN-062); no emitters yet |
+| Telemetry plan | **Designed** (PLAN-060–061); eval **10/10 Pass** (PLAN-062); backoffice capture and stub receiver (PLAN-064) |
 
 ## Today’s update (2026-09-16)
 

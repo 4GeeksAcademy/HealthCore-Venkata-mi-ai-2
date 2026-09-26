@@ -60,6 +60,7 @@ Every event is one JSON object. No extra top-level keys.
 | `flow_started` | navigation | We capture `flow_started` because we need to know how many people entered a flow, which allows us to decide the abandonment rate instead of counting abandons with no baseline. |
 | `incident_analysis_completed` | business | We capture `incident_analysis_completed` because we need to know how often staff run the incident CSV analyzer and how many rows fail validation, which allows us to decide whether the upload template or the clinic file is the problem. |
 | `supplier_record_changed` | business | We capture `supplier_record_changed` because we need to know when the vendor directory is created, rated, deactivated, or removed, which allows us to decide whether a Monday spend figure changed because of a directory edit. |
+| `web_vital_recorded` | performance | We capture `web_vital_recorded` because we need to know which backoffice routes have poor LCP, INP, or CLS, which allows us to decide which screen to fix in the next performance pass. |
 
 ---
 
@@ -284,6 +285,16 @@ Counts only. Do not emit categories, file names, or CSV cells. Incident files ca
 | `supplier_id` | integer | yes | Supplier id |
 | `action` | string enum | yes | `created`, `rate_updated`, `status_updated`, `deleted` |
 
+### `web_vital_recorded` (identified, performance)
+
+No sensitive fields. `path` uses the `section_viewed` allowlist. `value` is the metric as reported by the browser (milliseconds for LCP, INP, FCP, and TTFB; a unitless score for CLS).
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `name` | string enum | yes | `LCP`, `INP`, `CLS`, `FCP`, or `TTFB` |
+| `value` | number | yes | Browser-reported metric value |
+| `path` | string enum | yes | Same allowlist as `section_viewed` |
+
 ---
 
 ## Delivery
@@ -310,6 +321,7 @@ Stream means the event should be visible within seconds, because the decision ca
 | `flow_abandoned` | batch | Form redesign is not a same-minute action. |
 | `api_latency_recorded` | batch | Slow-route ranking feeds the next performance pass. The process log still has every request locally. |
 | `page_load_recorded` | batch | A slow screen is a release-planning input. Staff already see the delay; paging on it does not restock a clinic. |
+| `web_vital_recorded` | batch | Core Web Vitals guide the next performance pass. They do not page the clinic on the same shift. |
 | `incident_analysis_completed` | batch | Upload quality is reviewed with operations, not paged. |
 | `supplier_record_changed` | batch | Directory edits explain a later spend figure. They do not page anyone. |
 
@@ -322,6 +334,7 @@ Security and stock-alert events are not throttled: `login_failed`, `password_res
 | `section_viewed` | At most one event per `path` per `sessionId` per 30 seconds. Rapid clicks on the same nav item are one visit. |
 | `api_latency_recorded` | Emit only when `duration_ms` is at least 200, and at most one event per `method` + `route_template` per 60 seconds per process. Keep the max `duration_ms` in that window. Faster calls stay in the process log only. |
 | `page_load_recorded` | At most one event per `path` per `sessionId` per 60 seconds. Keep the max `duration_ms` in that window. |
+| `web_vital_recorded` | At most one event per metric `name` and `path` per `sessionId` per 60 seconds. |
 | `flow_started` | At most one per `flow` per `sessionId` until that flow succeeds or is abandoned. Remounting the same form is not a new start. |
 
 No other event is high-frequency enough to debounce. One outbound order is one business fact.

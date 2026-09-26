@@ -134,6 +134,18 @@ Format per line:
 
 62 | HC-MS5-PLAN-062 | MS5 | 2026-09-23 | Save Telemetry Plan Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-062-20260923-telemetry-plan-eval.md](./HC-MS5-PLAN-062-20260923-telemetry-plan-eval.md)
 
+63 | HC-MS5-PLAN-063 | MS5 | 2026-09-25 | Frontend Telemetry Capture Context Document | implemented | docs | [HC-MS5-PLAN-063-20260925-telemetry-frontend-context.md](./HC-MS5-PLAN-063-20260925-telemetry-frontend-context.md)
+
+64 | HC-MS5-PLAN-064 | MS5 | 2026-09-25 | Backoffice Telemetry Capture And Stub Receiver | implemented | implementation | [HC-MS5-PLAN-064-20260925-telemetry-frontend-capture.md](./HC-MS5-PLAN-064-20260925-telemetry-frontend-capture.md)
+
+65 | HC-MS5-PLAN-065 | MS5 | 2026-09-25 | Telemetry Stub GET Explains POST-Only URL | implemented | implementation | [HC-MS5-PLAN-065-20260925-telemetry-stub-get.md](./HC-MS5-PLAN-065-20260925-telemetry-stub-get.md)
+
+66 | HC-MS5-PLAN-066 | MS5 | 2026-09-25 | Allow 127.0.0.1 For Backoffice Dev Assets | implemented | implementation | [HC-MS5-PLAN-066-20260925-backoffice-dev-origin.md](./HC-MS5-PLAN-066-20260925-backoffice-dev-origin.md)
+
+67 | HC-MS5-PLAN-067 | MS5 | 2026-09-25 | Telemetry URL Comes From Environment Only | implemented | implementation | [HC-MS5-PLAN-067-20260925-telemetry-endpoint-env.md](./HC-MS5-PLAN-067-20260925-telemetry-endpoint-env.md)
+
+68 | HC-MS5-PLAN-068 | MS5 | 2026-09-25 | Save Telemetry Capture Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-068-20260925-telemetry-capture-eval.md](./HC-MS5-PLAN-068-20260925-telemetry-capture-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { resetPassword } from "@/lib/auth-api";
+import { useTrackedFlow } from "@/lib/use-tracked-flow";
 import { getUserFacingError } from "@/lib/user-facing-error";
 
 export default function ResetPasswordPage() {
@@ -14,6 +15,7 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const finishFlow = useTrackedFlow("password_reset");
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -32,6 +34,7 @@ export default function ResetPasswordPage() {
     setBusy(true);
     try {
       await resetPassword(token, newPassword);
+      finishFlow();
       window.location.href = "/login?reset=success";
     } catch (err) {
       setError(

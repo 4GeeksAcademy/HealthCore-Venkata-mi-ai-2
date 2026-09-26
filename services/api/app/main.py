@@ -19,6 +19,7 @@ from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
 from app.routers.profiles import router as profiles_router
 from app.routers.suppliers import router as suppliers_router
+from app.routers.telemetry import router as telemetry_router
 from app.routers.users import router as users_router
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,7 @@ app.include_router(inventory_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(profiles_router)
+app.include_router(telemetry_router)
 
 
 @app.middleware("http")

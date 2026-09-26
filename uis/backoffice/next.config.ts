@@ -4,6 +4,9 @@ import type { NextConfig } from "next";
 const healthcoreSrc = path.resolve(process.cwd(), "../../src");
 
 const nextConfig: NextConfig = {
+  // The browser uses 127.0.0.1. Next blocks that host unless it is listed here,
+  // which stops hydration so Login and Register submit as a page reload.
+  allowedDevOrigins: ["127.0.0.1"],
   poweredByHeader: false,
   compress: true,
   // Allow importing Milestone 2 TypeScript from repo root `src/`.

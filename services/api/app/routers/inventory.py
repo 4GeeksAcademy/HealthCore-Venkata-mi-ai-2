@@ -212,6 +212,10 @@ def post_outbound(
         created_at=iso_timestamp(row.created_at),
         user_uuid=row.user_uuid,
         created_by=str(user.get("email") or row.user_uuid),
+        sku=product.sku,
+        threshold=product.threshold,
+        previous_stock=previous_stock,
+        current_stock=current_stock,
         threshold_crossed=threshold_crossed(previous_stock, current_stock, product.threshold),
     )
 

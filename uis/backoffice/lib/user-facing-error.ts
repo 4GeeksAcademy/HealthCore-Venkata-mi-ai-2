@@ -23,6 +23,8 @@ const SAFE_API_DETAILS = new Set([
   "Note not found.",
   "Note content is required.",
   "Product not found.",
+  "SKU already exists.",
+  "Stock cannot be modified directly. Register an inbound or outbound order.",
   "Request body must be valid JSON.",
   "Full name is required.",
   "Email is required.",

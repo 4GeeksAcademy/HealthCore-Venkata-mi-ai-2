@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { authedFetch } from "@/lib/authed-fetch";
+import { track } from "@/lib/telemetry";
 import { getUserFacingError, readResponseJson } from "@/lib/user-facing-error";
 
 export type IncidentAnalysisSummary = {
@@ -62,6 +63,7 @@ export function IncidentAnalyzerPanel() {
     try {
       const body = new FormData();
       body.append("file", file);
+      const started = performance.now();
       const res = await authedFetch(`${apiBase()}/api/incidents/analyze`, {
         method: "POST",
         body,
@@ -73,6 +75,12 @@ export function IncidentAnalyzerPanel() {
       ) {
         throw new Error("Unable to read analysis results. Please try again.");
       }
+      track("incident_analysis_completed", {
+        total_processed: payload.total_processed,
+        total_valid: payload.total_valid,
+        total_invalid: payload.total_invalid,
+        duration_ms: performance.now() - started,
+      });
       setSummary(payload);
     } catch (err) {
       setSummary(null);

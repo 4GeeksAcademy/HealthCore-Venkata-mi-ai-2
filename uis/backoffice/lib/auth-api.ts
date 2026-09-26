@@ -1,4 +1,5 @@
 import { authedFetch } from "@/lib/authed-fetch";
+import { track } from "@/lib/telemetry";
 import {
   messageForHttpStatus,
   readResponseJson,
@@ -72,12 +73,54 @@ async function publicFetch(path: string, init: RequestInit): Promise<Response> {
   return res;
 }
 
+function roleFromAccessToken(token: string): "admin" | "manager" | "user" | null {
+  const part = token.split(".")[1];
+  if (!part) return null;
+  try {
+    const json = JSON.parse(atob(part.replace(/-/g, "+").replace(/_/g, "/"))) as {
+      role?: unknown;
+    };
+    if (json.role === "admin" || json.role === "manager" || json.role === "user") {
+      return json.role;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+export function trackLoginSucceeded(token: string): void {
+  const role = roleFromAccessToken(token);
+  if (!role) return;
+  track("login_succeeded", { role });
+}
+
 export async function login(email: string, password: string): Promise<AuthTokenResponse> {
-  const res = await publicFetch("/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase()}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch {
+    throw new Error("Unable to reach the service. Please try again.");
+  }
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const body = (await res.json()) as { detail?: unknown };
+      if (typeof body.detail === "string") detail = body.detail;
+    } catch {
+      detail = "";
+    }
+    if (res.status === 401) {
+      track("login_failed", {
+        reason: detail === "Inactive user" ? "inactive_user" : "invalid_credentials",
+      });
+    }
+    throw new Error(sanitizeApiDetail(res.status, detail || undefined));
+  }
   return readResponseJson<AuthTokenResponse>(res);
 }
 
@@ -118,20 +161,34 @@ export async function forgotPassword(email: string): Promise<void> {
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  await publicFetch("/auth/reset-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, new_password: newPassword }),
-  });
+  try {
+    await publicFetch("/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, new_password: newPassword }),
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "Invalid or expired token") {
+      track("password_reset_failed", { reason: "invalid_or_expired_token" });
+    }
+    throw err;
+  }
 }
 
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
-  await authedFetch("/auth/change-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      current_password: currentPassword,
-      new_password: newPassword,
-    }),
-  });
+  try {
+    await authedFetch("/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "Current password is incorrect") {
+      track("password_change_failed", { reason: "current_password_incorrect" });
+    }
+    throw err;
+  }
 }

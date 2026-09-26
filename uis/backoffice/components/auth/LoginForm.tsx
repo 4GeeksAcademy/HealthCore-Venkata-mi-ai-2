@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { login } from "@/lib/auth-api";
+import { login, trackLoginSucceeded } from "@/lib/auth-api";
 import { setAuthToken } from "@/lib/auth-storage";
 import { getUserFacingError } from "@/lib/user-facing-error";
 
@@ -30,6 +30,7 @@ export function LoginForm() {
     try {
       const result = await login(email, password);
       setAuthToken(result.access_token);
+      trackLoginSucceeded(result.access_token);
       window.location.href = "/";
     } catch (err) {
       setError(getUserFacingError(err, "Unable to sign in. Please try again."));

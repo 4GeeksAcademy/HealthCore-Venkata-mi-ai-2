@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TelemetryRoot } from "@/components/telemetry/TelemetryRoot";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,7 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="app-body">{children}</body>
+      <body className="app-body">
+        <TelemetryRoot />
+        {children}
+      </body>
     </html>
   );
 }

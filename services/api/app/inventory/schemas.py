@@ -58,6 +58,10 @@ class OutboundOrderResponse(BaseModel):
     created_at: str
     user_uuid: str
     created_by: str
+    sku: str
+    threshold: int
+    previous_stock: int
+    current_stock: int
     threshold_crossed: bool
 
 

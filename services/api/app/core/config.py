@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     reset_token_expire_minutes: int = 30
     backoffice_public_url: str = "http://localhost:3001"
+    telemetry_endpoint: str = "http://localhost:3001/hc-api/telemetry/events"
     resend_api_key: str | None = None
     resend_from_email: str | None = None
     sendgrid_api_key: str | None = None

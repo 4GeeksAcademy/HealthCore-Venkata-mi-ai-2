@@ -43,3 +43,5 @@ BackendSerialization (20260918) | Backend serialization audit (`response_model` 
 Caching (20260921) | Performance optimisation caching (lazy load / useMemo / TTL) | 2026-09-21 | complete | 8/8 Pass (re-run) | [Results/Caching-20260921.md](./Results/Caching-20260921.md)
 
 TelemetryPlan (20260923) | Telemetry plan (catalogue, envelope, stream vs batch) | 2026-09-23 | complete | 10/10 Pass | [Results/TelemetryPlan-20260923.md](./Results/TelemetryPlan-20260923.md)
+
+TelemetryCapture (20260925) | Telemetry frontend capture (stub, track, instrumentation) | 2026-09-25 | complete | 12/12 Pass | [Results/TelemetryCapture-20260925.md](./Results/TelemetryCapture-20260925.md)

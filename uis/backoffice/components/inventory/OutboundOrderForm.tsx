@@ -6,6 +6,9 @@ import {
   createOutboundOrder,
   fetchInventoryProducts,
 } from "@/lib/inventory-api";
+import { trackInventoryFailure } from "@/lib/inventory-telemetry";
+import { track } from "@/lib/telemetry";
+import { useTrackedFlow } from "@/lib/use-tracked-flow";
 import { getUserFacingError } from "@/lib/user-facing-error";
 import type { InventoryProduct } from "@/types/inventory";
 
@@ -19,6 +22,7 @@ export function OutboundOrderForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const finishFlow = useTrackedFlow("outbound_order");
 
   const selected = useMemo(
     () => products.find((product) => String(product.id) === productId) ?? null,
@@ -90,16 +94,39 @@ export function OutboundOrderForm() {
 
     setSubmitting(true);
     try {
-      await createOutboundOrder({
+      const created = await createOutboundOrder({
         product_id: parsedProductId,
         quantity: parsedQuantity,
         notes: notes.trim(),
       });
+      finishFlow();
+      track("outbound_order_created", {
+        order_id: created.id,
+        product_id: created.product_id,
+        sku: created.sku,
+        quantity: created.quantity,
+        threshold_crossed: created.threshold_crossed,
+      });
+      if (created.threshold_crossed) {
+        track("stock_threshold_triggered", {
+          order_id: created.id,
+          product_id: created.product_id,
+          sku: created.sku,
+          threshold: created.threshold,
+          previous_stock: created.previous_stock,
+          current_stock: created.current_stock,
+        });
+      }
       setQuantity("");
       setNotes("");
       setSuccess("Outbound order recorded.");
       await load();
     } catch (err) {
+      trackInventoryFailure("POST /inventory/orders/outbound", err, {
+        product_id: parsedProductId,
+        sku: selected?.sku,
+        quantity: parsedQuantity,
+      });
       setFormError(
         getUserFacingError(
           err,

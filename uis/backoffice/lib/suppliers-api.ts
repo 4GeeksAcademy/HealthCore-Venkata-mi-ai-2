@@ -1,5 +1,6 @@
 import type { Supplier, SupplierCreate, SupplierStatus } from "@/types/supplier";
 import { authedFetch } from "@/lib/authed-fetch";
+import { track } from "@/lib/telemetry";
 import { readResponseJson } from "@/lib/user-facing-error";
 
 function apiBase(): string {
@@ -29,7 +30,9 @@ export async function createSupplier(payload: SupplierCreate): Promise<Supplier>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return readResponseJson<Supplier>(res);
+  const created = await readResponseJson<Supplier>(res);
+  track("supplier_record_changed", { supplier_id: created.id, action: "created" });
+  return created;
 }
 
 export async function updateSupplierRate(
@@ -41,7 +44,9 @@ export async function updateSupplierRate(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ monthly_rate }),
   });
-  return readResponseJson<Supplier>(res);
+  const updated = await readResponseJson<Supplier>(res);
+  track("supplier_record_changed", { supplier_id: id, action: "rate_updated" });
+  return updated;
 }
 
 export async function updateSupplierStatus(
@@ -53,5 +58,7 @@ export async function updateSupplierStatus(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
   });
-  return readResponseJson<Supplier>(res);
+  const updated = await readResponseJson<Supplier>(res);
+  track("supplier_record_changed", { supplier_id: id, action: "status_updated" });
+  return updated;
 }
