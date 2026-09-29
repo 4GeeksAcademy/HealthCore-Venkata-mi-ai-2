@@ -25,6 +25,21 @@ Every event is one JSON object. No extra top-level keys.
 
 `created_by` on order JSON stays on the HTTP response for the history page. It is not an event field.
 
+### Persistence mapping (`telemetry_events.tags`)
+
+When the storage sink writes a row, `tags` (JSONB) is:
+
+| Key in `tags` | Source |
+|---------------|--------|
+| Allowlisted property keys | `event.properties` (same allowlists as below — no extra keys) |
+| `eventId` | envelope `eventId` |
+| `sessionId` | envelope `sessionId` |
+| `userId` | envelope `userId` (`null` when anonymous) |
+| `schemaVersion` | envelope `schemaVersion` |
+| `requestId` | envelope `requestId` |
+
+Fixed columns: `timestamp`, `service` (`backoffice`), `event_type`, `level` (`info` / `warn` / `error` from event type), optional `value` from `properties.value` / `duration_ms` / `latency_ms`, optional `message`.
+
 ---
 
 ## Catalogue

@@ -1,4 +1,4 @@
-"""Clinic inventory HTTP routes — SQLModel / Supabase, JWT required."""
+"""Clinic inventory HTTP routes — TinyDB or Supabase via inventory.repo."""
 
 from __future__ import annotations
 
@@ -7,8 +7,6 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlmodel import Session, select
 
 from app.core.response_cache import (
     PRODUCTS_KEY,
@@ -17,9 +15,8 @@ from app.core.response_cache import (
     read_cached_rows,
     store_cached_rows,
 )
-from app.database import get_db
 from app.deps.auth import get_current_user
-from app.inventory.models import InboundOrder, MedicalSupply, OutboundOrder
+from app.inventory import repo as inventory_repo
 from app.inventory.schemas import (
     InboundOrderCreate,
     InboundOrderResponse,
@@ -29,17 +26,7 @@ from app.inventory.schemas import (
     OutboundOrderCreate,
     OutboundOrderResponse,
 )
-from app.inventory.service import (
-    DIRECT_STOCK_EDIT_DETAIL,
-    current_stock_for,
-    get_supply,
-    insufficient_stock_detail,
-    iso_timestamp,
-    list_orders,
-    list_supplies,
-    threshold_crossed,
-    utc_now,
-)
+from app.inventory.service import DIRECT_STOCK_EDIT_DETAIL
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
 
@@ -52,12 +39,11 @@ def _user_uuid(user: dict) -> str:
 def get_products(
     response: Response,
     _: dict = Depends(get_current_user),
-    session: Session = Depends(get_db),
 ) -> list[MedicalSupplyResponse]:
     cached = read_cached_rows(response, PRODUCTS_KEY)
     if cached is not None:
         return [MedicalSupplyResponse.model_validate(row) for row in cached]
-    rows = list_supplies(session)
+    rows = inventory_repo.list_products()
     store_cached_rows(
         PRODUCTS_KEY,
         [row.model_dump(mode="json") for row in rows],
@@ -70,7 +56,6 @@ def get_products(
 async def create_product(
     request: Request,
     _: dict = Depends(get_current_user),
-    session: Session = Depends(get_db),
 ) -> MedicalSupplyResponse:
     try:
         raw = await request.json()
@@ -84,38 +69,19 @@ async def create_product(
         payload = MedicalSupplyCreate.model_validate(raw)
     except ValidationError as exc:
         raise RequestValidationError(exc.errors())
-    existing = session.exec(select(MedicalSupply).where(MedicalSupply.sku == payload.sku)).first()
-    if existing is not None:
-        raise HTTPException(status_code=400, detail="SKU already exists.")
-    row = MedicalSupply(name=payload.name, sku=payload.sku, threshold=payload.threshold)
-    session.add(row)
-    try:
-        session.commit()
-        session.refresh(row)
-    except IntegrityError:
-        session.rollback()
-        raise HTTPException(status_code=400, detail="SKU already exists.")
-    except SQLAlchemyError:
-        session.rollback()
-        raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
-    assert row.id is not None
-    invalidate_products()
-    return MedicalSupplyResponse(
-        id=row.id,
-        name=row.name,
-        sku=row.sku,
-        threshold=row.threshold,
-        current_stock=0,
+    created = inventory_repo.create_product(
+        name=payload.name, sku=payload.sku, threshold=payload.threshold
     )
+    invalidate_products()
+    return created
 
 
 @router.get("/products/{product_id}", response_model=MedicalSupplyResponse)
 def get_product(
     product_id: int,
     _: dict = Depends(get_current_user),
-    session: Session = Depends(get_db),
 ) -> MedicalSupplyResponse:
-    row = get_supply(session, product_id)
+    row = inventory_repo.get_product(product_id)
     if row is None:
         raise HTTPException(status_code=404, detail="Product not found.")
     return row
@@ -129,39 +95,16 @@ def get_product(
 def post_inbound(
     payload: InboundOrderCreate,
     user: dict = Depends(get_current_user),
-    session: Session = Depends(get_db),
 ) -> InboundOrderResponse:
-    product = session.get(MedicalSupply, payload.product_id)
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found.")
-    row = InboundOrder(
+    created = inventory_repo.create_inbound(
         product_id=payload.product_id,
-        product_name=product.name,
-        sku=product.sku,
         quantity=payload.quantity,
         notes=payload.notes,
-        created_at=utc_now(),
         user_uuid=_user_uuid(user),
+        user_email=str(user.get("email") or ""),
     )
-    session.add(row)
-    try:
-        session.commit()
-        session.refresh(row)
-    except SQLAlchemyError:
-        session.rollback()
-        raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
-    assert row.id is not None
     invalidate_products()
-    return InboundOrderResponse(
-        id=row.id,
-        product_id=row.product_id,
-        product_name=product.name,
-        quantity=row.quantity,
-        notes=row.notes,
-        created_at=iso_timestamp(row.created_at),
-        user_uuid=row.user_uuid,
-        created_by=str(user.get("email") or row.user_uuid),
-    )
+    return created
 
 
 @router.post(
@@ -172,57 +115,20 @@ def post_inbound(
 def post_outbound(
     payload: OutboundOrderCreate,
     user: dict = Depends(get_current_user),
-    session: Session = Depends(get_db),
 ) -> OutboundOrderResponse:
-    product = session.get(MedicalSupply, payload.product_id)
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found.")
-    # Live SQL totals — never the GET /products cache — so stale listings cannot over-issue.
-    previous_stock = current_stock_for(session, payload.product_id)
-    if payload.quantity > previous_stock:
-        raise HTTPException(
-            status_code=400,
-            detail=insufficient_stock_detail(previous_stock, payload.quantity),
-        )
-    row = OutboundOrder(
+    created = inventory_repo.create_outbound(
         product_id=payload.product_id,
-        product_name=product.name,
-        sku=product.sku,
         quantity=payload.quantity,
         notes=payload.notes,
-        created_at=utc_now(),
         user_uuid=_user_uuid(user),
+        user_email=str(user.get("email") or ""),
     )
-    session.add(row)
-    try:
-        session.commit()
-        session.refresh(row)
-    except SQLAlchemyError:
-        session.rollback()
-        raise HTTPException(status_code=503, detail="Service temporarily unavailable. Please try again.")
-    assert row.id is not None
     invalidate_products()
-    current_stock = current_stock_for(session, payload.product_id)
-    return OutboundOrderResponse(
-        id=row.id,
-        product_id=row.product_id,
-        product_name=product.name,
-        quantity=row.quantity,
-        notes=row.notes,
-        created_at=iso_timestamp(row.created_at),
-        user_uuid=row.user_uuid,
-        created_by=str(user.get("email") or row.user_uuid),
-        sku=product.sku,
-        threshold=product.threshold,
-        previous_stock=previous_stock,
-        current_stock=current_stock,
-        threshold_crossed=threshold_crossed(previous_stock, current_stock, product.threshold),
-    )
+    return created
 
 
 @router.get("/orders", response_model=list[InventoryOrderResponse])
 def get_orders(
     _: dict = Depends(get_current_user),
-    session: Session = Depends(get_db),
 ) -> list[InventoryOrderResponse]:
-    return list_orders(session)
+    return inventory_repo.list_orders()

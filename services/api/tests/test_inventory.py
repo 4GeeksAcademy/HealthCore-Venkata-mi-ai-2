@@ -5,7 +5,9 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from app.inventory.models import InboundOrder, MedicalSupply, OutboundOrder
-from app.inventory.service import seed_inventory
+from app.inventory.repo import seed_inventory
+from app.inventory.service import DIRECT_STOCK_EDIT_DETAIL, insufficient_stock_detail
+
 from tests.conftest import STAFF_EMAIL
 
 

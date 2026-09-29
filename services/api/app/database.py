@@ -21,7 +21,11 @@ def get_engine() -> Engine:
     """Return the SQLModel engine for inventory (Supabase or test SQLite). Not a session."""
     global _engine
     if _engine is None:
-        url = get_settings().database_url
+        from app.inventory.repo import inventory_sql_url, uses_tinydb
+
+        if uses_tinydb():
+            raise StorageError("SQL inventory engine is not used when INVENTORY_BACKEND=tinydb")
+        url = inventory_sql_url()
         kwargs: dict = {}
         if url.startswith("sqlite"):
             kwargs["connect_args"] = {"check_same_thread": False}
@@ -166,9 +170,11 @@ def init_inventory_schema() -> None:
 
 
 def init_dual_stores() -> None:
-    """Confirm TinyDB auth store and SQLModel inventory engine both initialize."""
+    """Confirm TinyDB auth store and the active inventory backend both initialize."""
+    from app.inventory.repo import init_inventory_backend
+
     auth_store.get_user_by_id(0)
-    init_inventory_schema()
+    init_inventory_backend()
 
 
 def get_db() -> Generator[Session, None, None]:

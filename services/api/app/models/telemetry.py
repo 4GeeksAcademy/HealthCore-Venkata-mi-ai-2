@@ -1,4 +1,4 @@
-"""Telemetry envelope models. Reused when persistence is added later."""
+"""Telemetry envelope models. TelemetryEvent is the Phase-2 contract — do not change fields."""
 
 from __future__ import annotations
 
@@ -18,9 +18,13 @@ class TelemetryEvent(BaseModel):
     properties: dict[str, Any] = Field(default_factory=dict)
 
 
-class TelemetryBatch(BaseModel):
-    events: list[TelemetryEvent]
+class TelemetryBatchEnvelope(BaseModel):
+    """Loose batch body: each item is validated with TelemetryEvent.model_validate in the handler."""
+
+    events: list[Any]
 
 
 class TelemetryReceived(BaseModel):
     received: int
+    stored: int
+    rejected: int

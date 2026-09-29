@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from app.core.response_cache import PRODUCTS_TTL_SECONDS, SUPPLIERS_TTL_SECONDS, response_cache
 from app.core.ttl_cache import TtlCache
-from app.inventory.service import seed_inventory
+from app.inventory.repo import seed_inventory
 from app.load_seed import seed_inventory_load, seed_supplier_load
 from tests.test_suppliers import USA_SUPPLIER, UK_SUPPLIER
 

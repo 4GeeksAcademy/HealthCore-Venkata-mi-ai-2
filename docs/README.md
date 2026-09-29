@@ -21,6 +21,7 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [Performance_Optimisation_Caching.md](./Project_Contexts/Performance_Optimisation_Caching.md) — lazy load, `useMemo`, FastAPI TTL cache
 - [CONTEXT-telemetry-plan.md](./Project_Contexts/CONTEXT-telemetry-plan.md) — telemetry brief; gaps closed; design in `docs/telemetry/`
 - [CONTEXT-telemetry-frontend-capture.md](./Project_Contexts/CONTEXT-telemetry-frontend-capture.md) — backoffice `track()` capture; stub `POST /telemetry/events` is implemented (PLAN-064)
+- [CONTEXT-telemetry-storage.md](./Project_Contexts/CONTEXT-telemetry-storage.md) — replace stub with Supabase `telemetry_events` bulk persist (per-event validate)
 
 ## Telemetry
 
@@ -28,6 +29,7 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [event-schemas.json](./telemetry/event-schemas.json) — JSON Schema draft-07 for the envelope and property allowlists
 - Telemetry plan eval (2026-09-23, **10/10 Pass**) — [Results/TelemetryPlan-20260923.md](../memory-bank/evaluations/Results/TelemetryPlan-20260923.md)
 - Telemetry capture eval (2026-09-25, **12/12 Pass**) — [Results/TelemetryCapture-20260925.md](../memory-bank/evaluations/Results/TelemetryCapture-20260925.md)
+- Telemetry storage eval (2026-09-28, **8/8 Pass**) — [Results/TelemetryStorage-20260928.md](../memory-bank/evaluations/Results/TelemetryStorage-20260928.md)
 
 ## Audits
 

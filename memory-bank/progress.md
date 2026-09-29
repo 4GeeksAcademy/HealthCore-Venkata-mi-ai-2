@@ -1,9 +1,19 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-25  
-**Latest stamped plan:** [HC-MS5-PLAN-068](./plans/HC-MS5-PLAN-068-20260925-telemetry-capture-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-067](./plans/HC-MS5-PLAN-067-20260925-telemetry-endpoint-env.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-09-28  
+**Latest stamped plan:** [HC-MS5-PLAN-072](./plans/HC-MS5-PLAN-072-20260928-telemetry-storage-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-071](./plans/HC-MS5-PLAN-071-20260928-telemetry-storage.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-09-28)
+
+**Telemetry storage eval (PLAN-072):** Official rubric **8/8 Pass**, saved after human confirm: [Results/TelemetryStorage-20260928.md](./evaluations/Results/TelemetryStorage-20260928.md). Same-day re-evals overwrite that file only. Does not replace plan/capture evals. Does not close MS5.
+
+**Telemetry storage (PLAN-071):** Stub replaced. `POST /telemetry/events` validates each event with unchanged `TelemetryEvent`, bulk-inserts into Supabase `telemetry_events`, returns `{received, stored, rejected}`. Indexes on `timestamp`, `event_type`, GIN on `tags`. Frontend unchanged. Pytest **61 passed**.
+
+**Telemetry storage CONTEXT (PLAN-070):** Docs only. Brief at [`docs/Project_Contexts/CONTEXT-telemetry-storage.md`](../docs/Project_Contexts/CONTEXT-telemetry-storage.md).
+
+**Inventory backend switch (PLAN-069):** `INVENTORY_BACKEND=tinydb|supabase`. TinyDB uses `inventory.json`. Supabase uses decrypted `SUPABASE_DATABASE_URL` and creates `medical_supply` / order tables on startup. Auth/suppliers stay TinyDB. Supabase inventory connect succeeded; telemetry storage is PLAN-071.
 
 ## Today’s update (2026-09-25)
 

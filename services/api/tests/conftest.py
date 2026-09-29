@@ -12,6 +12,7 @@ os.environ["JWT_SECRET_KEY"] = "unit-test-jwt-secret-do-not-use-live"
 os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 os.environ.setdefault("RESET_TOKEN_EXPIRE_MINUTES", "30")
 os.environ["DATABASE_URL"] = "sqlite://"
+os.environ["INVENTORY_BACKEND"] = "tinydb"
 
 from app.core.config import get_settings  # noqa: E402
 from app.core.response_cache import response_cache  # noqa: E402
@@ -20,6 +21,8 @@ from app.main import app  # noqa: E402
 from app.result_store import store as incident_result_store  # noqa: E402
 from app.stores import auth_store  # noqa: E402
 from app import suppliers_store  # noqa: E402
+from app import inventory_store  # noqa: E402
+from app.telemetry.store import init_telemetry_schema, reset_telemetry_engine  # noqa: E402
 
 TEST_JWT_SECRET = "unit-test-jwt-secret-do-not-use-live"
 STAFF_EMAIL = "qa.staff@healthcore.example"
@@ -35,18 +38,27 @@ def _isolate_persistence(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setenv("JWT_SECRET_KEY", TEST_JWT_SECRET)
     monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("INVENTORY_BACKEND", "tinydb")
+    monkeypatch.delenv("SUPABASE_DATABASE_URL", raising=False)
     monkeypatch.setattr(auth_store, "DATA_DIR", auth_dir)
     monkeypatch.setattr(auth_store, "DB_PATH", auth_dir / "auth.json")
     monkeypatch.setattr(suppliers_store, "DATA_DIR", suppliers_dir)
     monkeypatch.setattr(suppliers_store, "DB_PATH", suppliers_dir / "suppliers.json")
+    inv_dir = tmp_path / "inventory"
+    inv_dir.mkdir()
+    monkeypatch.setattr(inventory_store, "DATA_DIR", inv_dir)
+    monkeypatch.setattr(inventory_store, "DB_PATH", inv_dir / "inventory.json")
 
     get_settings.cache_clear()
     reset_engine()
+    reset_telemetry_engine()
+    init_telemetry_schema()
     response_cache.clear()
     incident_result_store._summary = None
     incident_result_store._csv = None
     yield
     reset_engine()
+    reset_telemetry_engine()
     response_cache.clear()
     get_settings.cache_clear()
 

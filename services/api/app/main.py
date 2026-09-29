@@ -21,6 +21,7 @@ from app.routers.profiles import router as profiles_router
 from app.routers.suppliers import router as suppliers_router
 from app.routers.telemetry import router as telemetry_router
 from app.routers.users import router as users_router
+from app.telemetry.store import init_telemetry_schema
 
 logger = logging.getLogger(__name__)
 timing_logger = logging.getLogger("api.timing")
@@ -29,6 +30,7 @@ timing_logger = logging.getLogger("api.timing")
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     init_dual_stores()
+    init_telemetry_schema()
     yield
 
 
@@ -110,4 +112,9 @@ async def unhandled_error_handler(_request: Request, exc: Exception) -> JSONResp
 
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
-    return HealthResponse(status="ok")
+    from app.core.config import get_settings
+
+    return HealthResponse(
+        status="ok",
+        inventory_backend=get_settings().inventory_backend,
+    )

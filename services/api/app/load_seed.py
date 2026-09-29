@@ -75,8 +75,41 @@ def seed_inventory_load(
     session: Session | None = None,
 ) -> int:
     """Insert extra supplies + many orders so stock aggregation is measurable."""
+    from app.inventory.repo import uses_tinydb
+    from app import inventory_store as tiny_store
+
     if product_count < 1:
         return 0
+    if uses_tinydb():
+        tiny_store.init_store()
+        inserted = 0
+        for index in range(1, product_count + 1):
+            sku = f"{LOAD_SKU_PREFIX}{index:03d}"
+            try:
+                created = tiny_store.create_product(
+                    name=f"{SUPPLY_NAMES[index % len(SUPPLY_NAMES)]} ({CLINICS[index % len(CLINICS)]} clinic pack {index:03d})",
+                    sku=sku,
+                    threshold=10 + (index % 20),
+                )
+            except ValueError:
+                continue
+            tiny_store.create_inbound(
+                product_id=created.id,
+                quantity=max(inbound_per_product, 1) * 4,
+                notes="load seed inbound",
+                user_uuid=SEED_USER_UUID,
+                user_email="",
+            )
+            if outbound_per_product > 0:
+                tiny_store.create_outbound(
+                    product_id=created.id,
+                    quantity=min(outbound_per_product, inbound_per_product * 4),
+                    notes="load seed outbound",
+                    user_uuid=SEED_USER_UUID,
+                    user_email="",
+                )
+            inserted += 1
+        return inserted
     if session is None:
         init_inventory_schema()
         with Session(get_engine()) as owned:

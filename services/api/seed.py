@@ -1,12 +1,13 @@
-"""Load CONTEXT seed suppliers into TinyDB and inventory into SQLModel/Supabase."""
+"""Load CONTEXT seed suppliers into TinyDB and inventory into the active backend."""
 
 from __future__ import annotations
 
 import sys
 
+from app.core.config import get_settings
 from app.core.errors import StorageError
 from app.database import init_dual_stores
-from app.inventory.service import seed_inventory
+from app.inventory.repo import seed_inventory
 from app.suppliers_store import seed_suppliers
 
 
@@ -32,7 +33,11 @@ def main() -> int:
         print("Could not seed inventory because of a file error.", file=sys.stderr)
         return 1
 
-    print(f"Inserted {inventory_inserted} inventory product(s) (stock from inbound − outbound).")
+    backend = get_settings().inventory_backend
+    print(
+        f"Inserted {inventory_inserted} inventory product(s) "
+        f"via INVENTORY_BACKEND={backend} (stock from inbound − outbound)."
+    )
     return 0
 
 

@@ -6,9 +6,9 @@ import sys
 
 from app.core.errors import StorageError
 from app.database import init_dual_stores
+from app.inventory.repo import seed_inventory
 from app.load_seed import seed_inventory_load, seed_supplier_load
 from app.suppliers_store import seed_suppliers
-from app.inventory.service import seed_inventory
 
 
 def main() -> int:

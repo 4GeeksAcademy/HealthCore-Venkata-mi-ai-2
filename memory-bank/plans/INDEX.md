@@ -146,6 +146,14 @@ Format per line:
 
 68 | HC-MS5-PLAN-068 | MS5 | 2026-09-25 | Save Telemetry Capture Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-068-20260925-telemetry-capture-eval.md](./HC-MS5-PLAN-068-20260925-telemetry-capture-eval.md)
 
+69 | HC-MS5-PLAN-069 | MS5 | 2026-09-28 | Inventory Backend Switch TinyDB Or Supabase | implemented | implementation | [HC-MS5-PLAN-069-20260928-inventory-backend-switch.md](./HC-MS5-PLAN-069-20260928-inventory-backend-switch.md)
+
+70 | HC-MS5-PLAN-070 | MS5 | 2026-09-28 | Telemetry Storage CONTEXT Document | implemented | docs | [HC-MS5-PLAN-070-20260928-telemetry-storage-context.md](./HC-MS5-PLAN-070-20260928-telemetry-storage-context.md)
+
+71 | HC-MS5-PLAN-071 | MS5 | 2026-09-28 | Telemetry Storage Supabase Bulk Persist | implemented | implementation | [HC-MS5-PLAN-071-20260928-telemetry-storage.md](./HC-MS5-PLAN-071-20260928-telemetry-storage.md)
+
+72 | HC-MS5-PLAN-072 | MS5 | 2026-09-28 | Save Telemetry Storage Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-072-20260928-telemetry-storage-eval.md](./HC-MS5-PLAN-072-20260928-telemetry-storage-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.
