@@ -1,9 +1,15 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-28  
-**Latest stamped plan:** [HC-MS5-PLAN-072](./plans/HC-MS5-PLAN-072-20260928-telemetry-storage-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-071](./plans/HC-MS5-PLAN-071-20260928-telemetry-storage.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-09-30  
+**Latest stamped plan:** [HC-MS5-PLAN-074](./plans/HC-MS5-PLAN-074-20260930-telemetry-report-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-073](./plans/HC-MS5-PLAN-073-20260930-telemetry-technical-report.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-09-30)
+
+**Telemetry report eval (PLAN-074):** Official rubric **10/10 Pass**, saved after human confirm: [Results/TelemetryReport-20260930.md](./evaluations/Results/TelemetryReport-20260930.md). Same-day re-evals overwrite that file only. Does not replace plan, capture, or storage evals. Does not close MS5.
+
+**Telemetry technical report (PLAN-073):** `services/telemetry/analysis.py` plus cached `GET /telemetry/report`. Metrics: events per day, error rate by type, API latency per day, login failure rate. Backoffice page `/telemetry`. Brief at [`docs/Project_Contexts/Telemetry_technical_report.md`](../docs/Project_Contexts/Telemetry_technical_report.md). Supabase has 48 stored events, including technical ones. Pytest **64 passed**.
 
 ## Today’s update (2026-09-28)
 

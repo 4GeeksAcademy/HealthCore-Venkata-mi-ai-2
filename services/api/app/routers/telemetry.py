@@ -1,15 +1,25 @@
-"""Telemetry receiver: per-event validate + bulk insert into telemetry_events."""
+"""Telemetry receiver and operational report."""
 
 from __future__ import annotations
 
+import importlib
 import logging
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import HTMLResponse
 
 from app.core.config import get_settings
-from app.models.telemetry import TelemetryBatchEnvelope, TelemetryReceived
-from app.telemetry.store import bulk_insert_events, validate_and_partition
+from app.core.errors import StorageError
+from app.core.ttl_cache import TtlCache
+from app.models.telemetry import TelemetryBatchEnvelope, TelemetryReceived, TelemetryReport
+from app.telemetry.store import bulk_insert_events, get_telemetry_engine, validate_and_partition
+
+REPORT_TTL_SECONDS = 60
+report_cache = TtlCache()
 
 router = APIRouter(prefix="/telemetry", tags=["telemetry"])
 logger = logging.getLogger("api.telemetry")
@@ -54,3 +64,71 @@ def receive_events(payload: TelemetryBatchEnvelope) -> TelemetryReceived:
         types,
     )
     return TelemetryReceived(received=received, stored=stored, rejected=rejected)
+
+
+def _analysis_module() -> Any:
+    mounted = Path("/opt/healthcore-telemetry")
+    local = Path(__file__).resolve().parents[3] / "telemetry"
+    directory = mounted if (mounted / "analysis.py").is_file() else local
+    location = str(directory)
+    if location not in sys.path:
+        sys.path.insert(0, location)
+    return importlib.import_module("analysis")
+
+
+def _parse_bound(value: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail="Invalid request. Please check the submitted data.",
+        ) from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+@router.get("/report", response_model=TelemetryReport)
+def telemetry_report(
+    start_date: str | None = Query(default=None),
+    end_date: str | None = Query(default=None),
+) -> TelemetryReport:
+    """Serve cached operational metrics. The date window is resolved once here."""
+    if end_date is None:
+        end = datetime.now(timezone.utc)
+    else:
+        end = _parse_bound(end_date)
+    if start_date is None:
+        start = end - timedelta(days=7)
+    else:
+        start = _parse_bound(start_date)
+    if start >= end:
+        raise HTTPException(
+            status_code=422,
+            detail="Invalid request. Please check the submitted data.",
+        )
+
+    cache_key = f"telemetry:report:{start.isoformat()}:{end.isoformat()}"
+    cached = report_cache.get(cache_key)
+    if isinstance(cached, dict):
+        return TelemetryReport.model_validate(cached)
+
+    analysis = _analysis_module()
+    engine = get_telemetry_engine()
+    try:
+        metrics = {
+            "events_per_day": analysis.events_per_day(engine, start, end),
+            "error_rate_by_type": analysis.error_rate_by_type(engine, start, end),
+            "latency_per_day": analysis.latency_per_day(engine, start, end),
+            "auth_failure_rate": analysis.auth_failure_rate(engine, start, end),
+        }
+    except analysis.ReportQueryError as exc:
+        raise StorageError("Unable to access telemetry data store") from exc
+
+    payload = {
+        "period": {"from": start.isoformat(), "to": end.isoformat()},
+        "metrics": metrics,
+    }
+    report_cache.set(cache_key, payload, REPORT_TTL_SECONDS)
+    return TelemetryReport.model_validate(payload)

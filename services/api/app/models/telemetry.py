@@ -28,3 +28,15 @@ class TelemetryReceived(BaseModel):
     received: int
     stored: int
     rejected: int
+
+
+class TelemetryReportPeriod(BaseModel):
+    from_: str = Field(alias="from")
+    to: str
+
+    model_config = {"populate_by_name": True}
+
+
+class TelemetryReport(BaseModel):
+    period: TelemetryReportPeriod
+    metrics: dict[str, list[dict[str, Any]]]

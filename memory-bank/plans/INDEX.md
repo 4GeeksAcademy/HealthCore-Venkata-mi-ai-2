@@ -154,6 +154,10 @@ Format per line:
 
 72 | HC-MS5-PLAN-072 | MS5 | 2026-09-28 | Save Telemetry Storage Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-072-20260928-telemetry-storage-eval.md](./HC-MS5-PLAN-072-20260928-telemetry-storage-eval.md)
 
+73 | HC-MS5-PLAN-073 | MS5 | 2026-09-30 | Telemetry Technical Report | implemented | implementation | [HC-MS5-PLAN-073-20260930-telemetry-technical-report.md](./HC-MS5-PLAN-073-20260930-telemetry-technical-report.md)
+
+74 | HC-MS5-PLAN-074 | MS5 | 2026-09-30 | Save Telemetry Technical Report Evaluation | implemented | docs | [HC-MS5-PLAN-074-20260930-telemetry-report-eval.md](./HC-MS5-PLAN-074-20260930-telemetry-report-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

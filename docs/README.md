@@ -22,6 +22,7 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [CONTEXT-telemetry-plan.md](./Project_Contexts/CONTEXT-telemetry-plan.md) — telemetry brief; gaps closed; design in `docs/telemetry/`
 - [CONTEXT-telemetry-frontend-capture.md](./Project_Contexts/CONTEXT-telemetry-frontend-capture.md) — backoffice `track()` capture; stub `POST /telemetry/events` is implemented (PLAN-064)
 - [CONTEXT-telemetry-storage.md](./Project_Contexts/CONTEXT-telemetry-storage.md) — replace stub with Supabase `telemetry_events` bulk persist (per-event validate)
+- [Telemetry_technical_report.md](./Project_Contexts/Telemetry_technical_report.md) — operational Pandas report and `GET /telemetry/report`
 
 ## Telemetry
 
@@ -30,6 +31,7 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - Telemetry plan eval (2026-09-23, **10/10 Pass**) — [Results/TelemetryPlan-20260923.md](../memory-bank/evaluations/Results/TelemetryPlan-20260923.md)
 - Telemetry capture eval (2026-09-25, **12/12 Pass**) — [Results/TelemetryCapture-20260925.md](../memory-bank/evaluations/Results/TelemetryCapture-20260925.md)
 - Telemetry storage eval (2026-09-28, **8/8 Pass**) — [Results/TelemetryStorage-20260928.md](../memory-bank/evaluations/Results/TelemetryStorage-20260928.md)
+- Telemetry report eval (2026-09-30, **10/10 Pass**) — [Results/TelemetryReport-20260930.md](../memory-bank/evaluations/Results/TelemetryReport-20260930.md)
 
 ## Audits
 

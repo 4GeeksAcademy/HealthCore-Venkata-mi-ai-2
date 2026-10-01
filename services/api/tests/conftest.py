@@ -54,12 +54,18 @@ def _isolate_persistence(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     reset_telemetry_engine()
     init_telemetry_schema()
     response_cache.clear()
+    from app.routers.telemetry import report_cache
+
+    report_cache.clear()
     incident_result_store._summary = None
     incident_result_store._csv = None
     yield
     reset_engine()
     reset_telemetry_engine()
     response_cache.clear()
+    from app.routers.telemetry import report_cache
+
+    report_cache.clear()
     get_settings.cache_clear()
 
 

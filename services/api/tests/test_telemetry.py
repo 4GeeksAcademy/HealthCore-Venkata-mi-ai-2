@@ -78,6 +78,91 @@ def test_telemetry_missing_events_key_is_422(client: TestClient) -> None:
     assert response.status_code == 422
 
 
+def _event(event_type: str, stamp: str, **properties: object) -> dict:
+    return {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "timestamp": stamp,
+        "sessionId": "sess-report",
+        "userId": "1",
+        "event_type": event_type,
+        "schemaVersion": "1.0.0",
+        "requestId": "req-report",
+        "properties": properties,
+    }
+
+
+def test_telemetry_report_groups_operational_metrics(client: TestClient) -> None:
+    day = "2026-09-28T12:00:00+00:00"
+    later = "2026-09-28T12:05:00+00:00"
+    response = client.post(
+        "/telemetry/events",
+        json={
+            "events": [
+                _event("section_viewed", day, path="/inventory"),
+                _event("login_failed", day, reason="invalid_credentials"),
+                _event("login_succeeded", later, role="staff"),
+                _event("api_request_failed", later, route_template="/inventory/products", status_code=500),
+                _event("api_latency_recorded", later, method="GET", route_template="/inventory/products", status_code=200, duration_ms=40, cache_status="miss"),
+                _event("api_latency_recorded", later, method="GET", route_template="/inventory/products", status_code=200, duration_ms=60, cache_status="hit"),
+            ]
+        },
+    )
+    assert response.status_code == 200
+
+    report = client.get(
+        "/telemetry/report",
+        params={"start_date": "2026-09-28T00:00:00+00:00", "end_date": "2026-09-29T00:00:00+00:00"},
+    )
+    assert report.status_code == 200
+    body = report.json()
+    assert body["period"]["from"].startswith("2026-09-28")
+    assert set(body["metrics"]) == {
+        "events_per_day",
+        "error_rate_by_type",
+        "latency_per_day",
+        "auth_failure_rate",
+    }
+    volume = {row["event_type"]: row["event_count"] for row in body["metrics"]["events_per_day"]}
+    assert volume["login_failed"] == 1
+    assert volume["api_latency_recorded"] == 2
+    rates = {row["event_type"]: row["error_rate"] for row in body["metrics"]["error_rate_by_type"]}
+    assert rates["api_request_failed"] == 1
+    assert rates["section_viewed"] == 0
+    assert body["metrics"]["latency_per_day"][0]["mean_duration_ms"] == 50
+    auth = body["metrics"]["auth_failure_rate"][0]
+    assert auth["failed"] == 1
+    assert auth["succeeded"] == 1
+    assert auth["failure_rate"] == 0.5
+
+
+def test_telemetry_report_uses_cache(client: TestClient, monkeypatch) -> None:
+    import app.routers.telemetry as telemetry_router
+
+    calls = {"n": 0}
+    analysis = telemetry_router._analysis_module()
+    original = analysis.events_per_day
+
+    def counted(engine, start_date, end_date):
+        calls["n"] += 1
+        return original(engine, start_date, end_date)
+
+    monkeypatch.setattr(analysis, "events_per_day", counted)
+    params = {"start_date": "2026-09-01T00:00:00+00:00", "end_date": "2026-09-02T00:00:00+00:00"}
+    first = client.get("/telemetry/report", params=params)
+    second = client.get("/telemetry/report", params=params)
+    assert first.status_code == 200
+    assert second.json() == first.json()
+    assert calls["n"] == 1
+
+
+def test_telemetry_report_rejects_bad_window(client: TestClient) -> None:
+    response = client.get(
+        "/telemetry/report",
+        params={"start_date": "2026-09-02T00:00:00+00:00", "end_date": "2026-09-01T00:00:00+00:00"},
+    )
+    assert response.status_code == 422
+
+
 def test_telemetry_get_explains_post_only(client: TestClient) -> None:
     response = client.get("/telemetry/events")
     assert response.status_code == 200

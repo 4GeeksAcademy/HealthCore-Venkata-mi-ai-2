@@ -45,6 +45,9 @@ export default function InternalLayout({
               <Link href="/inventory" prefetch={false}>
                 Inventory
               </Link>
+              <Link href="/telemetry" prefetch={false}>
+                Telemetry
+              </Link>
               <Link href="/hiring" prefetch={false}>
                 Hiring tracker
               </Link>
