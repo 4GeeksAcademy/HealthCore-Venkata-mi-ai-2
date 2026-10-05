@@ -49,3 +49,5 @@ TelemetryCapture (20260925) | Telemetry frontend capture (stub, track, instrumen
 TelemetryStorage (20260928) | Telemetry storage (Supabase bulk persist, per-event validate) | 2026-09-28 | complete | 8/8 Pass | [Results/TelemetryStorage-20260928.md](./Results/TelemetryStorage-20260928.md)
 
 TelemetryReport (20260930) | Telemetry technical report (Pandas metrics, cached endpoint) | 2026-09-30 | complete | 10/10 Pass | [Results/TelemetryReport-20260930.md](./Results/TelemetryReport-20260930.md)
+
+PipelineDesign (20261005) | Business performance pipeline design (monthly clinic supply pack) | 2026-10-05 | complete | 12/12 Pass | [Results/PipelineDesign-20261005.md](./Results/PipelineDesign-20261005.md)

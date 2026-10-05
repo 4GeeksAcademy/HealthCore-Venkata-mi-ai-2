@@ -1,9 +1,17 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-09-30  
-**Latest stamped plan:** [HC-MS5-PLAN-074](./plans/HC-MS5-PLAN-074-20260930-telemetry-report-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-073](./plans/HC-MS5-PLAN-073-20260930-telemetry-technical-report.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-10-05  
+**Latest stamped plan:** [HC-MS5-PLAN-077](./plans/HC-MS5-PLAN-077-20261005-pipeline-design-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-076](./plans/HC-MS5-PLAN-076-20261005-pipeline-design.md) (`implemented`, MS5, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-05)
+
+**Pipeline design eval (PLAN-077):** Official rubric **12/12 Pass**, saved after human confirm: [Results/PipelineDesign-20261005.md](./evaluations/Results/PipelineDesign-20261005.md). Same-day re-evals overwrite that file only. Does not replace telemetry plan, capture, storage, or report evals. Does not close MS5.
+
+**Business performance pipeline design (PLAN-076):** Design only. [`data/pipelines/PIPELINE_DESIGN.md`](../data/pipelines/PIPELINE_DESIGN.md). Monthly Clinic Supply Performance Report for Dr. Okonkwo and Claire. Source is read-only `telemetry_events`. Destination is `reporting.monthly_clinic_supply_performance`. Does not change `services/telemetry/analysis.py` or `GET /telemetry/report`. Part 1 rubric saved under PLAN-077. Does not close MS5.
+
+**Business performance pipeline CONTEXT (PLAN-075):** Docs only. Brief at [`docs/Project_Contexts/CONTEXT-data-pipeline.md`](../docs/Project_Contexts/CONTEXT-data-pipeline.md).
 
 ## Today’s update (2026-09-30)
 
@@ -88,6 +96,7 @@
 | Backend serialization audit | **Implemented** (PLAN-053–054) — CONTEXT + audit + `response_model` gaps closed; eval → [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md) (**6/6 Pass**) |
 | Caching (lazy load + TTL) | **Implemented** (PLAN-055–056) — suppliers + inventory product lists; eval → [Results/Caching-20260921.md](./evaluations/Results/Caching-20260921.md) (**8/8 Pass**) |
 | Telemetry plan | **Designed** (PLAN-060–061); eval **10/10 Pass** (PLAN-062); backoffice capture and stub receiver (PLAN-064) |
+| Business performance pipeline | **Designed** (PLAN-075–076); eval **12/12 Pass** (PLAN-077); no orchestration code |
 
 ## Today’s update (2026-09-16)
 

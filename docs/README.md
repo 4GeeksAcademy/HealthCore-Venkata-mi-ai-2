@@ -23,6 +23,8 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [CONTEXT-telemetry-frontend-capture.md](./Project_Contexts/CONTEXT-telemetry-frontend-capture.md) — backoffice `track()` capture; stub `POST /telemetry/events` is implemented (PLAN-064)
 - [CONTEXT-telemetry-storage.md](./Project_Contexts/CONTEXT-telemetry-storage.md) — replace stub with Supabase `telemetry_events` bulk persist (per-event validate)
 - [Telemetry_technical_report.md](./Project_Contexts/Telemetry_technical_report.md) — operational Pandas report and `GET /telemetry/report`
+- [CONTEXT-data-pipeline.md](./Project_Contexts/CONTEXT-data-pipeline.md) — monthly clinic supply performance pipeline; design in `data/pipelines/PIPELINE_DESIGN.md`
+- Pipeline design eval (2026-10-05, **12/12 Pass**) — [Results/PipelineDesign-20261005.md](../memory-bank/evaluations/Results/PipelineDesign-20261005.md)
 
 ## Telemetry
 
