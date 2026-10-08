@@ -164,6 +164,12 @@ Format per line:
 
 77 | HC-MS5-PLAN-077 | MS5 | 2026-10-05 | Save Business Performance Pipeline Design Evaluation | implemented | docs | [HC-MS5-PLAN-077-20261005-pipeline-design-eval.md](./HC-MS5-PLAN-077-20261005-pipeline-design-eval.md)
 
+78 | HC-MS5-PLAN-078 | MS5 | 2026-10-07 | HealthCore Resilience Pipeline Context Document | implemented | docs | [HC-MS5-PLAN-078-20261007-resilience-pipeline-context.md](./HC-MS5-PLAN-078-20261007-resilience-pipeline-context.md)
+
+79 | HC-MS5-PLAN-079 | MS5 | 2026-10-07 | Resilient Monthly Clinic Supply Pipeline Implementation | implemented | implementation | [HC-MS5-PLAN-079-20261007-resilience-pipeline-impl.md](./HC-MS5-PLAN-079-20261007-resilience-pipeline-impl.md)
+
+80 | HC-MS5-PLAN-080 | MS5 | 2026-10-07 | Save Business Performance Pipeline Resilience Evaluation | implemented | docs | [HC-MS5-PLAN-080-20261007-resilience-pipeline-eval.md](./HC-MS5-PLAN-080-20261007-resilience-pipeline-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

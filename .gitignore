@@ -20,6 +20,9 @@ htmlcov/
 coverage.xml
 uis/backoffice/coverage/
 services/api/.profile-cache-tmp/
+data/process/reporting.db
+data/process/*.db
+data/eval/monthly_clinic_supply_*.json
 
 # Python bytecode
 **/__pycache__/

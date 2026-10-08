@@ -1,0 +1,137 @@
+{
+  "description": "Synthetic supply telemetry for Option A when live telemetry_events has no accepted clinic-tagged rows. No PHI.",
+  "events": [
+    {
+      "id": "fix-001",
+      "timestamp": "2026-09-03T14:00:00+00:00",
+      "event_type": "inbound_order_created",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001",
+        "sessionId": "sess-fixture-1",
+        "requestId": "req-fixture-1",
+        "clinic_id": "us-tx-001",
+        "country": "US",
+        "product_id": 1,
+        "product_category": "ppe",
+        "quantity": 40,
+        "total_cost": 320.50
+      }
+    },
+    {
+      "id": "fix-002",
+      "timestamp": "2026-09-04T15:00:00+00:00",
+      "event_type": "inbound_order_created",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0002",
+        "sessionId": "sess-fixture-1",
+        "requestId": "req-fixture-2",
+        "clinic_id": "uk-lon-001",
+        "country": "UK",
+        "product_id": 2,
+        "product_category": "medication",
+        "quantity": 20,
+        "total_cost": 150.00
+      }
+    },
+    {
+      "id": "fix-003",
+      "timestamp": "2026-09-05T16:00:00+00:00",
+      "event_type": "outbound_order_created",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0003",
+        "sessionId": "sess-fixture-2",
+        "requestId": "req-fixture-3",
+        "clinic_id": "us-tx-001",
+        "country": "US",
+        "product_id": 1,
+        "product_category": "ppe",
+        "quantity": 5,
+        "department": "primary_care"
+      }
+    },
+    {
+      "id": "fix-004",
+      "timestamp": "2026-09-06T10:00:00+00:00",
+      "event_type": "outbound_order_created",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0004",
+        "sessionId": "sess-fixture-2",
+        "requestId": "req-fixture-4",
+        "clinic_id": "us-tx-001",
+        "country": "US",
+        "product_id": 3,
+        "product_category": "consumable",
+        "quantity": 2,
+        "department": "general_consultation"
+      }
+    },
+    {
+      "id": "fix-005",
+      "timestamp": "2026-09-07T11:00:00+00:00",
+      "event_type": "stock_threshold_triggered",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0005",
+        "sessionId": "sess-fixture-2",
+        "requestId": "req-fixture-5",
+        "clinic_id": "us-tx-001",
+        "country": "US",
+        "product_id": 1,
+        "product_category": "ppe",
+        "quantity": 5,
+        "threshold": 24,
+        "previous_stock": 25,
+        "current_stock": 20
+      }
+    },
+    {
+      "id": "fix-006",
+      "timestamp": "2026-09-08T12:00:00+00:00",
+      "event_type": "stock_threshold_triggered",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0006",
+        "sessionId": "sess-fixture-3",
+        "requestId": "req-fixture-6",
+        "clinic_id": "uk-man-001",
+        "country": "UK",
+        "product_id": 4,
+        "product_category": "equipment",
+        "quantity": 1,
+        "threshold": 3,
+        "previous_stock": 3,
+        "current_stock": 2
+      }
+    },
+    {
+      "id": "fix-007",
+      "timestamp": "2026-09-09T13:00:00+00:00",
+      "event_type": "supply_expiry_flagged",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0007",
+        "sessionId": "sess-fixture-3",
+        "requestId": "req-fixture-7",
+        "clinic_id": "uk-lon-001",
+        "country": "UK",
+        "product_id": 2,
+        "product_category": "medication",
+        "quantity": 10,
+        "expiry_date": "2026-10-05"
+      }
+    },
+    {
+      "id": "fix-008",
+      "timestamp": "2026-09-10T09:00:00+00:00",
+      "event_type": "inbound_order_created",
+      "tags": {
+        "eventId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0008",
+        "sessionId": "sess-fixture-4",
+        "requestId": "req-fixture-8",
+        "clinic_id": "us-fl-001",
+        "country": "US",
+        "product_id": 5,
+        "product_category": "consumable",
+        "quantity": 100,
+        "total_cost": 89.99
+      }
+    }
+  ]
+}

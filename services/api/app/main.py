@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
+import sys
 import time
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -23,6 +25,11 @@ from app.routers.telemetry import router as telemetry_router
 from app.routers.users import router as users_router
 from app.telemetry.store import init_telemetry_schema
 
+_services_dir = Path(__file__).resolve().parents[2]
+if str(_services_dir) not in sys.path:
+    sys.path.insert(0, str(_services_dir))
+from reporting.router import router as reporting_router  # noqa: E402
+
 logger = logging.getLogger(__name__)
 timing_logger = logging.getLogger("api.timing")
 
@@ -31,6 +38,18 @@ timing_logger = logging.getLogger("api.timing")
 async def lifespan(_app: FastAPI):
     init_dual_stores()
     init_telemetry_schema()
+    try:
+        pipelines = Path(__file__).resolve().parents[3] / "data" / "pipelines"
+        if str(pipelines) not in sys.path:
+            sys.path.insert(0, str(pipelines))
+        from monthly_clinic_supply.db import init_reporting_schema
+
+        init_reporting_schema()
+    except Exception:
+        logging.getLogger(__name__).warning(
+            "reporting schema init skipped",
+            exc_info=True,
+        )
     yield
 
 
@@ -58,6 +77,7 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(profiles_router)
 app.include_router(telemetry_router)
+app.include_router(reporting_router)
 
 
 @app.middleware("http")

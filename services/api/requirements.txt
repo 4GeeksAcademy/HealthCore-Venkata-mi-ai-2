@@ -9,3 +9,5 @@ email-validator
 sqlmodel>=0.0.22
 psycopg2-binary
 pandas>=2.2.0
+prefect>=3
+cryptography>=42.0.0

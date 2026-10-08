@@ -241,6 +241,15 @@ One main flow. Three tasks. A backfill flow is named and not part of Part 1.
 
 Scheduled start: 06:00 UTC on the 1st, for the previous UTC month. Parameter `month_start` overrides that for a manual or late-event run.
 
+**CLI run command (Part 2):**
+
+```bash
+python data/pipelines/pipeline.py
+python data/pipelines/pipeline.py --month-start 2026-09-01
+```
+
+Default month is the previous UTC month. Option A: when `telemetry_events` has no accepted clinic-tagged rows for that month, extract loads [`data/raw/monthly_clinic_supply_events.json`](../raw/monthly_clinic_supply_events.json). Local reporting SQLite (when no Supabase URI) is `data/process/reporting.db` and is gitignored.
+
 **Prefect block:** `healthcore-supabase`, a connection block that holds the same Supabase URI the API already reads from `SUPABASE_DATABASE_URL`. Tasks open the warehouse through the block. The URI is not written into this document, into source, or into git. Do not commit `.env`.
 
 ---

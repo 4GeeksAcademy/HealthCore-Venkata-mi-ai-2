@@ -8,7 +8,7 @@
 
 This file is the company brief for the data-pipeline assignment (Part 1: design). It is not orchestration code.
 
-**Status (2026-10-05):** Design only. Do not add Prefect flows, destination tables, emitters, or `services/reporting/` routes from this file. Follow [PIPELINE_DESIGN.md](../../data/pipelines/PIPELINE_DESIGN.md).
+**Status (2026-10-07):** Part 1 design is locked. Part 2 implementation follows [CONTEXT-resilience-pipeline.md](./CONTEXT-resilience-pipeline.md) and [PIPELINE_DESIGN.md](../../data/pipelines/PIPELINE_DESIGN.md).
 
 ---
 

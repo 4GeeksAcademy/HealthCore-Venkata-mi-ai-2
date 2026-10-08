@@ -51,3 +51,5 @@ TelemetryStorage (20260928) | Telemetry storage (Supabase bulk persist, per-even
 TelemetryReport (20260930) | Telemetry technical report (Pandas metrics, cached endpoint) | 2026-09-30 | complete | 10/10 Pass | [Results/TelemetryReport-20260930.md](./Results/TelemetryReport-20260930.md)
 
 PipelineDesign (20261005) | Business performance pipeline design (monthly clinic supply pack) | 2026-10-05 | complete | 12/12 Pass | [Results/PipelineDesign-20261005.md](./Results/PipelineDesign-20261005.md)
+
+PipelineResilience (20261007) | Business performance pipeline resilience (Prefect Part 2) | 2026-10-07 | complete | 14/14 Pass | [Results/PipelineResilience-20261007.md](./Results/PipelineResilience-20261007.md)

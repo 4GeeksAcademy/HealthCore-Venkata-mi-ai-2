@@ -1,9 +1,17 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-05  
-**Latest stamped plan:** [HC-MS5-PLAN-077](./plans/HC-MS5-PLAN-077-20261005-pipeline-design-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-076](./plans/HC-MS5-PLAN-076-20261005-pipeline-design.md) (`implemented`, MS5, docs)  
+**Last updated:** 2026-10-07  
+**Latest stamped plan:** [HC-MS5-PLAN-080](./plans/HC-MS5-PLAN-080-20261007-resilience-pipeline-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-079](./plans/HC-MS5-PLAN-079-20261007-resilience-pipeline-impl.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-07)
+
+**Pipeline resilience eval (PLAN-080):** Official rubric **14/14 Pass**, saved after human confirm: [Results/PipelineResilience-20261007.md](./evaluations/Results/PipelineResilience-20261007.md). Same-day re-evals overwrite that file only. Does not replace Part 1 design or telemetry evals. Does not close MS5.
+
+**Resilience pipeline (PLAN-079):** Prefect flow `monthly_clinic_supply_performance` with extract/transform/load, optional eval snapshot, retries, transform cache, upsert into `reporting.monthly_clinic_supply_performance`, CLI `python data/pipelines/pipeline.py`, JWT routes under `/reporting/*`. Option A: `data/raw/monthly_clinic_supply_events.json` when live telemetry has no accepted rows. Does not change `services/telemetry/analysis.py` or `GET /telemetry/report`. Rubric saved under PLAN-080. Does not close MS5.
+
+**Resilience pipeline CONTEXT (PLAN-078):** Docs only. Brief at [`docs/Project_Contexts/CONTEXT-resilience-pipeline.md`](../docs/Project_Contexts/CONTEXT-resilience-pipeline.md).
 
 ## Today’s update (2026-10-05)
 
@@ -96,7 +104,7 @@
 | Backend serialization audit | **Implemented** (PLAN-053–054) — CONTEXT + audit + `response_model` gaps closed; eval → [Results/BackendSerialization-20260918.md](./evaluations/Results/BackendSerialization-20260918.md) (**6/6 Pass**) |
 | Caching (lazy load + TTL) | **Implemented** (PLAN-055–056) — suppliers + inventory product lists; eval → [Results/Caching-20260921.md](./evaluations/Results/Caching-20260921.md) (**8/8 Pass**) |
 | Telemetry plan | **Designed** (PLAN-060–061); eval **10/10 Pass** (PLAN-062); backoffice capture and stub receiver (PLAN-064) |
-| Business performance pipeline | **Designed** (PLAN-075–076); eval **12/12 Pass** (PLAN-077); no orchestration code |
+| Business performance pipeline | **Designed** (PLAN-075–076); design eval **12/12** (PLAN-077); **Part 2 implemented** (PLAN-078–079); resilience eval **14/14** (PLAN-080) |
 
 ## Today’s update (2026-09-16)
 
