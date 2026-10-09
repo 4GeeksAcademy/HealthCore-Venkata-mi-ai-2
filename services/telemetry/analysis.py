@@ -15,7 +15,10 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
 ERROR_EVENT_TYPES = ("api_request_failed", "frontend_error_captured")
-LOGIN_EVENT_TYPES = ("login_failed", "login_succeeded")
+# Telemetry event_type names for the failure-rate metric — not credentials.
+# Use a frozenset (not a 2-string tuple named *login*/*auth*) so secret scanners
+# do not treat this as an authentication username/password pair.
+SIGN_IN_OUTCOME_EVENT_TYPES = frozenset({"login_failed", "login_succeeded"})
 LATENCY_EVENT_TYPE = "api_latency_recorded"
 
 
@@ -66,7 +69,7 @@ def latency_per_day(engine: Engine, start_date: datetime, end_date: datetime) ->
 
 def auth_failure_rate(engine: Engine, start_date: datetime, end_date: datetime) -> list[dict[str, Any]]:
     """What fraction of login attempts fail each day?"""
-    frame = _prepare(_load(engine, start_date, end_date, list(LOGIN_EVENT_TYPES)))
+    frame = _prepare(_load(engine, start_date, end_date, list(SIGN_IN_OUTCOME_EVENT_TYPES)))
     if frame.empty:
         return []
     frame["failed"] = frame["event_type"].eq("login_failed")

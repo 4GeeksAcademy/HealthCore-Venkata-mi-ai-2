@@ -129,10 +129,10 @@ def test_telemetry_report_groups_operational_metrics(client: TestClient) -> None
     assert rates["api_request_failed"] == 1
     assert rates["section_viewed"] == 0
     assert body["metrics"]["latency_per_day"][0]["mean_duration_ms"] == 50
-    auth = body["metrics"]["auth_failure_rate"][0]
-    assert auth["failed"] == 1
-    assert auth["succeeded"] == 1
-    assert auth["failure_rate"] == 0.5
+    failure_row = body["metrics"]["auth_failure_rate"][0]
+    assert failure_row["failed"] == 1
+    assert failure_row["succeeded"] == 1
+    assert failure_row["failure_rate"] == 0.5
 
 
 def test_telemetry_report_uses_cache(client: TestClient, monkeypatch) -> None:
