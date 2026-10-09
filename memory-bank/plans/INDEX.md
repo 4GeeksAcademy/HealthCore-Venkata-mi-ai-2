@@ -170,6 +170,12 @@ Format per line:
 
 80 | HC-MS5-PLAN-080 | MS5 | 2026-10-07 | Save Business Performance Pipeline Resilience Evaluation | implemented | docs | [HC-MS5-PLAN-080-20261007-resilience-pipeline-eval.md](./HC-MS5-PLAN-080-20261007-resilience-pipeline-eval.md)
 
+81 | HC-MS5-PLAN-081 | MS5 | 2026-10-09 | HealthCore Subflows and Tests Context Document | implemented | docs | [HC-MS5-PLAN-081-20261009-subflows-tests-context.md](./HC-MS5-PLAN-081-20261009-subflows-tests-context.md)
+
+82 | HC-MS5-PLAN-082 | MS5 | 2026-10-09 | Monthly Clinic Supply Subflows, Tests, and Reporting Dashboard | implemented | implementation | [HC-MS5-PLAN-082-20261009-subflows-tests-impl.md](./HC-MS5-PLAN-082-20261009-subflows-tests-impl.md)
+
+83 | HC-MS5-PLAN-083 | MS5 | 2026-10-09 | Save Business Performance Pipeline Subflows and Tests Evaluation | implemented | docs | [HC-MS5-PLAN-083-20261009-subflows-tests-eval.md](./HC-MS5-PLAN-083-20261009-subflows-tests-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

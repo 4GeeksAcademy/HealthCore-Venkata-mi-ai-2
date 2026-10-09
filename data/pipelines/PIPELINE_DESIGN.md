@@ -221,15 +221,21 @@ Table: `reporting.pipeline_runs`. One row per attempt. Written at the start (`st
 
 ## Phase 4 — Mapping to Prefect
 
-One main flow. Three tasks. A backfill flow is named and not part of Part 1.
+One main flow. Three tasks (Part 2). Part 3 wraps those stages as subflows coordinated by the main flow in `data/pipelines/pipeline.py`.
 
 | Prefect concept | Name | What it does |
 |-----------------|------|----------------|
-| Flow | `monthly_clinic_supply_performance` | One UTC `month_start`. Takes the run lock, runs the three tasks, sets `Completed` or `Failed`. |
+| Flow | `monthly_clinic_supply_performance` | One UTC `month_start`. Takes the run lock, runs the three subflows, sets `Completed` or `Failed`. |
+| Subflow (Part 3) | `extract_clinic_supply_telemetry` | Calls task `extract_supply_events`. Explicit input: `month_start`. Output: extract result dict. |
+| Subflow (Part 3) | `transform_monthly_clinic_supply_kpis` | Calls task `transform_monthly_clinic_kpis`. Inputs: extract result + `month_start`. Output: clinic-month rows. |
+| Subflow (Part 3) | `load_monthly_clinic_supply_performance` | Calls task `load_monthly_clinic_supply_performance`. Input: rows. Output: records loaded. |
+| Subflow (Part 3, optional) | `snapshot_monthly_clinic_supply_eval` | Non-critical eval write; main flow uses `return_state=True`. |
 | Task | `extract_supply_events` | SQL read of `telemetry_events`, `eventId` dedup, reject counts. Sets `phase = extract`. |
 | Task | `transform_monthly_clinic_kpis` | Clinic-month KPIs plus zero rows for the allowlist. No database write. Sets `phase = transform`. |
 | Task | `load_monthly_clinic_supply_performance` | Single-transaction upsert into `reporting.monthly_clinic_supply_performance`. Sets `phase = load`. |
-| Flow (optional, not in Part 1) | `backfill_monthly_clinic_supply_performance` | Would call the same flow once per month in a range. Part 3 may split stages into subflows. |
+| Flow (optional, not in Part 1) | `backfill_monthly_clinic_supply_performance` | Would call the same flow once per month in a range. |
+
+**Part 3 additional activity (design question 10):** Concurrent-run lock (`pipeline_runs` one `Running` row per `flow_name` + `month_start`, plus stale `Running` cleanup) shipped in Part 2 and remains the answer to question 10 — no second lock layer was added in Part 3.
 
 **States used**
 

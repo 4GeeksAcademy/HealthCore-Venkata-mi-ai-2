@@ -13,8 +13,11 @@ export function useAuthToken(): { token: string | null; ready: boolean } {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setToken(getAuthToken());
-    setReady(true);
+    const handle = window.setTimeout(() => {
+      setToken(getAuthToken());
+      setReady(true);
+    }, 0);
+    return () => window.clearTimeout(handle);
   }, []);
 
   return { token, ready };

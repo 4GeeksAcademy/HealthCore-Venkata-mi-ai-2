@@ -1,9 +1,17 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-07  
-**Latest stamped plan:** [HC-MS5-PLAN-080](./plans/HC-MS5-PLAN-080-20261007-resilience-pipeline-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-079](./plans/HC-MS5-PLAN-079-20261007-resilience-pipeline-impl.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-10-09  
+**Latest stamped plan:** [HC-MS5-PLAN-083](./plans/HC-MS5-PLAN-083-20261009-subflows-tests-eval.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-082](./plans/HC-MS5-PLAN-082-20261009-subflows-tests-impl.md) (`implemented`, MS5, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-09)
+
+**Pipeline subflows/tests eval (PLAN-083):** Official rubric **12/12 Pass**, saved after human confirm: [Results/PipelineSubflowsTests-20261009.md](./evaluations/Results/PipelineSubflowsTests-20261009.md). Same-day re-evals overwrite that file only. Does not replace Part 1 design, Part 2 resilience, or telemetry evals. Does not close MS5.
+
+**Subflows / tests / dashboard (PLAN-082):** Main flow in `data/pipelines/pipeline.py` invokes domain-named Prefect subflows; pure KPI helpers in `data/process/clinic_supply_kpis.py`; unit tests in `tests/pipelines/test_pipeline.py`; backoffice `/reporting` for the four Monthly Clinic Supply KPIs. Does not change `services/telemetry/analysis.py` or `GET /telemetry/report`. Rubric saved under PLAN-083. Does not close MS5.
+
+**Subflows CONTEXT (PLAN-081):** Docs only. Brief at [`docs/Project_Contexts/CONTEXT-subflows-tests.md`](../docs/Project_Contexts/CONTEXT-subflows-tests.md).
 
 ## Today’s update (2026-10-07)
 

@@ -27,6 +27,8 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - Pipeline design eval (2026-10-05, **12/12 Pass**) — [Results/PipelineDesign-20261005.md](../memory-bank/evaluations/Results/PipelineDesign-20261005.md)
 - [CONTEXT-resilience-pipeline.md](./Project_Contexts/CONTEXT-resilience-pipeline.md) — Part 2 Prefect resilient pipeline (Option A fixture fallback)
 - Pipeline resilience eval (2026-10-07, **14/14 Pass**) — [Results/PipelineResilience-20261007.md](../memory-bank/evaluations/Results/PipelineResilience-20261007.md)
+- [CONTEXT-subflows-tests.md](./Project_Contexts/CONTEXT-subflows-tests.md) — Part 3 subflows, unit tests, and backoffice reporting dashboard
+- Pipeline subflows/tests eval (2026-10-09, **12/12 Pass**) — [Results/PipelineSubflowsTests-20261009.md](../memory-bank/evaluations/Results/PipelineSubflowsTests-20261009.md)
 
 ## Telemetry
 
