@@ -12,10 +12,19 @@ class OrderType(str, Enum):
     outbound = "outbound"
 
 
+class ProductCategory(str, Enum):
+    medication = "medication"
+    ppe = "ppe"
+    consumable = "consumable"
+    equipment = "equipment"
+
+
 class MedicalSupplyCreate(BaseModel):
     name: str
     sku: str
     threshold: int = Field(ge=0)
+    category: ProductCategory = ProductCategory.consumable
+    expiry_date: str | None = None  # YYYY-MM-DD optional
 
 
 class MedicalSupplyResponse(BaseModel):
@@ -24,18 +33,26 @@ class MedicalSupplyResponse(BaseModel):
     sku: str
     threshold: int
     current_stock: int
+    category: str = "consumable"
+    expiry_date: str | None = None
 
 
 class InboundOrderCreate(BaseModel):
     product_id: int
     quantity: int = Field(gt=0)
     notes: str = ""
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
+    total_cost: float | None = None
 
 
 class OutboundOrderCreate(BaseModel):
     product_id: int
     quantity: int = Field(gt=0)
     notes: str = ""
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
+    department: str = "general_consultation"
 
 
 class InboundOrderResponse(BaseModel):
@@ -47,6 +64,12 @@ class InboundOrderResponse(BaseModel):
     created_at: str
     user_uuid: str
     created_by: str
+    sku: str = ""
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
+    product_category: str = "consumable"
+    expiry_date: str | None = None
+    total_cost: float | None = None
 
 
 class OutboundOrderResponse(BaseModel):
@@ -63,6 +86,11 @@ class OutboundOrderResponse(BaseModel):
     previous_stock: int
     current_stock: int
     threshold_crossed: bool
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
+    department: str = "general_consultation"
+    product_category: str = "consumable"
+    expiry_date: str | None = None
 
 
 class InventoryOrderResponse(BaseModel):
@@ -75,3 +103,6 @@ class InventoryOrderResponse(BaseModel):
     created_at: str
     user_uuid: str
     created_by: str
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
+    department: str | None = None

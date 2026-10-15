@@ -16,10 +16,16 @@ from app.inventory.schemas import (
     OutboundOrderResponse,
 )
 from app.inventory.service import (
+    DEFAULT_CATEGORY,
+    DEFAULT_CLINIC_ID,
+    DEFAULT_COUNTRY,
+    DEFAULT_DEPARTMENT,
     SEED_ROWS,
     SEED_USER_UUID,
     creator_email,
+    format_expiry,
     insufficient_stock_detail,
+    parse_expiry,
     threshold_crossed,
     utc_now,
     iso_timestamp,
@@ -68,40 +74,53 @@ def _product_doc(product_id: int) -> dict[str, Any] | None:
     return found[0] if found else None
 
 
+def _product_response(row: dict[str, Any]) -> MedicalSupplyResponse:
+    expiry = row.get("expiry_date")
+    return MedicalSupplyResponse(
+        id=int(row["id"]),
+        name=str(row["name"]),
+        sku=str(row["sku"]),
+        threshold=int(row["threshold"]),
+        current_stock=current_stock(int(row["id"])),
+        category=str(row.get("category") or DEFAULT_CATEGORY),
+        expiry_date=str(expiry) if expiry else None,
+    )
+
+
 def list_products() -> list[MedicalSupplyResponse]:
     rows = sorted(_db().table(PRODUCTS).all(), key=lambda row: int(row["id"]))
-    return [
-        MedicalSupplyResponse(
-            id=int(row["id"]),
-            name=str(row["name"]),
-            sku=str(row["sku"]),
-            threshold=int(row["threshold"]),
-            current_stock=current_stock(int(row["id"])),
-        )
-        for row in rows
-    ]
+    return [_product_response(row) for row in rows]
 
 
 def get_product(product_id: int) -> MedicalSupplyResponse | None:
     row = _product_doc(product_id)
     if row is None:
         return None
-    return MedicalSupplyResponse(
-        id=int(row["id"]),
-        name=str(row["name"]),
-        sku=str(row["sku"]),
-        threshold=int(row["threshold"]),
-        current_stock=current_stock(product_id),
-    )
+    return _product_response(row)
 
 
-def create_product(*, name: str, sku: str, threshold: int) -> MedicalSupplyResponse:
+def create_product(
+    *,
+    name: str,
+    sku: str,
+    threshold: int,
+    category: str = DEFAULT_CATEGORY,
+    expiry_date: str | None = None,
+) -> MedicalSupplyResponse:
     Product = Query()
     if _db().table(PRODUCTS).search(Product.sku == sku):
         raise ValueError("SKU already exists.")
     product_id = _next_id(PRODUCTS)
+    parsed = parse_expiry(expiry_date)
     _db().table(PRODUCTS).insert(
-        {"id": product_id, "name": name, "sku": sku, "threshold": threshold}
+        {
+            "id": product_id,
+            "name": name,
+            "sku": sku,
+            "threshold": threshold,
+            "category": category or DEFAULT_CATEGORY,
+            "expiry_date": format_expiry(parsed),
+        }
     )
     return MedicalSupplyResponse(
         id=product_id,
@@ -109,6 +128,8 @@ def create_product(*, name: str, sku: str, threshold: int) -> MedicalSupplyRespo
         sku=sku,
         threshold=threshold,
         current_stock=0,
+        category=category or DEFAULT_CATEGORY,
+        expiry_date=format_expiry(parsed),
     )
 
 
@@ -119,12 +140,17 @@ def create_inbound(
     notes: str,
     user_uuid: str,
     user_email: str,
+    clinic_id: str = DEFAULT_CLINIC_ID,
+    country: str = DEFAULT_COUNTRY,
+    total_cost: float | None = None,
 ) -> InboundOrderResponse:
     product = _product_doc(product_id)
     if product is None:
         raise LookupError("Product not found.")
     order_id = _next_id(INBOUND)
     created = utc_now()
+    clinic = clinic_id or DEFAULT_CLINIC_ID
+    ctry = country or DEFAULT_COUNTRY
     _db().table(INBOUND).insert(
         {
             "id": order_id,
@@ -135,6 +161,9 @@ def create_inbound(
             "notes": notes,
             "created_at": created.isoformat(),
             "user_uuid": user_uuid,
+            "clinic_id": clinic,
+            "country": ctry,
+            "total_cost": total_cost,
         }
     )
     return InboundOrderResponse(
@@ -146,6 +175,12 @@ def create_inbound(
         created_at=iso_timestamp(created),
         user_uuid=user_uuid,
         created_by=user_email or user_uuid,
+        sku=str(product["sku"]),
+        clinic_id=clinic,
+        country=ctry,
+        product_category=str(product.get("category") or DEFAULT_CATEGORY),
+        expiry_date=str(product["expiry_date"]) if product.get("expiry_date") else None,
+        total_cost=total_cost,
     )
 
 
@@ -156,6 +191,9 @@ def create_outbound(
     notes: str,
     user_uuid: str,
     user_email: str,
+    clinic_id: str = DEFAULT_CLINIC_ID,
+    country: str = DEFAULT_COUNTRY,
+    department: str = DEFAULT_DEPARTMENT,
 ) -> OutboundOrderResponse:
     product = _product_doc(product_id)
     if product is None:
@@ -165,6 +203,9 @@ def create_outbound(
         raise ValueError(insufficient_stock_detail(previous_stock, quantity))
     order_id = _next_id(OUTBOUND)
     created = utc_now()
+    clinic = clinic_id or DEFAULT_CLINIC_ID
+    ctry = country or DEFAULT_COUNTRY
+    dept = department or DEFAULT_DEPARTMENT
     _db().table(OUTBOUND).insert(
         {
             "id": order_id,
@@ -175,6 +216,9 @@ def create_outbound(
             "notes": notes,
             "created_at": created.isoformat(),
             "user_uuid": user_uuid,
+            "clinic_id": clinic,
+            "country": ctry,
+            "department": dept,
         }
     )
     current = current_stock(product_id)
@@ -193,6 +237,11 @@ def create_outbound(
         previous_stock=previous_stock,
         current_stock=current,
         threshold_crossed=threshold_crossed(previous_stock, current, threshold),
+        clinic_id=clinic,
+        country=ctry,
+        department=dept,
+        product_category=str(product.get("category") or DEFAULT_CATEGORY),
+        expiry_date=str(product["expiry_date"]) if product.get("expiry_date") else None,
     )
 
 
@@ -210,6 +259,9 @@ def list_orders() -> list[InventoryOrderResponse]:
                 created_at=str(row["created_at"]),
                 user_uuid=str(row["user_uuid"]),
                 created_by=creator_email(str(row["user_uuid"])),
+                clinic_id=str(row.get("clinic_id") or DEFAULT_CLINIC_ID),
+                country=str(row.get("country") or DEFAULT_COUNTRY),
+                department=None,
             )
         )
     for row in _db().table(OUTBOUND).all():
@@ -224,6 +276,9 @@ def list_orders() -> list[InventoryOrderResponse]:
                 created_at=str(row["created_at"]),
                 user_uuid=str(row["user_uuid"]),
                 created_by=creator_email(str(row["user_uuid"])),
+                clinic_id=str(row.get("clinic_id") or DEFAULT_CLINIC_ID),
+                country=str(row.get("country") or DEFAULT_COUNTRY),
+                department=str(row.get("department") or DEFAULT_DEPARTMENT),
             )
         )
     combined.sort(key=lambda item: item.created_at, reverse=True)
@@ -241,6 +296,14 @@ def seed_inventory() -> int:
             name=str(item["name"]),
             sku=str(item["sku"]),
             threshold=int(item["threshold"]),
+            category=str(item.get("category") or DEFAULT_CATEGORY),
+            expiry_date=str(item["expiry_date"])
+            if item.get("expiry_date") and not str(item["expiry_date"]).startswith("relative:")
+            else (
+                format_expiry(parse_expiry(item.get("expiry_date")))
+                if item.get("expiry_date")
+                else None
+            ),
         )
         create_inbound(
             product_id=created.id,
@@ -248,6 +311,9 @@ def seed_inventory() -> int:
             notes=str(item["inbound_notes"]),
             user_uuid=SEED_USER_UUID,
             user_email=creator_email(SEED_USER_UUID),
+            clinic_id=str(item.get("clinic_id") or DEFAULT_CLINIC_ID),
+            country=str(item.get("country") or DEFAULT_COUNTRY),
+            total_cost=float(item["total_cost"]) if item.get("total_cost") is not None else None,
         )
         outbound_qty = int(item["outbound"])
         if outbound_qty > 0:
@@ -257,6 +323,9 @@ def seed_inventory() -> int:
                 notes=str(item["outbound_notes"]),
                 user_uuid=SEED_USER_UUID,
                 user_email=creator_email(SEED_USER_UUID),
+                clinic_id=str(item.get("clinic_id") or DEFAULT_CLINIC_ID),
+                country=str(item.get("country") or DEFAULT_COUNTRY),
+                department=str(item.get("department") or DEFAULT_DEPARTMENT),
             )
         inserted += 1
     return inserted

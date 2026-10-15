@@ -176,6 +176,18 @@ Format per line:
 
 83 | HC-MS5-PLAN-083 | MS5 | 2026-10-09 | Save Business Performance Pipeline Subflows and Tests Evaluation | implemented | docs | [HC-MS5-PLAN-083-20261009-subflows-tests-eval.md](./HC-MS5-PLAN-083-20261009-subflows-tests-eval.md)
 
+84 | HC-MS6-PLAN-084 | MS6 | 2026-10-14 | HealthCore Background Processes Context Archive | implemented | docs | [HC-MS6-PLAN-084-20261014-background-processes-context.md](./HC-MS6-PLAN-084-20261014-background-processes-context.md)
+
+85 | HC-MS6-PLAN-085 | MS6 | 2026-10-14 | Nightly Telemetry Export job_runs Implementation | implemented | implementation | [HC-MS6-PLAN-085-20261014-background-processes-impl.md](./HC-MS6-PLAN-085-20261014-background-processes-impl.md)
+
+86 | HC-MS6-PLAN-086 | MS6 | 2026-10-14 | Save Background Processes Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-086-20261014-background-processes-eval.md](./HC-MS6-PLAN-086-20261014-background-processes-eval.md)
+
+87 | HC-MS6-PLAN-087 | MS6 | 2026-10-14 | CONTEXT-healthcore Additive Gaps Closure Plan | implemented | planning | [HC-MS6-PLAN-087-20261014-context-healthcore-gaps-plan.md](./HC-MS6-PLAN-087-20261014-context-healthcore-gaps-plan.md)
+
+88 | HC-MS6-PLAN-088 | MS6 | 2026-10-14 | CONTEXT-healthcore Additive Gaps Implementation | implemented | implementation | [HC-MS6-PLAN-088-20261014-context-healthcore-gaps-impl.md](./HC-MS6-PLAN-088-20261014-context-healthcore-gaps-impl.md)
+
+89 | HC-MS6-PLAN-089 | MS6 | 2026-10-14 | Re-run Background Processes Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-089-20261014-background-processes-eval-rerun.md](./HC-MS6-PLAN-089-20261014-background-processes-eval-rerun.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

@@ -103,6 +103,18 @@ def migrate_postgres_inventory(engine: Engine) -> None:
         ):
             _adopt_readable_table(conn, old, new)
 
+        if _postgres_table_exists(conn, "medical_supply"):
+            supply_cols = _postgres_columns(conn, "medical_supply")
+            if "category" not in supply_cols:
+                conn.execute(
+                    text(
+                        "ALTER TABLE medical_supply "
+                        "ADD COLUMN category VARCHAR NOT NULL DEFAULT 'consumable'"
+                    )
+                )
+            if "expiry_date" not in supply_cols:
+                conn.execute(text("ALTER TABLE medical_supply ADD COLUMN expiry_date DATE"))
+
         for table in ("inbound_order", "outbound_order"):
             if not _postgres_table_exists(conn, table):
                 continue
@@ -114,6 +126,27 @@ def migrate_postgres_inventory(engine: Engine) -> None:
             if "sku" not in cols:
                 conn.execute(
                     text(f'ALTER TABLE "{table}" ADD COLUMN sku VARCHAR NOT NULL DEFAULT \'\'' )
+                )
+            if "clinic_id" not in cols:
+                conn.execute(
+                    text(
+                        f'ALTER TABLE "{table}" '
+                        "ADD COLUMN clinic_id VARCHAR NOT NULL DEFAULT 'us-tx-001'"
+                    )
+                )
+            if "country" not in cols:
+                conn.execute(
+                    text(
+                        f'ALTER TABLE "{table}" '
+                        "ADD COLUMN country VARCHAR NOT NULL DEFAULT 'US'"
+                    )
+                )
+            if table == "outbound_order" and "department" not in cols:
+                conn.execute(
+                    text(
+                        'ALTER TABLE "outbound_order" '
+                        "ADD COLUMN department VARCHAR NOT NULL DEFAULT 'general_consultation'"
+                    )
                 )
 
         if _postgres_table_exists(conn, "inbound_order") and _postgres_table_exists(

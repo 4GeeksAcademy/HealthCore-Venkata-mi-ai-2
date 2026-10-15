@@ -70,7 +70,11 @@ async def create_product(
     except ValidationError as exc:
         raise RequestValidationError(exc.errors())
     created = inventory_repo.create_product(
-        name=payload.name, sku=payload.sku, threshold=payload.threshold
+        name=payload.name,
+        sku=payload.sku,
+        threshold=payload.threshold,
+        category=payload.category.value,
+        expiry_date=payload.expiry_date,
     )
     invalidate_products()
     return created
@@ -102,6 +106,9 @@ def post_inbound(
         notes=payload.notes,
         user_uuid=_user_uuid(user),
         user_email=str(user.get("email") or ""),
+        clinic_id=payload.clinic_id,
+        country=payload.country,
+        total_cost=payload.total_cost,
     )
     invalidate_products()
     return created
@@ -122,6 +129,9 @@ def post_outbound(
         notes=payload.notes,
         user_uuid=_user_uuid(user),
         user_email=str(user.get("email") or ""),
+        clinic_id=payload.clinic_id,
+        country=payload.country,
+        department=payload.department,
     )
     invalidate_products()
     return created

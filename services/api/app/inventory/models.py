@@ -1,6 +1,6 @@
 """SQLModel ORM tables for HealthCore medical-supply inventory (Supabase)."""
 
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -12,6 +12,9 @@ class MedicalSupply(SQLModel, table=True):
     name: str
     sku: str = Field(index=True, unique=True)
     threshold: int
+    # CONTEXT-healthcore: category + expiry (additive; defaults keep old rows valid)
+    category: str = Field(default="consumable")
+    expiry_date: date | None = Field(default=None)
 
 
 class InboundOrder(SQLModel, table=True):
@@ -25,6 +28,8 @@ class InboundOrder(SQLModel, table=True):
     notes: str = ""
     created_at: datetime
     user_uuid: str
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
     product: MedicalSupply | None = Relationship()
 
 
@@ -39,4 +44,7 @@ class OutboundOrder(SQLModel, table=True):
     notes: str = ""
     created_at: datetime
     user_uuid: str
+    clinic_id: str = "us-tx-001"
+    country: str = "US"
+    department: str = "general_consultation"
     product: MedicalSupply | None = Relationship()

@@ -106,6 +106,10 @@ export function OutboundOrderForm() {
         sku: created.sku,
         quantity: created.quantity,
         threshold_crossed: created.threshold_crossed,
+        clinic_id: created.clinic_id ?? "us-tx-001",
+        country: created.country ?? "US",
+        product_category: created.product_category ?? "consumable",
+        department: created.department ?? "general_consultation",
       });
       if (created.threshold_crossed) {
         track("stock_threshold_triggered", {
@@ -115,7 +119,27 @@ export function OutboundOrderForm() {
           threshold: created.threshold,
           previous_stock: created.previous_stock,
           current_stock: created.current_stock,
+          clinic_id: created.clinic_id ?? "us-tx-001",
+          country: created.country ?? "US",
+          product_category: created.product_category ?? "consumable",
         });
+      }
+      if (created.expiry_date) {
+        const { daysToExpiry, shouldFlagExpiry } = await import(
+          "@/lib/clinic-context"
+        );
+        if (shouldFlagExpiry(created.expiry_date)) {
+          track("supply_expiry_flagged", {
+            product_id: created.product_id,
+            sku: created.sku,
+            clinic_id: created.clinic_id ?? "us-tx-001",
+            country: created.country ?? "US",
+            product_category: created.product_category ?? "consumable",
+            quantity: created.quantity,
+            expiry_date: created.expiry_date,
+            days_to_expiry: daysToExpiry(created.expiry_date),
+          });
+        }
       }
       setQuantity("");
       setNotes("");

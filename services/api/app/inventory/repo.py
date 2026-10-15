@@ -50,17 +50,40 @@ def get_product(product_id: int) -> MedicalSupplyResponse | None:
         return sql_service.get_supply(session, product_id)
 
 
-def create_product(*, name: str, sku: str, threshold: int) -> MedicalSupplyResponse:
+def create_product(
+    *,
+    name: str,
+    sku: str,
+    threshold: int,
+    category: str = sql_service.DEFAULT_CATEGORY,
+    expiry_date: str | None = None,
+) -> MedicalSupplyResponse:
     if uses_tinydb():
         try:
-            return tiny_store.create_product(name=name, sku=sku, threshold=threshold)
+            return tiny_store.create_product(
+                name=name,
+                sku=sku,
+                threshold=threshold,
+                category=category,
+                expiry_date=expiry_date,
+            )
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
     with Session(get_engine()) as session:
         existing = session.exec(select(MedicalSupply).where(MedicalSupply.sku == sku)).first()
         if existing is not None:
             raise HTTPException(status_code=400, detail="SKU already exists.")
-        row = MedicalSupply(name=name, sku=sku, threshold=threshold)
+        try:
+            parsed_expiry = sql_service.parse_expiry(expiry_date)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail="expiry_date must be YYYY-MM-DD") from exc
+        row = MedicalSupply(
+            name=name,
+            sku=sku,
+            threshold=threshold,
+            category=category or sql_service.DEFAULT_CATEGORY,
+            expiry_date=parsed_expiry,
+        )
         session.add(row)
         try:
             session.commit()
@@ -74,13 +97,7 @@ def create_product(*, name: str, sku: str, threshold: int) -> MedicalSupplyRespo
                 status_code=503, detail="Service temporarily unavailable. Please try again."
             ) from exc
         assert row.id is not None
-        return MedicalSupplyResponse(
-            id=row.id,
-            name=row.name,
-            sku=row.sku,
-            threshold=row.threshold,
-            current_stock=0,
-        )
+        return sql_service.to_supply_response(row, 0)
 
 
 def create_inbound(
@@ -90,6 +107,9 @@ def create_inbound(
     notes: str,
     user_uuid: str,
     user_email: str,
+    clinic_id: str = sql_service.DEFAULT_CLINIC_ID,
+    country: str = sql_service.DEFAULT_COUNTRY,
+    total_cost: float | None = None,
 ) -> InboundOrderResponse:
     if uses_tinydb():
         try:
@@ -99,6 +119,9 @@ def create_inbound(
                 notes=notes,
                 user_uuid=user_uuid,
                 user_email=user_email,
+                clinic_id=clinic_id,
+                country=country,
+                total_cost=total_cost,
             )
         except LookupError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -114,6 +137,8 @@ def create_inbound(
             notes=notes,
             created_at=sql_service.utc_now(),
             user_uuid=user_uuid,
+            clinic_id=clinic_id or sql_service.DEFAULT_CLINIC_ID,
+            country=country or sql_service.DEFAULT_COUNTRY,
         )
         session.add(row)
         try:
@@ -134,6 +159,12 @@ def create_inbound(
             created_at=sql_service.iso_timestamp(row.created_at),
             user_uuid=row.user_uuid,
             created_by=user_email or user_uuid,
+            sku=product.sku,
+            clinic_id=row.clinic_id,
+            country=row.country,
+            product_category=getattr(product, "category", None) or sql_service.DEFAULT_CATEGORY,
+            expiry_date=sql_service.format_expiry(getattr(product, "expiry_date", None)),
+            total_cost=total_cost,
         )
 
 
@@ -144,6 +175,9 @@ def create_outbound(
     notes: str,
     user_uuid: str,
     user_email: str,
+    clinic_id: str = sql_service.DEFAULT_CLINIC_ID,
+    country: str = sql_service.DEFAULT_COUNTRY,
+    department: str = sql_service.DEFAULT_DEPARTMENT,
 ) -> OutboundOrderResponse:
     if uses_tinydb():
         try:
@@ -153,6 +187,9 @@ def create_outbound(
                 notes=notes,
                 user_uuid=user_uuid,
                 user_email=user_email,
+                clinic_id=clinic_id,
+                country=country,
+                department=department,
             )
         except LookupError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -176,6 +213,9 @@ def create_outbound(
             notes=notes,
             created_at=sql_service.utc_now(),
             user_uuid=user_uuid,
+            clinic_id=clinic_id or sql_service.DEFAULT_CLINIC_ID,
+            country=country or sql_service.DEFAULT_COUNTRY,
+            department=department or sql_service.DEFAULT_DEPARTMENT,
         )
         session.add(row)
         try:
@@ -204,6 +244,11 @@ def create_outbound(
             threshold_crossed=sql_service.threshold_crossed(
                 previous_stock, current_stock, product.threshold
             ),
+            clinic_id=row.clinic_id,
+            country=row.country,
+            department=row.department,
+            product_category=getattr(product, "category", None) or sql_service.DEFAULT_CATEGORY,
+            expiry_date=sql_service.format_expiry(getattr(product, "expiry_date", None)),
         )
 
 

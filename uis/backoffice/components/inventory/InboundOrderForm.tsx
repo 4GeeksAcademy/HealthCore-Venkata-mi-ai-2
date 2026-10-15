@@ -96,12 +96,37 @@ export function InboundOrderForm() {
         notes: notes.trim(),
       });
       finishFlow();
+      const product = products.find((item) => item.id === parsedProductId);
       track("inbound_order_created", {
         order_id: created.id,
         product_id: created.product_id,
-        sku,
+        sku: created.sku ?? sku,
         quantity: created.quantity,
+        clinic_id: created.clinic_id ?? "us-tx-001",
+        country: created.country ?? "US",
+        product_category:
+          created.product_category ?? product?.category ?? "consumable",
+        total_cost: created.total_cost ?? undefined,
       });
+      if (created.expiry_date || product?.expiry_date) {
+        const { daysToExpiry, shouldFlagExpiry } = await import(
+          "@/lib/clinic-context"
+        );
+        const expiry = created.expiry_date ?? product?.expiry_date ?? null;
+        if (shouldFlagExpiry(expiry)) {
+          track("supply_expiry_flagged", {
+            product_id: created.product_id,
+            sku: created.sku ?? sku,
+            clinic_id: created.clinic_id ?? "us-tx-001",
+            country: created.country ?? "US",
+            product_category:
+              created.product_category ?? product?.category ?? "consumable",
+            quantity: created.quantity,
+            expiry_date: expiry,
+            days_to_expiry: daysToExpiry(expiry),
+          });
+        }
+      }
       router.push("/inventory?notice=inbound");
     } catch (err) {
       trackInventoryFailure("POST /inventory/orders/inbound", err, {

@@ -1,11 +1,15 @@
 export type InventoryOrderType = "inbound" | "outbound";
 
+export type ProductCategory = "medication" | "ppe" | "consumable" | "equipment";
+
 export interface InventoryProduct {
   id: number;
   name: string;
   sku: string;
   stock: number;
   threshold: number;
+  category?: ProductCategory | string;
+  expiry_date?: string | null;
 }
 
 export interface InventoryOrder {
@@ -17,12 +21,23 @@ export interface InventoryOrder {
   notes: string;
   created_at: string;
   created_by: string;
+  clinic_id?: string;
+  country?: string;
+  department?: string | null;
+  sku?: string;
+  product_category?: string;
+  expiry_date?: string | null;
+  total_cost?: number | null;
 }
 
 export interface InventoryOrderCreate {
   product_id: number;
   quantity: number;
   notes: string;
+  clinic_id?: string;
+  country?: string;
+  department?: string;
+  total_cost?: number;
 }
 
 export function isLowStock(product: InventoryProduct): boolean {

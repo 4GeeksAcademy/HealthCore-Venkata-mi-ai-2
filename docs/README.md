@@ -29,6 +29,8 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - Pipeline resilience eval (2026-10-07, **14/14 Pass**) — [Results/PipelineResilience-20261007.md](../memory-bank/evaluations/Results/PipelineResilience-20261007.md)
 - [CONTEXT-subflows-tests.md](./Project_Contexts/CONTEXT-subflows-tests.md) — Part 3 subflows, unit tests, and backoffice reporting dashboard
 - Pipeline subflows/tests eval (2026-10-09, **12/12 Pass**) — [Results/PipelineSubflowsTests-20261009.md](../memory-bank/evaluations/Results/PipelineSubflowsTests-20261009.md)
+- [BackgroundProcesses.md](./Project_Contexts/BackgroundProcesses.md) — MS6 Ticket `#DEV-53` nightly telemetry export (`job_runs`, `scripts/nightly_export.py`)
+- Background Processes eval (2026-10-14, **10/10 Pass**, re-run) — [Results/BackgroundProcesses-20261014.md](../memory-bank/evaluations/Results/BackgroundProcesses-20261014.md)
 
 ## Telemetry
 

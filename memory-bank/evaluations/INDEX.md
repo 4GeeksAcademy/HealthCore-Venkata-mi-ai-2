@@ -55,3 +55,5 @@ PipelineDesign (20261005) | Business performance pipeline design (monthly clinic
 PipelineResilience (20261007) | Business performance pipeline resilience (Prefect Part 2) | 2026-10-07 | complete | 14/14 Pass | [Results/PipelineResilience-20261007.md](./Results/PipelineResilience-20261007.md)
 
 PipelineSubflowsTests (20261009) | Business performance pipeline subflows, tests, and dashboard (Part 3) | 2026-10-09 | complete | 12/12 Pass | [Results/PipelineSubflowsTests-20261009.md](./Results/PipelineSubflowsTests-20261009.md)
+
+BackgroundProcesses (20261014) | Nightly telemetry export (`job_runs`, cron, CSV backup) | 2026-10-14 | complete | 10/10 Pass (re-run) | [Results/BackgroundProcesses-20261014.md](./Results/BackgroundProcesses-20261014.md)

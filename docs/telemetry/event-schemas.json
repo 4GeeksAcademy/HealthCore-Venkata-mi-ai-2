@@ -43,6 +43,7 @@
         "order_validation_failed",
         "direct_stock_edit_rejected",
         "stock_threshold_triggered",
+        "supply_expiry_flagged",
         "product_created",
         "login_failed",
         "login_succeeded",
@@ -132,6 +133,18 @@
         "properties": {
           "userId": { "type": "string", "minLength": 1 },
           "properties": { "$ref": "#/definitions/stockThresholdTriggered" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "event_type": { "const": "supply_expiry_flagged" } },
+        "required": ["event_type"]
+      },
+      "then": {
+        "properties": {
+          "userId": { "type": "string", "minLength": 1 },
+          "properties": { "$ref": "#/definitions/supplyExpiryFlagged" }
         }
       }
     },
@@ -353,7 +366,14 @@
         "order_id": { "type": "integer", "minimum": 1 },
         "product_id": { "type": "integer", "minimum": 1 },
         "sku": { "type": "string", "minLength": 1 },
-        "quantity": { "type": "integer", "minimum": 1 }
+        "quantity": { "type": "integer", "minimum": 1 },
+        "clinic_id": { "type": "string", "minLength": 1 },
+        "country": { "type": "string", "enum": ["US", "UK"] },
+        "product_category": {
+          "type": "string",
+          "enum": ["medication", "ppe", "consumable", "equipment"]
+        },
+        "total_cost": { "type": "number" }
       }
     },
     "outboundOrderCreated": {
@@ -365,7 +385,14 @@
         "product_id": { "type": "integer", "minimum": 1 },
         "sku": { "type": "string", "minLength": 1 },
         "quantity": { "type": "integer", "minimum": 1 },
-        "threshold_crossed": { "type": "boolean" }
+        "threshold_crossed": { "type": "boolean" },
+        "clinic_id": { "type": "string", "minLength": 1 },
+        "country": { "type": "string", "enum": ["US", "UK"] },
+        "product_category": {
+          "type": "string",
+          "enum": ["medication", "ppe", "consumable", "equipment"]
+        },
+        "department": { "type": "string", "minLength": 1 }
       }
     },
     "orderValidationFailed": {
@@ -416,7 +443,40 @@
         "sku": { "type": "string", "minLength": 1 },
         "threshold": { "type": "integer", "minimum": 0 },
         "previous_stock": { "type": "integer", "minimum": 0 },
-        "current_stock": { "type": "integer", "minimum": 0 }
+        "current_stock": { "type": "integer", "minimum": 0 },
+        "clinic_id": { "type": "string", "minLength": 1 },
+        "country": { "type": "string", "enum": ["US", "UK"] },
+        "product_category": {
+          "type": "string",
+          "enum": ["medication", "ppe", "consumable", "equipment"]
+        }
+      }
+    },
+    "supplyExpiryFlagged": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_id",
+        "sku",
+        "clinic_id",
+        "country",
+        "product_category",
+        "quantity",
+        "expiry_date",
+        "days_to_expiry"
+      ],
+      "properties": {
+        "product_id": { "type": "integer", "minimum": 1 },
+        "sku": { "type": "string", "minLength": 1 },
+        "clinic_id": { "type": "string", "minLength": 1 },
+        "country": { "type": "string", "enum": ["US", "UK"] },
+        "product_category": {
+          "type": "string",
+          "enum": ["medication", "ppe", "consumable", "equipment"]
+        },
+        "quantity": { "type": "integer", "minimum": 0 },
+        "expiry_date": { "type": "string", "minLength": 1 },
+        "days_to_expiry": { "type": "integer" }
       }
     },
     "productCreated": {
@@ -427,7 +487,12 @@
         "product_id": { "type": "integer", "minimum": 1 },
         "sku": { "type": "string", "minLength": 1 },
         "threshold": { "type": "integer", "minimum": 0 },
-        "below_threshold": { "type": "boolean" }
+        "below_threshold": { "type": "boolean" },
+        "product_category": {
+          "type": "string",
+          "enum": ["medication", "ppe", "consumable", "equipment"]
+        },
+        "expiry_date": { "type": "string", "minLength": 1 }
       }
     },
     "loginFailed": {

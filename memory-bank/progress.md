@@ -1,9 +1,21 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-09  
-**Latest stamped plan:** [HC-MS5-PLAN-083](./plans/HC-MS5-PLAN-083-20261009-subflows-tests-eval.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-082](./plans/HC-MS5-PLAN-082-20261009-subflows-tests-impl.md) (`implemented`, MS5, implementation)  
+**Last updated:** 2026-10-14  
+**Latest stamped plan:** [HC-MS6-PLAN-089](./plans/HC-MS6-PLAN-089-20261014-background-processes-eval-rerun.md) (`implemented`, MS6, docs)  
+**Prior completed stamp:** [HC-MS6-PLAN-088](./plans/HC-MS6-PLAN-088-20261014-context-healthcore-gaps-impl.md) (`implemented`, MS6, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-14)
+
+**Background Processes eval re-run (PLAN-089):** Official rubric still **10/10 Pass**. Same-day file overwritten: [Results/BackgroundProcesses-20261014.md](./evaluations/Results/BackgroundProcesses-20261014.md). Pytest jobs **8 passed**; smoke covered success, duplicate skip, and processing-lock abort. Does not close MS6.
+
+**CONTEXT-healthcore gaps (PLAN-087/088):** Additive only. Product `category`/`expiry_date`; order `clinic_id`/`country`/`department`; `supply_expiry_flagged` emitter; telemetry allowlists + `event-schemas.json`; seed expanded to **10** SKUs across four categories with US/UK clinics. Inventory/cache pytest **21 passed**; jobs **8 passed**. Does not close MS6.
+
+**Background Processes eval (PLAN-086):** Official rubric **10/10 Pass**, saved after human confirm: [Results/BackgroundProcesses-20261014.md](./evaluations/Results/BackgroundProcesses-20261014.md). Same-day re-evals overwrite that file only. Does not replace pipeline or telemetry evals. Does not close MS6.
+
+**Background Processes implementation (PLAN-085):** Ticket `#DEV-53`. `services/job_runner` + `job_runs` (`pending`→`processing`→`completed`|`failed`), `scripts/nightly_export.py` (CSV backup under `data/raw/`, subprocess `data/pipelines/pipeline.py`), crontab documented in `scripts/README.md`. Pytest `tests/jobs/test_nightly_export.py` **8 passed**. Rubric saved under PLAN-086. Does not close MS6.
+
+**Background Processes CONTEXT (PLAN-084):** Docs only. Archived Ticket `#DEV-53` brief at [`docs/Project_Contexts/BackgroundProcesses.md`](../docs/Project_Contexts/BackgroundProcesses.md).
 
 ## Today’s update (2026-10-09)
 
