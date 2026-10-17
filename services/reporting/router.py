@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.deps.auth import get_current_user
@@ -32,12 +33,6 @@ def _latest_pipeline_run() -> Any:
     _ensure_pipeline_imports()
     module = importlib.import_module("monthly_clinic_supply.runs")
     return module.latest_pipeline_run()
-
-
-def _trigger_flow(month_start: str | None) -> dict[str, Any]:
-    _ensure_pipeline_imports()
-    module = importlib.import_module("monthly_clinic_supply.flow")
-    return module.trigger_monthly_clinic_supply_performance(month_start=month_start)
 
 
 def _query_kpis(month_start: str | None) -> dict[str, Any]:
@@ -93,29 +88,24 @@ def get_latest_pipeline_run(_user: dict = Depends(get_current_user)) -> dict[str
     }
 
 
-@router.post("/pipeline-runs", status_code=status.HTTP_200_OK)
+@router.post("/pipeline-runs", status_code=status.HTTP_202_ACCEPTED)
 def post_pipeline_run(
     body: PipelineTriggerBody | None = None,
     _user: dict = Depends(get_current_user),
-) -> dict[str, Any]:
+) -> JSONResponse:
+    """Enqueue the monthly clinic-supply ETL; return immediately with task_id."""
     month_start = body.month_start if body else None
-    try:
-        return _trigger_flow(month_start)
-    except RuntimeError as exc:
-        if str(exc) == "pipeline_already_running":
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="A pipeline run is already in progress for that month.",
-            ) from exc
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unable to run the reporting pipeline.",
-        ) from exc
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unable to run the reporting pipeline.",
-        ) from exc
+    # Lightweight message: month_start only — worker loads source data itself.
+    # Import here so API startup does not require Redis until this route is hit.
+    from services.tasks.pipeline import run_monthly_clinic_supply_pipeline
+
+    async_result = run_monthly_clinic_supply_pipeline.apply_async(
+        kwargs={"month_start": month_start},
+    )
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content={"task_id": async_result.id},
+    )
 
 
 @router.get(

@@ -27,3 +27,7 @@ NIGHTLY_SKIP_PIPELINE=1 TARGET_DATE=2026-10-13 python scripts/nightly_export.py
 Justification: crontab keeps the worker off the FastAPI main thread so a hung export cannot block `/health` or inventory routes. CSV lands in `data/raw/telemetry_YYYY-MM-DD.csv` (backup only). Pipeline subprocess: `python data/pipelines/pipeline.py --month-start <first-of-target-month>`.
 
 Brief: [`docs/Project_Contexts/BackgroundProcesses.md`](../docs/Project_Contexts/BackgroundProcesses.md).
+
+## Celery async tasks (not a script — see services)
+
+Ticket **#DEV-55** workers are documented in [`services/README.md`](../services/README.md). Start with `docker compose up -d redis worker flower` or `celery -A services.celery_app worker` from the repo root. Do not run the worker inside the FastAPI process.

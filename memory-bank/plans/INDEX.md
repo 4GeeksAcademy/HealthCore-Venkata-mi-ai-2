@@ -188,6 +188,12 @@ Format per line:
 
 89 | HC-MS6-PLAN-089 | MS6 | 2026-10-14 | Re-run Background Processes Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-089-20261014-background-processes-eval-rerun.md](./HC-MS6-PLAN-089-20261014-background-processes-eval-rerun.md)
 
+90 | HC-MS6-PLAN-090 | MS6 | 2026-10-16 | HealthCore Message Queue Context Archive | implemented | docs | [HC-MS6-PLAN-090-20261016-message-queue-context.md](./HC-MS6-PLAN-090-20261016-message-queue-context.md)
+
+91 | HC-MS6-PLAN-091 | MS6 | 2026-10-16 | Async Task Queue Redis Celery Implementation Plan | planned | planning | [HC-MS6-PLAN-091-20261016-message-queue-plan.md](./HC-MS6-PLAN-091-20261016-message-queue-plan.md)
+
+92 | HC-MS6-PLAN-092 | MS6 | 2026-10-16 | Async Task Queue Redis Celery Implementation | implemented | implementation | [HC-MS6-PLAN-092-20261016-message-queue-impl.md](./HC-MS6-PLAN-092-20261016-message-queue-impl.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

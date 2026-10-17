@@ -1,15 +1,35 @@
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--maxmemory-policy", "noeviction"]
+    networks:
+      - healthcore
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   api:
     build:
       context: ./services
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /repo:/repo/services:/repo/data/pipelines
     ports:
       - "8001:8001"
     volumes:
       - ./services/api:/app
       - ./services/telemetry:/opt/healthcore-telemetry
+      - ./:/repo
+    depends_on:
+      redis:
+        condition: service_healthy
     networks:
       - healthcore
     healthcheck:
@@ -17,6 +37,62 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
+
+  worker:
+    build:
+      context: ./services
+      dockerfile: Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /repo:/repo/services:/repo/data/pipelines
+    working_dir: /repo
+    volumes:
+      - ./:/repo
+    command:
+      [
+        "celery",
+        "-A",
+        "services.celery_app",
+        "worker",
+        "--loglevel=info",
+        "--concurrency=1",
+        "-E",
+      ]
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - healthcore
+
+  flower:
+    build:
+      context: ./services
+      dockerfile: Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /repo:/repo/services
+      FLOWER_UNAUTHENTICATED_API: "true"
+    working_dir: /repo
+    volumes:
+      - ./:/repo
+    command:
+      [
+        "celery",
+        "-A",
+        "services.celery_app",
+        "--broker=redis://redis:6379/0",
+        "flower",
+        "--port=5555",
+      ]
+    ports:
+      - "5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy
+      worker:
+        condition: service_started
+    networks:
+      - healthcore
 
   ui:
     build:

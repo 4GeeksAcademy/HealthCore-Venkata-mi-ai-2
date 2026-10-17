@@ -1,9 +1,15 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-14  
-**Latest stamped plan:** [HC-MS6-PLAN-089](./plans/HC-MS6-PLAN-089-20261014-background-processes-eval-rerun.md) (`implemented`, MS6, docs)  
-**Prior completed stamp:** [HC-MS6-PLAN-088](./plans/HC-MS6-PLAN-088-20261014-context-healthcore-gaps-impl.md) (`implemented`, MS6, implementation)  
+**Last updated:** 2026-10-16  
+**Latest stamped plan:** [HC-MS6-PLAN-092](./plans/HC-MS6-PLAN-092-20261016-message-queue-impl.md) (`implemented`, MS6, implementation)  
+**Prior completed stamp:** [HC-MS6-PLAN-091](./plans/HC-MS6-PLAN-091-20261016-message-queue-plan.md) (`planned`, MS6, planning)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-16)
+
+**Message Queue implementation (PLAN-092):** Ticket `#DEV-55`. Compose `redis` + `worker` + `flower`; `services/celery_app.py` + `services/tasks/pipeline.py`; `POST /reporting/pipeline-runs` → **202** + `task_id`; `GET /tasks/{task_id}`; SQL `task_dead_letters` DLQ with `max_retries=3` + exponential backoff. Pytest reporting + tasks **7 passed**. Docker Desktop was not running in-session for live Flower — start with `docker compose up -d redis worker flower`. Eval Results pending human approval. Does not close MS6.
+
+**Message Queue plan (PLAN-090/091):** Ticket `#DEV-55` brief archived at [`docs/Project_Contexts/MessageQueue.md`](../docs/Project_Contexts/MessageQueue.md). Plan locked `POST /reporting/pipeline-runs` → Celery + Redis + Flower. Implemented under PLAN-092.
 
 ## Today’s update (2026-10-14)
 

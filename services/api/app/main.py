@@ -21,6 +21,7 @@ from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
 from app.routers.profiles import router as profiles_router
 from app.routers.suppliers import router as suppliers_router
+from app.routers.tasks import router as tasks_router
 from app.routers.telemetry import router as telemetry_router
 from app.routers.users import router as users_router
 from app.telemetry.store import init_telemetry_schema
@@ -78,6 +79,7 @@ app.include_router(users_router)
 app.include_router(profiles_router)
 app.include_router(telemetry_router)
 app.include_router(reporting_router)
+app.include_router(tasks_router)
 
 
 @app.middleware("http")
