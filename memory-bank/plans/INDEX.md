@@ -194,6 +194,14 @@ Format per line:
 
 92 | HC-MS6-PLAN-092 | MS6 | 2026-10-16 | Async Task Queue Redis Celery Implementation | implemented | implementation | [HC-MS6-PLAN-092-20261016-message-queue-impl.md](./HC-MS6-PLAN-092-20261016-message-queue-impl.md)
 
+93 | HC-MS6-PLAN-093 | MS6 | 2026-10-26 | HealthCore Monthly Revenue Forecast Plan | planned | planning | [HC-MS6-PLAN-093-20261026-sales-forecast-plan.md](./HC-MS6-PLAN-093-20261026-sales-forecast-plan.md)
+
+94 | HC-MS6-PLAN-094 | MS6 | 2026-10-26 | HealthCore Monthly Revenue Forecast Implementation | implemented | implementation | [HC-MS6-PLAN-094-20261026-sales-forecast-impl.md](./HC-MS6-PLAN-094-20261026-sales-forecast-impl.md)
+
+95 | HC-MS6-PLAN-095 | MS6 | 2026-10-26 | Tighter Random Forest Revenue Forecast | implemented | implementation | [HC-MS6-PLAN-095-20261026-sales-forecast-tighter.md](./HC-MS6-PLAN-095-20261026-sales-forecast-tighter.md)
+
+96 | HC-MS6-PLAN-096 | MS6 | 2026-10-26 | Save Sales Forecast Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-096-20261026-sales-forecast-eval.md](./HC-MS6-PLAN-096-20261026-sales-forecast-eval.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

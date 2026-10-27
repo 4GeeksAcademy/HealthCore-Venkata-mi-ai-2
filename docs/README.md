@@ -32,6 +32,8 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [BackgroundProcesses.md](./Project_Contexts/BackgroundProcesses.md) — MS6 Ticket `#DEV-53` nightly telemetry export (`job_runs`, `scripts/nightly_export.py`)
 - Background Processes eval (2026-10-14, **10/10 Pass**, re-run) — [Results/BackgroundProcesses-20261014.md](../memory-bank/evaluations/Results/BackgroundProcesses-20261014.md)
 - [MessageQueue.md](./Project_Contexts/MessageQueue.md) — MS6 Ticket `#DEV-55` async task queue (Redis + Celery + Flower)
+- [SalesForcasting_.regressiion.md](./Project_Contexts/SalesForcasting_.regressiion.md) — monthly consolidated revenue forecast (Random Forest, 2016–2023 / 2024–2025)
+- Sales forecast eval (2026-10-26, **9/9 Pass**) — [Results/SalesForecast-20261026.md](../memory-bank/evaluations/Results/SalesForecast-20261026.md)
 
 ## Telemetry
 

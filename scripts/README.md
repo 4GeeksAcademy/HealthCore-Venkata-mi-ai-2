@@ -28,6 +28,17 @@ Justification: crontab keeps the worker off the FastAPI main thread so a hung ex
 
 Brief: [`docs/Project_Contexts/BackgroundProcesses.md`](../docs/Project_Contexts/BackgroundProcesses.md).
 
+## Monthly revenue forecast (`train_sales_forecast.py`)
+
+Finance feasibility check for Dr. Okonkwo and Tom Callahan. Loads the official consolidated series `data/raw/healthcore_sales.csv` (no simulated rows). Trains a Random Forest on causal lag, rolling, and calendar features. Train years are 2016–2023. Test years are 2024–2025. Charts and test metrics land in `data/eval/sales_forecast/`.
+
+```bash
+# From repo root, after `uv sync`
+uv run python scripts/train_sales_forecast.py
+```
+
+Column contract: [`docs/Project_Contexts/healthcore-sales-BRIEFING.en.md`](../docs/Project_Contexts/healthcore-sales-BRIEFING.en.md). Company intent stays [`CONTEXT-healthcore.md`](../CONTEXT-healthcore.md). Aggregated revenue only — no patient fields.
+
 ## Celery async tasks (not a script — see services)
 
 Ticket **#DEV-55** workers are documented in [`services/README.md`](../services/README.md). Start with `docker compose up -d redis worker flower` or `celery -A services.celery_app worker` from the repo root. Do not run the worker inside the FastAPI process.

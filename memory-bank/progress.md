@@ -1,9 +1,19 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-16  
-**Latest stamped plan:** [HC-MS6-PLAN-092](./plans/HC-MS6-PLAN-092-20261016-message-queue-impl.md) (`implemented`, MS6, implementation)  
-**Prior completed stamp:** [HC-MS6-PLAN-091](./plans/HC-MS6-PLAN-091-20261016-message-queue-plan.md) (`planned`, MS6, planning)  
+**Last updated:** 2026-10-26  
+**Latest stamped plan:** [HC-MS6-PLAN-096](./plans/HC-MS6-PLAN-096-20261026-sales-forecast-eval.md) (`implemented`, MS6, docs)  
+**Prior completed stamp:** [HC-MS6-PLAN-095](./plans/HC-MS6-PLAN-095-20261026-sales-forecast-tighter.md) (`implemented`, MS6, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-26)
+
+**Sales forecast eval (PLAN-096):** Official rubric **9/9 Pass**, saved after human confirm: [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md). Pytest split + causality **2 passed**. Test RMSE **5.5%** (184,661 USD). Does not close MS6.
+
+**Tighter revenue forecast (PLAN-095):** Same Random Forest, same `revenue_usd` target, same causal features, same 8/2 split. Leaves may be one training month (400 trees, `random_state=42`). Test RMSE **5.5%** (184,661 USD), was 5.8%. PSI **0.584**. Gini **0.900**. K² **0.247** (p = 0.884). Five 2025 months sit above the 2016–2023 peak, so the tree cannot reach those dollar levels. Rubric saved under PLAN-096. Does not close MS6.
+
+**Monthly revenue forecast (PLAN-094):** First forest. Test RMSE was **5.8%** (195,205 USD). Superseded for the fit settings by PLAN-095. Split, features, and dataset unchanged.
+
+**Monthly revenue forecast plan (PLAN-093):** Finance RFI for Dr. Okonkwo and Tom Callahan. Official consolidated series, causal features, 8-year / 2-year split. Implemented under PLAN-094.
 
 ## Today’s update (2026-10-16)
 
@@ -113,6 +123,7 @@
 
 | Area | Status |
 |------|--------|
+| Monthly revenue forecast | **Implemented** (PLAN-093–095) — Random Forest on official `healthcore_sales.csv`; eval → [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md) (**9/9 Pass**). Does not close MS6. |
 | Milestone 2 `src/utils/` | Present + **integrated into backoffice UI** |
 | Public site `uis/healthcore` | Done (rubric “website”) |
 | MS5 containerization (`#infra-40`) | **Implemented** (PLAN-041) — Compose verified on host; browse runbook in CONTEXT (PLAN-042) |

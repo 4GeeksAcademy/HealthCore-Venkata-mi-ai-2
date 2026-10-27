@@ -24,9 +24,10 @@ data/process/reporting.db
 data/process/*.db
 data/eval/monthly_clinic_supply_*.json
 
-# Python bytecode
+# Python bytecode and local uv env
 **/__pycache__/
 *.pyc
+.venv/
 
 # Lighthouse CLI temp + full JSON (keep PNG screenshots + scores.json)
 docs/lighthouse/.tmp/

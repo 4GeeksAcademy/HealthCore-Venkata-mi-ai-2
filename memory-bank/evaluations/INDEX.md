@@ -57,3 +57,5 @@ PipelineResilience (20261007) | Business performance pipeline resilience (Prefec
 PipelineSubflowsTests (20261009) | Business performance pipeline subflows, tests, and dashboard (Part 3) | 2026-10-09 | complete | 12/12 Pass | [Results/PipelineSubflowsTests-20261009.md](./Results/PipelineSubflowsTests-20261009.md)
 
 BackgroundProcesses (20261014) | Nightly telemetry export (`job_runs`, cron, CSV backup) | 2026-10-14 | complete | 10/10 Pass (re-run) | [Results/BackgroundProcesses-20261014.md](./Results/BackgroundProcesses-20261014.md)
+
+SalesForecast (20261026) | Monthly consolidated revenue forecast (Random Forest, 8/2 split) | 2026-10-26 | complete | 9/9 Pass | [Results/SalesForecast-20261026.md](./Results/SalesForecast-20261026.md)
