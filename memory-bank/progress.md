@@ -1,9 +1,19 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-26  
-**Latest stamped plan:** [HC-MS6-PLAN-096](./plans/HC-MS6-PLAN-096-20261026-sales-forecast-eval.md) (`implemented`, MS6, docs)  
-**Prior completed stamp:** [HC-MS6-PLAN-095](./plans/HC-MS6-PLAN-095-20261026-sales-forecast-tighter.md) (`implemented`, MS6, implementation)  
+**Last updated:** 2026-10-28  
+**Latest stamped plan:** [HC-MS6-PLAN-100](./plans/HC-MS6-PLAN-100-20261028-regression-eval-save.md) (`implemented`, MS6, docs)  
+**Prior completed stamp:** [HC-MS6-PLAN-099](./plans/HC-MS6-PLAN-099-20261028-lift-forest-eval.md) (`implemented`, MS6, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-10-28)
+
+**Regression model eval save (PLAN-100):** Human confirmed. Official rubric **6/6 Pass** for the yearly-lift forest: [Results/RegressionModelEval-20261028.md](./evaluations/Results/RegressionModelEval-20261028.md). Better than the dollar-target review (overfitting, validation RMSE 162,325 ± 28,770 USD). Approved validation RMSE **131,697 ± 15,999 USD**, label **well fitted**. Does not close MS6.
+
+**Yearly lift evaluation (PLAN-099):** Same five folds and the same fixed block as PLAN-098. The forest learns `revenue_usd / revenue_lag_12` (400 trees, depth 6, leaf size 3) and the score is still dollars. Label **well fitted**. Validation RMSE **131,697 ± 15,999 USD**, was **162,325 ± 28,770 USD**. Largest-prefix gap **2.6** points, was **4.8**. Dollar-target artifacts kept at `data/eval/evaluation_report_dollar.md` and `data/eval/learning_curve_dollar.png`. `make_model()` unchanged. Pytest time-series CV **4 passed**. Results saved under PLAN-100. Does not close MS6.
+
+**Regression model evaluation (PLAN-098):** Formal review of the PLAN-095 dollar forest. Five `TimeSeriesSplit` folds on 2016–2023 only. Validation RMSE **162,325 ± 28,770 USD**. Learning curve labeled the forest **overfitting** (training RMSE 1.3%, validation RMSE 6.2%). That report now lives at `data/eval/evaluation_report_dollar.md`. Does not close MS6.
+
+**Regression model evaluation plan (PLAN-097):** Locked the fold rules, the RMSE choice, and the fit labels before the run. Implemented under PLAN-098.
 
 ## Today’s update (2026-10-26)
 
@@ -124,6 +134,7 @@
 | Area | Status |
 |------|--------|
 | Monthly revenue forecast | **Implemented** (PLAN-093–095) — Random Forest on official `healthcore_sales.csv`; eval → [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md) (**9/9 Pass**). Does not close MS6. |
+| Regression model evaluation | **Implemented** (PLAN-097–100) — yearly-lift forest, eval → [Results/RegressionModelEval-20261028.md](./evaluations/Results/RegressionModelEval-20261028.md) (**6/6 Pass**, well fitted, validation RMSE 131,697 ± 15,999 USD). Does not close MS6. |
 | Milestone 2 `src/utils/` | Present + **integrated into backoffice UI** |
 | Public site `uis/healthcore` | Done (rubric “website”) |
 | MS5 containerization (`#infra-40`) | **Implemented** (PLAN-041) — Compose verified on host; browse runbook in CONTEXT (PLAN-042) |

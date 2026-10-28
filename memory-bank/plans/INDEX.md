@@ -202,6 +202,14 @@ Format per line:
 
 96 | HC-MS6-PLAN-096 | MS6 | 2026-10-26 | Save Sales Forecast Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-096-20261026-sales-forecast-eval.md](./HC-MS6-PLAN-096-20261026-sales-forecast-eval.md)
 
+97 | HC-MS6-PLAN-097 | MS6 | 2026-10-28 | HealthCore Regression Model Evaluation Plan | planned | planning | [HC-MS6-PLAN-097-20261028-regression-model-eval-plan.md](./HC-MS6-PLAN-097-20261028-regression-model-eval-plan.md)
+
+98 | HC-MS6-PLAN-098 | MS6 | 2026-10-28 | HealthCore Regression Model Evaluation | implemented | implementation | [HC-MS6-PLAN-098-20261028-regression-model-eval-impl.md](./HC-MS6-PLAN-098-20261028-regression-model-eval-impl.md)
+
+99 | HC-MS6-PLAN-099 | MS6 | 2026-10-28 | Yearly Lift Forest Evaluation | implemented | implementation | [HC-MS6-PLAN-099-20261028-lift-forest-eval.md](./HC-MS6-PLAN-099-20261028-lift-forest-eval.md)
+
+100 | HC-MS6-PLAN-100 | MS6 | 2026-10-28 | Save Regression Model Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-100-20261028-regression-eval-save.md](./HC-MS6-PLAN-100-20261028-regression-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

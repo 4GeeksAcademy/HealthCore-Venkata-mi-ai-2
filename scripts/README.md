@@ -39,6 +39,17 @@ uv run python scripts/train_sales_forecast.py
 
 Column contract: [`docs/Project_Contexts/healthcore-sales-BRIEFING.en.md`](../docs/Project_Contexts/healthcore-sales-BRIEFING.en.md). Company intent stays [`CONTEXT-healthcore.md`](../CONTEXT-healthcore.md). Aggregated revenue only — no patient fields.
 
+## Revenue forecast evaluation (`evaluate_regression_model.py`)
+
+Promotion review of that same forest. Five `TimeSeriesSplit` folds on 2016–2023 only, plus a learning curve. Writes `data/eval/learning_curve.png` and `data/eval/evaluation_report.md`. Does not change the forest and does not fit on 2024–2025.
+
+```bash
+# From repo root, after `uv sync`
+uv run python scripts/evaluate_regression_model.py
+```
+
+Chronological-order test: `tests/pipelines/test_sales_forecast_time_cv.py`. Brief: [`docs/Project_Contexts/Evaluating_Regression_Model.md`](../docs/Project_Contexts/Evaluating_Regression_Model.md).
+
 ## Celery async tasks (not a script — see services)
 
 Ticket **#DEV-55** workers are documented in [`services/README.md`](../services/README.md). Start with `docker compose up -d redis worker flower` or `celery -A services.celery_app worker` from the repo root. Do not run the worker inside the FastAPI process.

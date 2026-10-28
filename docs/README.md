@@ -34,6 +34,8 @@ Assignment CONTEXTs for implementing agents live in [`Project_Contexts/`](./Proj
 - [MessageQueue.md](./Project_Contexts/MessageQueue.md) — MS6 Ticket `#DEV-55` async task queue (Redis + Celery + Flower)
 - [SalesForcasting_.regressiion.md](./Project_Contexts/SalesForcasting_.regressiion.md) — monthly consolidated revenue forecast (Random Forest, 2016–2023 / 2024–2025)
 - Sales forecast eval (2026-10-26, **9/9 Pass**) — [Results/SalesForecast-20261026.md](../memory-bank/evaluations/Results/SalesForecast-20261026.md)
+- [Evaluating_Regression_Model.md](./Project_Contexts/Evaluating_Regression_Model.md) — time-series CV and learning curve for the revenue forest
+- Regression model eval (2026-10-28, **6/6 Pass**) — [Results/RegressionModelEval-20261028.md](../memory-bank/evaluations/Results/RegressionModelEval-20261028.md)
 
 ## Telemetry
 

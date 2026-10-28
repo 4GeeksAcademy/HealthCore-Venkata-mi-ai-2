@@ -59,3 +59,5 @@ PipelineSubflowsTests (20261009) | Business performance pipeline subflows, tests
 BackgroundProcesses (20261014) | Nightly telemetry export (`job_runs`, cron, CSV backup) | 2026-10-14 | complete | 10/10 Pass (re-run) | [Results/BackgroundProcesses-20261014.md](./Results/BackgroundProcesses-20261014.md)
 
 SalesForecast (20261026) | Monthly consolidated revenue forecast (Random Forest, 8/2 split) | 2026-10-26 | complete | 9/9 Pass | [Results/SalesForecast-20261026.md](./Results/SalesForecast-20261026.md)
+
+RegressionModelEval (20261028) | Yearly-lift revenue forest (time-series CV and learning curve) | 2026-10-28 | complete | 6/6 Pass | [Results/RegressionModelEval-20261028.md](./Results/RegressionModelEval-20261028.md)
