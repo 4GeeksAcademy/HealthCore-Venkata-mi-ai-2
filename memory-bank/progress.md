@@ -1,9 +1,15 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-10-28  
-**Latest stamped plan:** [HC-MS6-PLAN-100](./plans/HC-MS6-PLAN-100-20261028-regression-eval-save.md) (`implemented`, MS6, docs)  
-**Prior completed stamp:** [HC-MS6-PLAN-099](./plans/HC-MS6-PLAN-099-20261028-lift-forest-eval.md) (`implemented`, MS6, implementation)  
+**Last updated:** 2026-11-02  
+**Latest stamped plan:** [HC-MS7-PLAN-103](./plans/HC-MS7-PLAN-103-20261102-rag-eval-save.md) (`implemented`, MS7, docs)  
+**Prior completed stamp:** [HC-MS7-PLAN-102](./plans/HC-MS7-PLAN-102-20261102-rag-knowledge-base-impl.md) (`implemented`, MS7, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-11-02)
+
+**RAG eval save (PLAN-103):** Human approved. Official rubric **17/17 Pass**: [Results/RAGKnowledgeBase-20261102.md](./evaluations/Results/RAGKnowledgeBase-20261102.md). Recall@3 **100%** at `min_score` 0.30, 14 chunks. Does not close MS7 (PR `feat: rag knowledge base` and tech-lead sign-off pending).
+
+**Coordinator knowledge base RAG (PLAN-101/102):** Milestone 7, English RAG briefing. Priya Nair's coordinators ask policy questions at `/knowledge` in the backoffice. `POST /knowledge/query` calls `query()` = `retrieve()` + `generate_answer()` and returns `{answer}` only. Qdrant `healthcore_knowledge` holds **14 chunks** from the four policy documents in `docs/company-knowledge-base/`. Models come from the 4Geeks team allowlist: `pplx-embed-v1-0.6b` embeddings (1024-d) and `gpt-6-luna` generation. `min_score` is **0.30**. Live Recall@3 is **100%** (16/16). Pytest RAG **17 passed**, API suite **71 passed**. Design doc: [`docs/rag/rag-design.md`](../docs/rag/rag-design.md). Rubric saved under PLAN-103. Does not close MS7.
 
 ## Today’s update (2026-10-28)
 
@@ -133,6 +139,7 @@
 
 | Area | Status |
 |------|--------|
+| Coordinator knowledge base (RAG) | **Implemented** (PLAN-101–102) — Qdrant `healthcore_knowledge`, `/knowledge` UI, Recall@3 100%; eval → [Results/RAGKnowledgeBase-20261102.md](./evaluations/Results/RAGKnowledgeBase-20261102.md) (**17/17 Pass**). Does not close MS7. |
 | Monthly revenue forecast | **Implemented** (PLAN-093–095) — Random Forest on official `healthcore_sales.csv`; eval → [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md) (**9/9 Pass**). Does not close MS6. |
 | Regression model evaluation | **Implemented** (PLAN-097–100) — yearly-lift forest, eval → [Results/RegressionModelEval-20261028.md](./evaluations/Results/RegressionModelEval-20261028.md) (**6/6 Pass**, well fitted, validation RMSE 131,697 ± 15,999 USD). Does not close MS6. |
 | Milestone 2 `src/utils/` | Present + **integrated into backoffice UI** |

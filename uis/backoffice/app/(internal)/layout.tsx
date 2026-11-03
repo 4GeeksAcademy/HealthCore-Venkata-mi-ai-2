@@ -51,6 +51,9 @@ export default function InternalLayout({
               <Link href="/reporting" prefetch={false}>
                 Supply report
               </Link>
+              <Link href="/knowledge" prefetch={false}>
+                Knowledge assistant
+              </Link>
               <Link href="/hiring" prefetch={false}>
                 Hiring tracker
               </Link>

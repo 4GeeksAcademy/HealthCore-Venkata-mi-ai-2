@@ -210,6 +210,12 @@ Format per line:
 
 100 | HC-MS6-PLAN-100 | MS6 | 2026-10-28 | Save Regression Model Rubric Evaluation | implemented | docs | [HC-MS6-PLAN-100-20261028-regression-eval-save.md](./HC-MS6-PLAN-100-20261028-regression-eval-save.md)
 
+101 | HC-MS7-PLAN-101 | MS7 | 2026-11-02 | HealthCore Coordinator Knowledge Base RAG Plan | planned | planning | [HC-MS7-PLAN-101-20261102-rag-knowledge-base-plan.md](./HC-MS7-PLAN-101-20261102-rag-knowledge-base-plan.md)
+
+102 | HC-MS7-PLAN-102 | MS7 | 2026-11-02 | HealthCore Coordinator Knowledge Base RAG Implementation | implemented | implementation | [HC-MS7-PLAN-102-20261102-rag-knowledge-base-impl.md](./HC-MS7-PLAN-102-20261102-rag-knowledge-base-impl.md)
+
+103 | HC-MS7-PLAN-103 | MS7 | 2026-11-02 | Save RAG Knowledge Base Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-103-20261102-rag-eval-save.md](./HC-MS7-PLAN-103-20261102-rag-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

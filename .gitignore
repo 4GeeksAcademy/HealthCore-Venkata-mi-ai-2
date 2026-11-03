@@ -23,6 +23,7 @@ services/api/.profile-cache-tmp/
 data/process/reporting.db
 data/process/*.db
 data/eval/monthly_clinic_supply_*.json
+data/process/.qdrant/
 
 # Python bytecode and local uv env
 **/__pycache__/

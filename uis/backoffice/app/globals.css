@@ -624,3 +624,56 @@ textarea {
     width: 100%;
   }
 }
+
+/* Coordinator knowledge assistant (/knowledge): light + dark, scoped to this page. */
+.knowledge-page {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.knowledge-examples {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.knowledge-examples .button.ghost {
+  text-align: left;
+}
+
+.knowledge-answer {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .knowledge-page {
+    --background: #111a18;
+    --foreground: #e8eeec;
+    --surface: #18231f;
+    --surface-strong: #1e2b27;
+    --border: #2f413b;
+    --muted: #a7b5b1;
+    --accent: #5fc2ac;
+    --accent-soft: #1c3a33;
+    --danger: #f08a8a;
+    --danger-soft: #3a1f1f;
+  }
+
+  .knowledge-page .page-header {
+    background: linear-gradient(135deg, #18231f 0%, #1c3a33 100%);
+  }
+
+  .knowledge-page .button {
+    color: #0d1a17;
+  }
+
+  .knowledge-page .button.ghost,
+  .knowledge-page .button.secondary,
+  .knowledge-page .link-button.secondary {
+    color: var(--foreground);
+  }
+}

@@ -61,3 +61,5 @@ BackgroundProcesses (20261014) | Nightly telemetry export (`job_runs`, cron, CSV
 SalesForecast (20261026) | Monthly consolidated revenue forecast (Random Forest, 8/2 split) | 2026-10-26 | complete | 9/9 Pass | [Results/SalesForecast-20261026.md](./Results/SalesForecast-20261026.md)
 
 RegressionModelEval (20261028) | Yearly-lift revenue forest (time-series CV and learning curve) | 2026-10-28 | complete | 6/6 Pass | [Results/RegressionModelEval-20261028.md](./Results/RegressionModelEval-20261028.md)
+
+RAGKnowledgeBase (20261102) | Coordinator knowledge base RAG (Qdrant, `/knowledge/query`, Recall@3) | 2026-11-02 | complete | 17/17 Pass | [Results/RAGKnowledgeBase-20261102.md](./Results/RAGKnowledgeBase-20261102.md)

@@ -19,6 +19,7 @@ from app.models.health import HealthResponse
 from app.routers.auth import router as auth_router
 from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
+from app.routers.knowledge import router as knowledge_router
 from app.routers.profiles import router as profiles_router
 from app.routers.suppliers import router as suppliers_router
 from app.routers.tasks import router as tasks_router
@@ -80,6 +81,7 @@ app.include_router(profiles_router)
 app.include_router(telemetry_router)
 app.include_router(reporting_router)
 app.include_router(tasks_router)
+app.include_router(knowledge_router)
 
 
 @app.middleware("http")

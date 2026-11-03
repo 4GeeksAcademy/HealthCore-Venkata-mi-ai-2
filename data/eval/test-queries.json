@@ -1,0 +1,138 @@
+{
+  "collection": "healthcore_knowledge",
+  "language": "en",
+  "metric": "Recall@3 — a question counts as a hit when its expected chunk (source_document + chunk_index) is among the top 3 retrieved results",
+  "target_recall_at_3": 0.8,
+  "queries": [
+    {
+      "id": "Q01",
+      "question": "Is there a charge for cancelling 12 hours in advance?",
+      "source_document": "appointment-policy",
+      "chunk_index": 1,
+      "section": "Cancellation policy"
+    },
+    {
+      "id": "Q02",
+      "question": "Do Medicare patients pay a no-show fee?",
+      "source_document": "appointment-policy",
+      "chunk_index": 1,
+      "section": "Cancellation policy"
+    },
+    {
+      "id": "Q03",
+      "question": "How soon can a patient usually get a routine appointment?",
+      "source_document": "appointment-policy",
+      "chunk_index": 0,
+      "section": "Booking appointments"
+    },
+    {
+      "id": "Q04",
+      "question": "Until when can a patient reschedule using the reminder message?",
+      "source_document": "appointment-policy",
+      "chunk_index": 2,
+      "section": "Automated reminders"
+    },
+    {
+      "id": "Q05",
+      "question": "A patient has missed three appointments in the last few months. Can I still book them a routine visit?",
+      "source_document": "appointment-policy",
+      "chunk_index": 3,
+      "section": "Appointment and Cancellation Policy"
+    },
+    {
+      "id": "Q06",
+      "question": "Do you accept Aetna at the Florida clinics?",
+      "source_document": "insurance-coverage",
+      "chunk_index": 0,
+      "section": "United States (Texas, Florida, Georgia)"
+    },
+    {
+      "id": "Q07",
+      "question": "Can a Medicaid patient be seen at our Georgia location?",
+      "source_document": "insurance-coverage",
+      "chunk_index": 0,
+      "section": "United States (Texas, Florida, Georgia)"
+    },
+    {
+      "id": "Q08",
+      "question": "Does HealthCore see NHS patients in Manchester?",
+      "source_document": "insurance-coverage",
+      "chunk_index": 1,
+      "section": "United Kingdom (London and Manchester)"
+    },
+    {
+      "id": "Q09",
+      "question": "A caller asks whether we take an insurer that is not on our list. Can I confirm it?",
+      "source_document": "insurance-coverage",
+      "chunk_index": 2,
+      "section": "Accepted Insurance Coverage"
+    },
+    {
+      "id": "Q10",
+      "question": "What do I need to bring to my first appointment?",
+      "source_document": "new-patient-checklist",
+      "chunk_index": 1,
+      "section": "Documents the patient should bring on the day of the appointment"
+    },
+    {
+      "id": "Q11",
+      "question": "Which forms and checks must a new patient complete before the first visit?",
+      "source_document": "new-patient-checklist",
+      "chunk_index": 0,
+      "section": "New Patient Checklist"
+    },
+    {
+      "id": "Q12",
+      "question": "What happens if a new patient arrives without filling in the medical history form?",
+      "source_document": "new-patient-checklist",
+      "chunk_index": 2,
+      "section": "New Patient Checklist"
+    },
+    {
+      "id": "Q13",
+      "question": "How long does an internal referral to a specialist take?",
+      "source_document": "referral-process",
+      "chunk_index": 1,
+      "section": "Target completed-referral time"
+    },
+    {
+      "id": "Q14",
+      "question": "A patient still has no specialist appointment options a week after the referral. What should I do?",
+      "source_document": "referral-process",
+      "chunk_index": 2,
+      "section": "Internal Referral Process"
+    },
+    {
+      "id": "Q15",
+      "question": "How does the system decide which clinic receives a specialist referral?",
+      "source_document": "referral-process",
+      "chunk_index": 0,
+      "section": "Internal Referral Process"
+    },
+    {
+      "id": "Q16",
+      "question": "Does a referral to a specialist outside the HealthCore network follow the same process?",
+      "source_document": "referral-process",
+      "chunk_index": 3,
+      "section": "Internal Referral Process"
+    }
+  ],
+  "negatives": [
+    {
+      "id": "N01",
+      "question": "What is the capital of Australia?"
+    },
+    {
+      "id": "N02",
+      "question": "Can you recommend a good restaurant for lunch?"
+    },
+    {
+      "id": "N03",
+      "question": "What is the Wi-Fi password for the staff network?"
+    },
+    {
+      "id": "N04",
+      "question": "How do I reset the printer in the break room?"
+    }
+  ]
+}
