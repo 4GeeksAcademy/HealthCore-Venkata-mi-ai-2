@@ -29,6 +29,7 @@ from services.knowledge_agent import (  # noqa: E402
     TraceStore,
     compile_agent_graph,
     default_spec,
+    rules_plan,
 )
 from services.knowledge_agent import nodes as agent_nodes  # noqa: E402
 
@@ -63,7 +64,17 @@ class StubRag:
         return self.answer
 
     def deps(self) -> AgentDependencies:
-        return AgentDependencies(retrieve=self.retrieve, generate_answer=self.generate_answer)
+        return AgentDependencies(
+            retrieve=self.retrieve,
+            generate_answer=self.generate_answer,
+            plan_sources=rules_plan,
+            lookup_ticket=_no_tool_call,
+            lookup_inventory=_no_tool_call,
+        )
+
+
+def _no_tool_call(_request: Any) -> Any:
+    raise AssertionError("a knowledge-base question must not call a live tool")
 
 
 @pytest.fixture
@@ -91,18 +102,40 @@ def test_default_graph_compiles_with_conditional_edges() -> None:
     assert set(drawn.nodes) == {
         "__start__",
         "receive_question",
+        "plan_sources",
+        "lookup_ticket",
+        "lookup_inventory",
+        "tool_fallback",
         "retrieve",
         "generate_answer",
         "no_context_answer",
+        "compose_answer",
         "reject_question",
         "__end__",
     }
     conditional = {(e.source, e.target) for e in drawn.edges if e.conditional}
     assert conditional == {
-        ("receive_question", "retrieve"),
+        ("receive_question", "plan_sources"),
         ("receive_question", "reject_question"),
+        ("plan_sources", "lookup_ticket"),
+        ("plan_sources", "lookup_inventory"),
+        ("plan_sources", "retrieve"),
+        ("lookup_ticket", "tool_fallback"),
+        ("lookup_ticket", "lookup_inventory"),
+        ("lookup_ticket", "retrieve"),
+        ("lookup_ticket", "compose_answer"),
+        ("lookup_inventory", "tool_fallback"),
+        ("lookup_inventory", "retrieve"),
+        ("lookup_inventory", "compose_answer"),
+        ("tool_fallback", "lookup_inventory"),
+        ("tool_fallback", "retrieve"),
+        ("tool_fallback", "compose_answer"),
         ("retrieve", "generate_answer"),
         ("retrieve", "no_context_answer"),
+        ("generate_answer", "compose_answer"),
+        ("generate_answer", "__end__"),
+        ("no_context_answer", "compose_answer"),
+        ("no_context_answer", "__end__"),
     }
 
 
@@ -117,6 +150,7 @@ def test_orphan_node_fails_compilation() -> None:
 def test_node_without_path_to_end_fails_compilation() -> None:
     spec = default_spec(StubRag([]).deps())
     spec = replace(spec, edges=tuple(e for e in spec.edges if e[0] != "reject_question"))
+    assert spec.edges == (("compose_answer", END),)
 
     with pytest.raises(AgentGraphBuildError, match="no path to END: \\['reject_question'\\]"):
         compile_agent_graph(spec)
@@ -124,7 +158,7 @@ def test_node_without_path_to_end_fails_compilation() -> None:
 
 def test_edge_to_unknown_node_fails_compilation() -> None:
     spec = default_spec(StubRag([]).deps())
-    spec = replace(spec, edges=spec.edges + (("generate_answer", "nowhere"),))
+    spec = replace(spec, edges=spec.edges + (("compose_answer", "nowhere"),))
 
     with pytest.raises(AgentGraphBuildError, match="unknown node `nowhere`"):
         compile_agent_graph(spec)
@@ -181,7 +215,13 @@ def test_generation_receives_exactly_the_retrieved_context(make_runner) -> None:
     [(question, context)] = stub.generate_calls
     assert question == stub.retrieve_calls[0]
     assert context == [{k: CHUNK[k] for k in ("source_document", "chunk_index", "section", "text", "score")}]
-    assert runner.traces.node_sequence(result.run_id) == ["receive_question", "retrieve", "generate_answer"]
+    assert runner.traces.node_sequence(result.run_id) == [
+        "receive_question",
+        "plan_sources",
+        "retrieve",
+        "generate_answer",
+    ]
+    assert result.sources == ("knowledge_base",)
 
 
 def test_empty_context_routes_to_honest_answer_without_generation(make_runner) -> None:
@@ -193,7 +233,12 @@ def test_empty_context_routes_to_honest_answer_without_generation(make_runner) -
     assert result.outcome == "no_context"
     assert result.answer.startswith(rag.NO_CONTEXT_SENTENCE)
     assert stub.generate_calls == []
-    assert runner.traces.node_sequence(result.run_id) == ["receive_question", "retrieve", "no_context_answer"]
+    assert runner.traces.node_sequence(result.run_id) == [
+        "receive_question",
+        "plan_sources",
+        "retrieve",
+        "no_context_answer",
+    ]
 
 
 @pytest.mark.parametrize("question", ["", "   \n\t ", "x" * 1001])
@@ -219,15 +264,16 @@ def test_checkpoint_after_every_transition(make_runner) -> None:
     result = runner.run("cancel fee?")
     checkpoints = runner.checkpoints(result.run_id)
 
-    assert [c["step"] for c in checkpoints] == [-1, 0, 1, 2, 3]
+    assert [c["step"] for c in checkpoints] == [-1, 0, 1, 2, 3, 4]
     assert [c["next"] for c in checkpoints] == [
         ["__start__"],
         ["receive_question"],
+        ["plan_sources"],
         ["retrieve"],
         ["generate_answer"],
         [],
     ]
-    assert checkpoints[3]["state_keys"] == ["context", "question"]
+    assert checkpoints[4]["state_keys"] == ["context", "plan", "question"]
 
 
 def test_failed_run_resumes_from_checkpoint_without_retrieving_again(make_runner) -> None:
@@ -258,6 +304,7 @@ def test_failed_run_resumes_from_checkpoint_without_retrieving_again(make_runner
     assert run["status"] == "completed"
     assert [(s["node"], s["status"]) for s in run["steps"]] == [
         ("receive_question", "completed"),
+        ("plan_sources", "completed"),
         ("retrieve", "completed"),
         ("generate_answer", "failed"),
         ("generate_answer", "completed"),
@@ -280,12 +327,14 @@ def test_trace_is_queryable_from_disk_after_the_run(tmp_path: Path) -> None:
 
     assert run["labels"] == {"case_id": "probe"}
     assert run["outcome"] == "answered"
-    retrieve_step = run["steps"][1]
+    assert run["steps"][1]["output"]["sources"] == ["knowledge_base"]
+    retrieve_step = run["steps"][2]
     assert retrieve_step["node"] == "retrieve"
     assert retrieve_step["output"]["hits"] == [
         {"source_document": "appointment-policy", "chunk_index": 1, "section": "Cancellation policy", "score": 0.64}
     ]
-    assert run["steps"][2]["output"]["source_line"] == "Source: appointment-policy"
+    assert run["steps"][3]["output"]["source_line"] == "Source: appointment-policy"
+    assert run["sources_used"] == ["knowledge_base"]
 
 
 def test_trace_omits_question_and_answer_text_by_default(make_runner, monkeypatch) -> None:

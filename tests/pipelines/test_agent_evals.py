@@ -139,3 +139,126 @@ def test_generation_never_runs_on_empty_context() -> None:
         if "retrieve" in _nodes(run) and not _step(run, "retrieve")["output"]["hits"]:
             assert "generate_answer" not in _nodes(run)
             assert _nodes(run)[-1] == "no_context_answer"
+
+
+# ---------------------------------------------------------------------------
+# Part 2: routing between the knowledge base and the live tools
+# ---------------------------------------------------------------------------
+
+TOOL_NODES = {"lookup_ticket", "lookup_inventory"}
+STATUS_PHRASES = ("is open", "is closed", "is discarded")
+
+
+def _tool_call(run: dict[str, Any]) -> dict[str, Any]:
+    return next(s for s in run["steps"] if s["node"] in TOOL_NODES)["output"]["tool_call"]
+
+
+@pytest.mark.parametrize("case", _case_ids())
+def test_trace_shows_which_sources_were_used_in_order(case: dict[str, Any]) -> None:
+    run = _run_for(case)
+    assert run["sources_used"] == case["expected_sources"]
+    if "plan_sources" in _nodes(run):
+        planned = {"ticket": "incident_manager", "inventory": "inventory_manager", "knowledge_base": "knowledge_base"}
+        plan = _step(run, "plan_sources")["output"]
+        assert [planned[s] for s in plan["sources"]] == run["sources_used"]
+        # Live: the model plans; if it is unreachable twice the rules decide. Either way the route above must hold.
+        assert plan["planner"] in ({"llm", "rules_fallback"} if TRACE["mode"] == "live" else {"rules"})
+
+
+def test_live_trace_shows_the_llm_planner_routing_both_ways() -> None:
+    if TRACE["mode"] != "live":
+        pytest.skip("offline traces use the rules planner")
+    llm_kinds = {
+        case["kind"]
+        for case in CASES
+        if case["id"] in RUNS_BY_CASE
+        and "plan_sources" in _nodes(RUNS_BY_CASE[case["id"]])
+        and _step(RUNS_BY_CASE[case["id"]], "plan_sources")["output"]["planner"] == "llm"
+    }
+    assert "tool_routing" in llm_kinds
+    assert llm_kinds & {"rag_routing", "grounding"}
+
+
+@pytest.mark.parametrize("case", _case_ids("tool_routing") + _case_ids("fallback"))
+def test_tool_case_called_the_expected_service_read_only(case: dict[str, Any]) -> None:
+    run = _run_for(case)
+    call = _tool_call(run)
+    assert call["tool"] == case["expected_tool"]
+    assert call["status"] == case["expected_tool_status"]
+    assert call["method"] == "GET"
+    if "expected_endpoint" in case:
+        assert call["endpoint"] == case["expected_endpoint"]
+    if call["status"] in ("ok", "not_found"):
+        assert call["http_status"] in (200, 404)
+    if "expected_ticket_total" in case:
+        assert call["total"] == case["expected_ticket_total"]
+
+
+@pytest.mark.parametrize("case", _case_ids("tool_routing"))
+def test_answer_states_exactly_what_the_tool_returned(case: dict[str, Any]) -> None:
+    run = _run_for(case)
+    call, answer = _tool_call(run), run["answer_text"]
+    if call["tool"] == "ticket_lookup":
+        assert call["tickets"], "tool returned no tickets"
+        for ticket in call["tickets"]:
+            assert ticket["incident_id"] in answer
+            if len(call["tickets"]) == 1 and call["total"] == 1:
+                assert f"Ticket {ticket['incident_id']} is {ticket['status']}" in answer
+        if call["total"] > 1:
+            assert f"has {call['total']} " in answer
+    else:
+        for product in call["products"]:
+            assert f"(SKU {product['sku']}): {product['current_stock']} in stock" in answer
+
+
+@pytest.mark.parametrize("case", _case_ids("fallback"))
+def test_fallback_is_explicit_and_never_invents_a_status(case: dict[str, Any]) -> None:
+    run = _run_for(case)
+    nodes = _nodes(run)
+    assert "tool_fallback" in nodes and nodes.index("tool_fallback") == nodes.index(_tool_node(run)) + 1
+    assert _step(run, "tool_fallback")["output"]["fallback"] == {
+        "tool": case["expected_tool"],
+        "reason": case["expected_fallback_reason"],
+    }
+    assert run["outcome"] == "tool_fallback"
+    answer = run["answer_text"]
+    assert not any(phrase in answer for phrase in STATUS_PHRASES)
+    assert " in stock," not in answer
+    if "expected_latency_ms" in case:
+        low, high = case["expected_latency_ms"]
+        assert low <= _tool_call(run)["latency_ms"] <= high
+
+
+def _tool_node(run: dict[str, Any]) -> str:
+    return next(node for node in _nodes(run) if node in TOOL_NODES)
+
+
+def test_knowledge_base_questions_never_call_a_tool() -> None:
+    rag_cases = [c for c in CASES if c["expected_sources"] == ["knowledge_base"]]
+    assert any(c["kind"] == "rag_routing" for c in rag_cases)
+    for case in rag_cases:
+        if case.get("requires_mode") and TRACE["mode"] != case["requires_mode"]:
+            continue
+        assert not set(_nodes(RUNS_BY_CASE[case["id"]])) & TOOL_NODES, case["id"]
+
+
+def test_tool_only_questions_never_touch_the_knowledge_base() -> None:
+    tool_only = [c for c in CASES if c["expected_sources"] in (["incident_manager"], ["inventory_manager"])]
+    assert len(tool_only) >= 2
+    for case in tool_only:
+        assert "retrieve" not in _nodes(RUNS_BY_CASE[case["id"]]), case["id"]
+
+
+def test_timeout_is_four_seconds_and_every_tool_call_is_a_get() -> None:
+    assert TRACE["tools"]["timeout_seconds"] == 4.0
+    calls = [_tool_call(run) for run in TRACE["runs"] if set(_nodes(run)) & TOOL_NODES]
+    assert calls
+    assert all(call["method"] == "GET" for call in calls)
+    assert all(call["latency_ms"] <= 5500 for call in calls)
+
+
+def test_compose_answer_runs_only_after_a_tool() -> None:
+    for run in TRACE["runs"]:
+        nodes = _nodes(run)
+        if "compose_answer" in nodes:
+            assert set(nodes) & TOOL_NODES and nodes[-1] == "compose_answer"

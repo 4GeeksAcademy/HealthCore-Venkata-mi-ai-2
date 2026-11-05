@@ -224,6 +224,11 @@ Format per line:
 
 107 | HC-MS7-PLAN-107 | MS7 | 2026-11-04 | LangGraph Knowledge Agent Live Trace Re-record | implemented | implementation | [HC-MS7-PLAN-107-20261104-langgraph-agent-live-trace.md](./HC-MS7-PLAN-107-20261104-langgraph-agent-live-trace.md)
 
+108 | HC-MS7-PLAN-108 | MS7 | 2026-11-04 | Coordinator Agent External Tools (Incidents and Inventory) Plan | planned | planning | [HC-MS7-PLAN-108-20261104-langgraph-external-tools-plan.md](./HC-MS7-PLAN-108-20261104-langgraph-external-tools-plan.md)
+109 | HC-MS7-PLAN-109 | MS7 | 2026-11-04 | Coordinator Agent External Tools (Incidents and Inventory) Implementation | implemented | implementation | [HC-MS7-PLAN-109-20261104-langgraph-external-tools.md](./HC-MS7-PLAN-109-20261104-langgraph-external-tools.md)
+
+110 | HC-MS7-PLAN-110 | MS7 | 2026-11-04 | Save LangGraph External Tools Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-110-20261104-langgraph-external-tools-eval-save.md](./HC-MS7-PLAN-110-20261104-langgraph-external-tools-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

@@ -29,6 +29,7 @@ class AgentResult:
     run_id: str
     answer: str
     outcome: str
+    sources: tuple[str, ...] = ()
 
 
 class AgentRunFailed(RuntimeError):
@@ -73,7 +74,52 @@ def summarize_update(node: str, update: AgentState, *, store_text: bool) -> dict
             summary["answer"] = update["answer"]
     if "outcome" in update:
         summary["outcome"] = update["outcome"]
+    if "plan" in update:
+        plan = update["plan"]
+        summary["sources"] = list(plan["sources"])
+        summary["planner"] = plan["planner"]
+        if plan.get("ticket_input") is not None:
+            summary["ticket_input"] = plan["ticket_input"]
+        if plan.get("inventory_input") is not None and store_text:
+            summary["inventory_input"] = plan["inventory_input"]
+        if plan.get("knowledge_question"):
+            summary["knowledge_question_chars"] = len(plan["knowledge_question"])
+            if store_text:
+                summary["knowledge_question"] = plan["knowledge_question"]
+    if update.get("tool_results"):
+        summary["tool_call"] = _summarize_tool_call(update["tool_results"][-1], store_text=store_text)
+    if update.get("fallbacks"):
+        note = update["fallbacks"][-1]
+        summary["fallback"] = {"tool": note["tool"], "reason": note["reason"]}
     return summary
+
+
+def _summarize_tool_call(result: dict[str, Any], *, store_text: bool) -> dict[str, Any]:
+    """Which service was called, how, and what came back — ids and figures, never patient data."""
+    output = result["output"]
+    call: dict[str, Any] = {
+        "tool": result["tool"],
+        "status": result["status"],
+        "method": "GET" if output.get("endpoint") else None,
+        "endpoint": output.get("endpoint"),
+        "http_status": output.get("http_status"),
+        "latency_ms": output.get("latency_ms"),
+    }
+    if result["tool"] == "ticket_lookup":
+        call["input"] = result["input"]
+        call["total"] = output.get("total", 0)
+        call["tickets"] = [
+            {"incident_id": t["incident_id"], "status": t["status"], "category": t["category"]}
+            for t in output.get("tickets", [])
+        ]
+    else:
+        if store_text:
+            call["input"] = result["input"]
+        call["products"] = [
+            {"sku": p["sku"], "current_stock": p["current_stock"], "threshold": p["threshold"]}
+            for p in output.get("products", [])
+        ]
+    return call
 
 
 def _env_flag(name: str) -> bool:
@@ -188,7 +234,12 @@ class AgentRunner:
             outcome=outcome,
             answer=answer if self.store_text else None,
         )
-        return AgentResult(run_id=run_id, answer=answer, outcome=outcome)
+        return AgentResult(
+            run_id=run_id,
+            answer=answer,
+            outcome=outcome,
+            sources=tuple(self.traces.source_sequence(run_id)),
+        )
 
 
 @lru_cache

@@ -12,8 +12,9 @@ from .graph import (
     default_spec,
 )
 from .nodes import AgentDependencies
+from .planner import SourcePlanner, rules_plan
 from .runner import AgentResult, AgentRunFailed, AgentRunner, get_agent_runner
-from .state import AgentState, RetrievedChunk
+from .state import AgentState, RetrievedChunk, SourcePlan
 from .trace_store import TraceStore
 
 __all__ = [
@@ -30,8 +31,11 @@ __all__ = [
     "NodeSpec",
     "RetrievedChunk",
     "RouteSpec",
+    "SourcePlan",
+    "SourcePlanner",
     "TraceStore",
     "compile_agent_graph",
     "default_spec",
     "get_agent_runner",
+    "rules_plan",
 ]

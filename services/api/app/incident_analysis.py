@@ -125,7 +125,12 @@ def analyze_rows(rows: list[dict[str, str]]) -> AnalysisResult:
     )
 
 
-def analyze_csv_text(text: str) -> AnalysisResult:
+def valid_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Rows that pass ``validate_row`` — the same rows the metrics count as valid."""
+    return [row for row in rows if not validate_row(row)]
+
+
+def parse_csv_rows(text: str) -> list[dict[str, str]]:
     if text is None or text.strip() == "":
         raise AnalysisError("File is empty.")
 
@@ -153,7 +158,11 @@ def analyze_csv_text(text: str) -> AnalysisResult:
     if not rows:
         raise AnalysisError("CSV contains no data rows.")
 
-    return analyze_rows(rows)
+    return rows
+
+
+def analyze_csv_text(text: str) -> AnalysisResult:
+    return analyze_rows(parse_csv_rows(text))
 
 
 def results_to_metric_rows(result: AnalysisResult) -> list[dict[str, str]]:

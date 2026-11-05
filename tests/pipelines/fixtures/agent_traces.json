@@ -1,17 +1,29 @@
 {
-  "recorded_at": "2026-11-05T01:26:49+00:00",
+  "recorded_at": "2026-11-05T02:17:55+00:00",
   "mode": "live",
-  "graph_version": "knowledge-agent/1",
+  "graph_version": "knowledge-agent/2",
   "models": {
     "embedding": "downtown-miami/openrouter/perplexity/pplx-embed-v1-0.6b",
-    "generation": "downtown-miami/openrouter/openai/gpt-6-luna"
+    "generation": "downtown-miami/openrouter/openai/gpt-6-luna",
+    "planner": "downtown-miami/openrouter/openai/gpt-6-luna"
   },
   "min_score": 0.3,
-  "graph_mermaid": "---\nconfig:\n  flowchart:\n    curve: linear\n---\ngraph TD;\n\t__start__([<p>__start__</p>]):::first\n\treceive_question(receive_question)\n\tretrieve(retrieve)\n\tgenerate_answer(generate_answer)\n\tno_context_answer(no_context_answer)\n\treject_question(reject_question)\n\t__end__([<p>__end__</p>]):::last\n\t__start__ --> receive_question;\n\treceive_question -.-> reject_question;\n\treceive_question -.-> retrieve;\n\tretrieve -.-> generate_answer;\n\tretrieve -.-> no_context_answer;\n\tgenerate_answer --> __end__;\n\tno_context_answer --> __end__;\n\treject_question --> __end__;\n\tclassDef default fill:#f2f0ff,line-height:1.2\n\tclassDef first fill-opacity:0\n\tclassDef last fill:#bfb6fc\n",
+  "tools": {
+    "transport": "HTTP to HEALTHCORE_API_URL (env), bearer JWT from POST /auth/login",
+    "timeout_seconds": 4.0,
+    "incident_manager": [
+      "GET /api/incidents/{incident_id}",
+      "GET /api/incidents"
+    ],
+    "inventory_manager": [
+      "GET /inventory/products"
+    ]
+  },
+  "graph_mermaid": "---\nconfig:\n  flowchart:\n    curve: linear\n---\ngraph TD;\n\t__start__([<p>__start__</p>]):::first\n\treceive_question(receive_question)\n\tplan_sources(plan_sources)\n\tlookup_ticket(lookup_ticket)\n\tlookup_inventory(lookup_inventory)\n\ttool_fallback(tool_fallback)\n\tretrieve(retrieve)\n\tgenerate_answer(generate_answer)\n\tno_context_answer(no_context_answer)\n\tcompose_answer(compose_answer)\n\treject_question(reject_question)\n\t__end__([<p>__end__</p>]):::last\n\t__start__ --> receive_question;\n\tgenerate_answer -.-> __end__;\n\tgenerate_answer -.-> compose_answer;\n\tlookup_inventory -.-> compose_answer;\n\tlookup_inventory -.-> retrieve;\n\tlookup_inventory -.-> tool_fallback;\n\tlookup_ticket -.-> compose_answer;\n\tlookup_ticket -.-> lookup_inventory;\n\tlookup_ticket -.-> retrieve;\n\tlookup_ticket -.-> tool_fallback;\n\tno_context_answer -.-> __end__;\n\tno_context_answer -.-> compose_answer;\n\tplan_sources -.-> lookup_inventory;\n\tplan_sources -.-> lookup_ticket;\n\tplan_sources -.-> retrieve;\n\treceive_question -.-> plan_sources;\n\treceive_question -.-> reject_question;\n\tretrieve -.-> generate_answer;\n\tretrieve -.-> no_context_answer;\n\ttool_fallback -.-> compose_answer;\n\ttool_fallback -.-> lookup_inventory;\n\ttool_fallback -.-> retrieve;\n\tcompose_answer --> __end__;\n\treject_question --> __end__;\n\tclassDef default fill:#f2f0ff,line-height:1.2\n\tclassDef first fill-opacity:0\n\tclassDef last fill:#bfb6fc\n",
   "runs": [
     {
-      "run_id": "169fe2270ca24e35bd845112f6d7d673",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "2172291d9a6e42058fa0448311413626",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG01-cancellation-fee"
@@ -23,15 +35,15 @@
       "question_sha256": "916ff7f87c126712808474faffe493a1f5793f65fc03cc9ddbee425516cc7873",
       "question_chars": 53,
       "question_text": "Is there a charge for cancelling 12 hours in advance?",
-      "answer_text": "Cancelling 12 hours in advance is within the less-than-24-hour window. The charge is **50 USD** in the United States or **40 GBP** in the UK for private-pay patients. Medicare or Medicaid patients are not charged a no-show fee; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
-      "started_at": "2026-11-05T01:24:26.102+00:00",
-      "finished_at": "2026-11-05T01:26:11.765+00:00",
+      "answer_text": "Cancelling 12 hours in advance is less than 24 hours, so private-pay patients are charged 50 USD (or 40 GBP in the UK). Medicare or Medicaid patients are not charged a no-show fee; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+      "started_at": "2026-11-05T02:13:21.163+00:00",
+      "finished_at": "2026-11-05T02:13:31.976+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 13.373,
+          "duration_ms": 13.56,
           "output": {
             "keys": [
               "question"
@@ -42,9 +54,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 3062.221,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 5782.0,
+          "duration_ms": 801.431,
           "output": {
             "hits": [
               {
@@ -78,13 +105,13 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "generate_answer",
           "status": "completed",
-          "duration_ms": 99861.229,
+          "duration_ms": 6921.588,
           "output": {
-            "answer": "Cancelling 12 hours in advance is within the less-than-24-hour window. The charge is **50 USD** in the United States or **40 GBP** in the UK for private-pay patients. Medicare or Medicaid patients are not charged a no-show fee; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
-            "answer_chars": 317,
+            "answer": "Cancelling 12 hours in advance is less than 24 hours, so private-pay patients are charged 50 USD (or 40 GBP in the UK). Medicare or Medicaid patients are not charged a no-show fee; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 270,
             "keys": [
               "answer",
               "outcome"
@@ -93,11 +120,14 @@
             "source_line": "Source: appointment-policy › Cancellation policy"
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "f6fcfd2c314d48f3b688c2320c9f4940",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "023f5503dd9e46bb922a58e7bec2eb93",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG02-medicare-no-show"
@@ -109,15 +139,15 @@
       "question_sha256": "3a592242fa62f77c735c193430afed1188f789e7d2997e7978f43f174acba299",
       "question_chars": 39,
       "question_text": "Do Medicare patients pay a no-show fee?",
-      "answer_text": "No. Medicare patients are not charged a no-show fee, but the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
-      "started_at": "2026-11-05T01:26:11.768+00:00",
-      "finished_at": "2026-11-05T01:26:23.132+00:00",
+      "answer_text": "- **United States:** Medicare patients do not pay a no-show fee; the incident is logged in their record.\n- **United Kingdom:** Medicare patients are not charged a no-show fee under the documented policy; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+      "started_at": "2026-11-05T02:13:31.983+00:00",
+      "finished_at": "2026-11-05T02:13:48.182+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 3.606,
+          "duration_ms": 5.795,
           "output": {
             "keys": [
               "question"
@@ -128,9 +158,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 6126.862,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 8203.772,
+          "duration_ms": 555.095,
           "output": {
             "hits": [
               {
@@ -152,13 +197,13 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "generate_answer",
           "status": "completed",
-          "duration_ms": 3148.363,
+          "duration_ms": 9497.205,
           "output": {
-            "answer": "No. Medicare patients are not charged a no-show fee, but the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
-            "answer_chars": 146,
+            "answer": "- **United States:** Medicare patients do not pay a no-show fee; the incident is logged in their record.\n- **United Kingdom:** Medicare patients are not charged a no-show fee under the documented policy; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 293,
             "keys": [
               "answer",
               "outcome"
@@ -167,11 +212,14 @@
             "source_line": "Source: appointment-policy › Cancellation policy"
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "1c9db970a15e46a7bad043a803a03a7a",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "bb7d72cf275a48db86cbaf060e71f6ff",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG03-us-commercial-insurers"
@@ -183,15 +231,15 @@
       "question_sha256": "9eab3f07dd93b66bfecf352b351b3b695ace50962e7986bb13730c88d992cf66",
       "question_chars": 58,
       "question_text": "Which commercial insurance plans do the US clinics accept?",
-      "answer_text": "The US clinics accept Blue Cross Blue Shield, Aetna, Cigna, and UnitedHealthcare.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
-      "started_at": "2026-11-05T01:26:23.136+00:00",
-      "finished_at": "2026-11-05T01:26:25.581+00:00",
+      "answer_text": "The US clinics accept these commercial insurance plans: Blue Cross Blue Shield, Aetna, Cigna, and UnitedHealthcare.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+      "started_at": "2026-11-05T02:13:48.188+00:00",
+      "finished_at": "2026-11-05T02:13:53.965+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 2.424,
+          "duration_ms": 5.461,
           "output": {
             "keys": [
               "question"
@@ -202,9 +250,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 2647.332,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 538.964,
+          "duration_ms": 369.532,
           "output": {
             "hits": [
               {
@@ -226,13 +289,13 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "generate_answer",
           "status": "completed",
-          "duration_ms": 1897.634,
+          "duration_ms": 2742.884,
           "output": {
-            "answer": "The US clinics accept Blue Cross Blue Shield, Aetna, Cigna, and UnitedHealthcare.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
-            "answer_chars": 151,
+            "answer": "The US clinics accept these commercial insurance plans: Blue Cross Blue Shield, Aetna, Cigna, and UnitedHealthcare.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+            "answer_chars": 185,
             "keys": [
               "answer",
               "outcome"
@@ -241,11 +304,14 @@
             "source_line": "Source: insurance-coverage › United States (Texas, Florida, Georgia)"
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "f62f877b35de439c9d0a29a6a53971a2",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "487f11cc50f94531b49394501dac66cf",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG04-new-patient-documents"
@@ -257,15 +323,15 @@
       "question_sha256": "e3c423f021cc4a509830aa2e9f2946a5f9e5dba17a3f08a7047b5339926c5c7d",
       "question_chars": 72,
       "question_text": "What documents should a new patient bring on the day of the appointment?",
-      "answer_text": "Please ask the new patient to bring:\n- A valid ID document.\n- An insurance card, if applicable.\n- A list of current medications, if warranted by the reason for the visit.\n\nSource: new-patient-checklist › Documents the patient should bring on the day of the appointment",
-      "started_at": "2026-11-05T01:26:25.584+00:00",
-      "finished_at": "2026-11-05T01:26:32.495+00:00",
+      "answer_text": "A new patient should bring:\n- A valid ID document.\n- An insurance card, if applicable.\n- A list of current medications, if warranted by the reason for the visit.\n\nSource: new-patient-checklist › Documents the patient should bring on the day of the appointment",
+      "started_at": "2026-11-05T02:13:53.968+00:00",
+      "finished_at": "2026-11-05T02:14:17.765+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 2.005,
+          "duration_ms": 1.935,
           "output": {
             "keys": [
               "question"
@@ -276,9 +342,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 16034.411,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 250.286,
+          "duration_ms": 411.125,
           "output": {
             "hits": [
               {
@@ -318,13 +399,13 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "generate_answer",
           "status": "completed",
-          "duration_ms": 6650.441,
+          "duration_ms": 7339.189,
           "output": {
-            "answer": "Please ask the new patient to bring:\n- A valid ID document.\n- An insurance card, if applicable.\n- A list of current medications, if warranted by the reason for the visit.\n\nSource: new-patient-checklist › Documents the patient should bring on the day of the appointment",
-            "answer_chars": 268,
+            "answer": "A new patient should bring:\n- A valid ID document.\n- An insurance card, if applicable.\n- A list of current medications, if warranted by the reason for the visit.\n\nSource: new-patient-checklist › Documents the patient should bring on the day of the appointment",
+            "answer_chars": 259,
             "keys": [
               "answer",
               "outcome"
@@ -333,11 +414,14 @@
             "source_line": "Source: new-patient-checklist › Documents the patient should bring on the day of the appointment"
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "8dc3e34eb8b84c40b9302fcf7f0945ec",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "97cc6039b0c84aa69b32b46619457b85",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG05-referral-escalation"
@@ -350,14 +434,14 @@
       "question_chars": 92,
       "question_text": "A patient has had no referral appointment options for 5 business days. Who do I escalate to?",
       "answer_text": "Escalate the case directly to Marcus Reid, Director of Clinical Operations.\n\nSource: referral-process › Internal Referral Process",
-      "started_at": "2026-11-05T01:26:32.498+00:00",
-      "finished_at": "2026-11-05T01:26:37.052+00:00",
+      "started_at": "2026-11-05T02:14:17.771+00:00",
+      "finished_at": "2026-11-05T02:15:22.577+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 2.171,
+          "duration_ms": 3.737,
           "output": {
             "keys": [
               "question"
@@ -368,9 +452,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 1781.951,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 1647.9,
+          "duration_ms": 322.317,
           "output": {
             "hits": [
               {
@@ -410,10 +509,10 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "generate_answer",
           "status": "completed",
-          "duration_ms": 2896.577,
+          "duration_ms": 62688.947,
           "output": {
             "answer": "Escalate the case directly to Marcus Reid, Director of Clinical Operations.\n\nSource: referral-process › Internal Referral Process",
             "answer_chars": 129,
@@ -425,11 +524,14 @@
             "source_line": "Source: referral-process › Internal Referral Process"
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "63f39135b04740018bbb4ee6ea559a6b",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "0ac56e5e2b2045aeb7afb0a9fd4b3298",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG06-unlisted-insurer-humana"
@@ -441,15 +543,15 @@
       "question_sha256": "727a5fcfe89ac9814e674a54dd05e0ad9b7a1f1351571ba6217a2ba1ed469cbc",
       "question_chars": 21,
       "question_text": "Do you accept Humana?",
-      "answer_text": "- **United States:** Humana is not on the documented list of accepted commercial insurers. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n- **United Kingdom:** Humana is not on the documented list. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
-      "started_at": "2026-11-05T01:26:37.055+00:00",
-      "finished_at": "2026-11-05T01:26:41.368+00:00",
+      "answer_text": "- **United States:** Humana is not on the documented list. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n- **United Kingdom:** I don't have enough information in the HealthCore knowledge base to answer that. Please check with the billing team.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+      "started_at": "2026-11-05T02:15:22.581+00:00",
+      "finished_at": "2026-11-05T02:15:32.555+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 2.228,
+          "duration_ms": 3.12,
           "output": {
             "keys": [
               "question"
@@ -460,9 +562,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 2286.041,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 736.142,
+          "duration_ms": 314.062,
           "output": {
             "hits": [
               {
@@ -478,13 +595,13 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "generate_answer",
           "status": "completed",
-          "duration_ms": 3567.386,
+          "duration_ms": 7356.962,
           "output": {
-            "answer": "- **United States:** Humana is not on the documented list of accepted commercial insurers. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n- **United Kingdom:** Humana is not on the documented list. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
-            "answer_chars": 408,
+            "answer": "- **United States:** Humana is not on the documented list. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n- **United Kingdom:** I don't have enough information in the HealthCore knowledge base to answer that. Please check with the billing team.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+            "answer_chars": 361,
             "keys": [
               "answer",
               "outcome"
@@ -493,11 +610,14 @@
             "source_line": "Source: insurance-coverage › United States (Texas, Florida, Georgia)"
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "0b938e53697947fc9d8f74091d83c1e1",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "071217e6f49d4798b9db680094a82fa7",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG07-off-topic-no-context"
@@ -510,14 +630,14 @@
       "question_chars": 49,
       "question_text": "What is the Wi-Fi password for the staff network?",
       "answer_text": "I don't have enough information in the HealthCore knowledge base to answer that. Please check with the relevant HealthCore team before answering the patient.",
-      "started_at": "2026-11-05T01:26:41.371+00:00",
-      "finished_at": "2026-11-05T01:26:49.956+00:00",
+      "started_at": "2026-11-05T02:15:32.559+00:00",
+      "finished_at": "2026-11-05T02:15:40.040+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 2.686,
+          "duration_ms": 3.251,
           "output": {
             "keys": [
               "question"
@@ -528,9 +648,24 @@
         },
         {
           "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 6487.168,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
           "node": "retrieve",
           "status": "completed",
-          "duration_ms": 8567.536,
+          "duration_ms": 968.173,
           "output": {
             "hits": [],
             "keys": [
@@ -539,10 +674,10 @@
           }
         },
         {
-          "seq": 3,
+          "seq": 4,
           "node": "no_context_answer",
           "status": "completed",
-          "duration_ms": 8.391,
+          "duration_ms": 13.844,
           "output": {
             "answer": "I don't have enough information in the HealthCore knowledge base to answer that. Please check with the relevant HealthCore team before answering the patient.",
             "answer_chars": 157,
@@ -554,11 +689,14 @@
             "source_line": null
           }
         }
+      ],
+      "sources_used": [
+        "knowledge_base"
       ]
     },
     {
-      "run_id": "4688fdbdd8964711869d61f5affc878d",
-      "graph_version": "knowledge-agent/1",
+      "run_id": "4b6ea06e92704ef1b1261bdd75b31405",
+      "graph_version": "knowledge-agent/2",
       "mode": "live",
       "labels": {
         "case_id": "AG08-blank-question"
@@ -571,14 +709,14 @@
       "question_chars": 3,
       "question_text": "   ",
       "answer_text": "Please type a question for the knowledge assistant (up to 1000 characters).",
-      "started_at": "2026-11-05T01:26:49.959+00:00",
-      "finished_at": "2026-11-05T01:26:49.976+00:00",
+      "started_at": "2026-11-05T02:15:40.043+00:00",
+      "finished_at": "2026-11-05T02:15:40.060+00:00",
       "steps": [
         {
           "seq": 1,
           "node": "receive_question",
           "status": "completed",
-          "duration_ms": 2.384,
+          "duration_ms": 2.871,
           "output": {
             "keys": [
               "outcome",
@@ -593,7 +731,7 @@
           "seq": 2,
           "node": "reject_question",
           "status": "completed",
-          "duration_ms": 7.36,
+          "duration_ms": 7.325,
           "output": {
             "answer": "Please type a question for the knowledge assistant (up to 1000 characters).",
             "answer_chars": 75,
@@ -605,6 +743,1239 @@
             "source_line": null
           }
         }
+      ],
+      "sources_used": []
+    },
+    {
+      "run_id": "64262864231744cfa43ebff02b9c77fc",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG09-ticket-status-by-id"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "43a34ac65b570de96e48c0d0cd975fe5521d85bc31d98fcb920a1ada0fa72997",
+      "question_chars": 37,
+      "question_text": "What's the status of ticket INC-0042?",
+      "answer_text": "Ticket INC-0042 is closed. Category: WORKFORCE. Clinic: us-tx-002 (US). Last updated: 2026-11-05T01:57:10+00:00.\nSource: HealthCore incident manager (live)",
+      "started_at": "2026-11-05T02:15:40.063+00:00",
+      "finished_at": "2026-11-05T02:15:52.953+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.134,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "What's the status of ticket INC-0042?",
+            "question_chars": 37
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 12636.423,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0042"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 237.427,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0042",
+              "http_status": 200,
+              "input": {
+                "ticket_id": "INC-0042"
+              },
+              "latency_ms": 228.7,
+              "method": "GET",
+              "status": "ok",
+              "tickets": [
+                {
+                  "category": "WORKFORCE",
+                  "incident_id": "INC-0042",
+                  "status": "closed"
+                }
+              ],
+              "tool": "ticket_lookup",
+              "total": 1
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 7.411,
+          "output": {
+            "answer": "Ticket INC-0042 is closed. Category: WORKFORCE. Clinic: us-tx-002 (US). Last updated: 2026-11-05T01:57:10+00:00.\nSource: HealthCore incident manager (live)",
+            "answer_chars": 155,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: HealthCore incident manager (live)"
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
+      ]
+    },
+    {
+      "run_id": "82de16e4d6f245f59f51b4623bc99339",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG10-ticket-short-number"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "27dd556aced3316930bd9c4579e0cc7fede2f02b2d1be0f271678fe41eb8c634",
+      "question_chars": 31,
+      "question_text": "Can you check ticket 63 for me?",
+      "answer_text": "Ticket INC-0063 is open. Category: BILLING. Clinic: us-fl-001 (US). Last updated: 2026-11-05T01:57:10+00:00.\nSource: HealthCore incident manager (live)",
+      "started_at": "2026-11-05T02:15:52.956+00:00",
+      "finished_at": "2026-11-05T02:16:09.569+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 1.929,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Can you check ticket 63 for me?",
+            "question_chars": 31
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 16556.146,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "rules_fallback",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0063"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 35.556,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0063",
+              "http_status": 200,
+              "input": {
+                "ticket_id": "INC-0063"
+              },
+              "latency_ms": 24.9,
+              "method": "GET",
+              "status": "ok",
+              "tickets": [
+                {
+                  "category": "BILLING",
+                  "incident_id": "INC-0063",
+                  "status": "open"
+                }
+              ],
+              "tool": "ticket_lookup",
+              "total": 1
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 11.461,
+          "output": {
+            "answer": "Ticket INC-0063 is open. Category: BILLING. Clinic: us-fl-001 (US). Last updated: 2026-11-05T01:57:10+00:00.\nSource: HealthCore incident manager (live)",
+            "answer_chars": 151,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: HealthCore incident manager (live)"
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
+      ]
+    },
+    {
+      "run_id": "68232753352a47049332331fe0f8852b",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG11-ticket-filtered-count"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "6f5381f83c0b64a1c176df63ff75004eb713d17a58a747bb91c31fd9460ee007",
+      "question_chars": 53,
+      "question_text": "How many open billing incidents do we have right now?",
+      "answer_text": "The incident manager has 6 open BILLING incidents.\nFirst 5: INC-0061 (open, BILLING, us-tx-001); INC-0062 (open, BILLING, us-tx-002); INC-0063 (open, BILLING, us-fl-001); INC-0064 (open, BILLING, us-fl-002); INC-0065 (open, BILLING, us-ga-001).\nSource: HealthCore incident manager (live)",
+      "started_at": "2026-11-05T02:16:09.573+00:00",
+      "finished_at": "2026-11-05T02:16:20.822+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.2,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "How many open billing incidents do we have right now?",
+            "question_chars": 53
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 11171.328,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "category": "BILLING",
+              "status": "open"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 52.937,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents?status=open&category=BILLING&limit=5",
+              "http_status": 200,
+              "input": {
+                "category": "BILLING",
+                "status": "open"
+              },
+              "latency_ms": 42.5,
+              "method": "GET",
+              "status": "ok",
+              "tickets": [
+                {
+                  "category": "BILLING",
+                  "incident_id": "INC-0061",
+                  "status": "open"
+                },
+                {
+                  "category": "BILLING",
+                  "incident_id": "INC-0062",
+                  "status": "open"
+                },
+                {
+                  "category": "BILLING",
+                  "incident_id": "INC-0063",
+                  "status": "open"
+                },
+                {
+                  "category": "BILLING",
+                  "incident_id": "INC-0064",
+                  "status": "open"
+                },
+                {
+                  "category": "BILLING",
+                  "incident_id": "INC-0065",
+                  "status": "open"
+                }
+              ],
+              "tool": "ticket_lookup",
+              "total": 6
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 13.347,
+          "output": {
+            "answer": "The incident manager has 6 open BILLING incidents.\nFirst 5: INC-0061 (open, BILLING, us-tx-001); INC-0062 (open, BILLING, us-tx-002); INC-0063 (open, BILLING, us-fl-001); INC-0064 (open, BILLING, us-fl-002); INC-0065 (open, BILLING, us-ga-001).\nSource: HealthCore incident manager (live)",
+            "answer_chars": 287,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: HealthCore incident manager (live)"
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
+      ]
+    },
+    {
+      "run_id": "dc3f4905e5c948469c879c390a90dfef",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG12-policy-goes-to-rag-not-tool"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "037b8f3da14156a13b36e87157e2d5b743704d9d0a3609d72f1c8c020e488498",
+      "question_chars": 49,
+      "question_text": "Do we charge UK patients for a late cancellation?",
+      "answer_text": "Yes—UK private-pay patients are charged 40 GBP for cancelling less than 24 hours in advance. The policy doesn’t specify charges for other UK payment types.\n\nSource: appointment-policy › Cancellation policy",
+      "started_at": "2026-11-05T02:16:20.828+00:00",
+      "finished_at": "2026-11-05T02:16:33.821+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 3.344,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Do we charge UK patients for a late cancellation?",
+            "question_chars": 49
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 2745.701,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "knowledge_base"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 617.077,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 1,
+                "score": 0.6017,
+                "section": "Cancellation policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.4395,
+                "section": "Appointment and Cancellation Policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 1,
+                "score": 0.4332,
+                "section": "United Kingdom (London and Manchester)",
+                "source_document": "insurance-coverage"
+              },
+              {
+                "chunk_index": 0,
+                "score": 0.3899,
+                "section": "Booking appointments",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 2,
+                "score": 0.3886,
+                "section": "Automated reminders",
+                "source_document": "appointment-policy"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 4,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 9614.456,
+          "output": {
+            "answer": "Yes—UK private-pay patients are charged 40 GBP for cancelling less than 24 hours in advance. The policy doesn’t specify charges for other UK payment types.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 205,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: appointment-policy › Cancellation policy"
+          }
+        }
+      ],
+      "sources_used": [
+        "knowledge_base"
+      ]
+    },
+    {
+      "run_id": "d686ccfd5940480589bc21db947be453",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG13-ticket-and-policy"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "04e1f3461f6dceb91bf392cc2f56b9927eb9017b9bb80bc229fe98486d4ab7f1",
+      "question_chars": 132,
+      "question_text": "Ticket INC-0007 is about a late cancellation. What is its status, and what fee do we charge for cancelling less than 24 hours ahead?",
+      "answer_text": "Ticket INC-0007 is closed. Category: APPOINTMENT. Clinic: uk-lon-001 (UK). Last updated: 2026-11-05T01:57:10+00:00.\nSource: HealthCore incident manager (live)\n\nFrom the HealthCore knowledge base:\nFor private-pay patients, cancelling less than 24 hours ahead costs 50 USD, or 40 GBP in the UK. Medicare and Medicaid patients are not charged this fee.\n\nSource: appointment-policy › Cancellation policy",
+      "started_at": "2026-11-05T02:16:33.827+00:00",
+      "finished_at": "2026-11-05T02:16:52.256+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 6.346,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Ticket INC-0007 is about a late cancellation. What is its status, and what fee do we charge for cancelling less than 24 hours ahead?",
+            "question_chars": 132
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 6628.97,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "knowledge_question": "What fee do we charge for cancelling less than 24 hours ahead?",
+            "knowledge_question_chars": 62,
+            "planner": "llm",
+            "sources": [
+              "ticket",
+              "knowledge_base"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0007"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 52.256,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0007",
+              "http_status": 200,
+              "input": {
+                "ticket_id": "INC-0007"
+              },
+              "latency_ms": 41.4,
+              "method": "GET",
+              "status": "ok",
+              "tickets": [
+                {
+                  "category": "APPOINTMENT",
+                  "incident_id": "INC-0007",
+                  "status": "closed"
+                }
+              ],
+              "tool": "ticket_lookup",
+              "total": 1
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 905.256,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 1,
+                "score": 0.6326,
+                "section": "Cancellation policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 2,
+                "score": 0.3604,
+                "section": "Automated reminders",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.3361,
+                "section": "Appointment and Cancellation Policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 0,
+                "score": 0.3259,
+                "section": "Booking appointments",
+                "source_document": "appointment-policy"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 5,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 10789.345,
+          "output": {
+            "answer": "For private-pay patients, cancelling less than 24 hours ahead costs 50 USD, or 40 GBP in the UK. Medicare and Medicaid patients are not charged this fee.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 203,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: appointment-policy › Cancellation policy"
+          }
+        },
+        {
+          "seq": 6,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 15.347,
+          "output": {
+            "answer": "Ticket INC-0007 is closed. Category: APPOINTMENT. Clinic: uk-lon-001 (UK). Last updated: 2026-11-05T01:57:10+00:00.\nSource: HealthCore incident manager (live)\n\nFrom the HealthCore knowledge base:\nFor private-pay patients, cancelling less than 24 hours ahead costs 50 USD, or 40 GBP in the UK. Medicare and Medicaid patients are not charged this fee.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 399,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: appointment-policy › Cancellation policy"
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager",
+        "knowledge_base"
+      ]
+    },
+    {
+      "run_id": "24014dfdf1854ababf2b1a711ffd9805",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG14-ticket-not-found"
+      },
+      "status": "completed",
+      "outcome": "tool_fallback",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "7439a550d17af5f8313a66b2efffe3222cf417aa1e796c52f76d8ae133dafbce",
+      "question_chars": 32,
+      "question_text": "What's the status of ticket 482?",
+      "answer_text": "I couldn't find ticket INC-0482 in the incident manager, so I can't confirm its status. Please check the ticket number.",
+      "started_at": "2026-11-05T02:16:52.262+00:00",
+      "finished_at": "2026-11-05T02:16:55.292+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.532,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "What's the status of ticket 482?",
+            "question_chars": 32
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 2938.601,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0482"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 60.011,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0482",
+              "http_status": 404,
+              "input": {
+                "ticket_id": "INC-0482"
+              },
+              "latency_ms": 49.3,
+              "method": "GET",
+              "status": "not_found",
+              "tickets": [],
+              "tool": "ticket_lookup",
+              "total": 0
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "tool_fallback",
+          "status": "completed",
+          "duration_ms": 8.586,
+          "output": {
+            "fallback": {
+              "reason": "not_found",
+              "tool": "ticket_lookup"
+            },
+            "keys": [
+              "fallbacks"
+            ]
+          }
+        },
+        {
+          "seq": 5,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 10.277,
+          "output": {
+            "answer": "I couldn't find ticket INC-0482 in the incident manager, so I can't confirm its status. Please check the ticket number.",
+            "answer_chars": 119,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "tool_fallback",
+            "source_line": null
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
+      ]
+    },
+    {
+      "run_id": "dad48ad98a8f40bcbbd86261c8ecfe2f",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG15-incident-service-unreachable"
+      },
+      "status": "completed",
+      "outcome": "tool_fallback",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "43a34ac65b570de96e48c0d0cd975fe5521d85bc31d98fcb920a1ada0fa72997",
+      "question_chars": 37,
+      "question_text": "What's the status of ticket INC-0042?",
+      "answer_text": "I couldn't confirm ticket INC-0042's status right now: the incident manager is not reachable. Please try again in a moment, or check it directly in the HealthCore backoffice.",
+      "started_at": "2026-11-05T02:16:55.472+00:00",
+      "finished_at": "2026-11-05T02:17:14.181+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.111,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "What's the status of ticket INC-0042?",
+            "question_chars": 37
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 16604.815,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "rules_fallback",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0042"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 2064.05,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0042",
+              "http_status": null,
+              "input": {
+                "ticket_id": "INC-0042"
+              },
+              "latency_ms": 2050.6,
+              "method": "GET",
+              "status": "unavailable",
+              "tickets": [],
+              "tool": "ticket_lookup",
+              "total": 0
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "tool_fallback",
+          "status": "completed",
+          "duration_ms": 15.089,
+          "output": {
+            "fallback": {
+              "reason": "unavailable",
+              "tool": "ticket_lookup"
+            },
+            "keys": [
+              "fallbacks"
+            ]
+          }
+        },
+        {
+          "seq": 5,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 8.266,
+          "output": {
+            "answer": "I couldn't confirm ticket INC-0042's status right now: the incident manager is not reachable. Please try again in a moment, or check it directly in the HealthCore backoffice.",
+            "answer_chars": 174,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "tool_fallback",
+            "source_line": null
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
+      ]
+    },
+    {
+      "run_id": "ede8e626df92476eb7636012a53a5519",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG16-incident-service-timeout"
+      },
+      "status": "completed",
+      "outcome": "tool_fallback",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "43a34ac65b570de96e48c0d0cd975fe5521d85bc31d98fcb920a1ada0fa72997",
+      "question_chars": 37,
+      "question_text": "What's the status of ticket INC-0042?",
+      "answer_text": "I couldn't confirm ticket INC-0042's status right now: the incident manager did not respond in time. Please try again in a moment, or check it directly in the HealthCore backoffice.",
+      "started_at": "2026-11-05T02:17:14.367+00:00",
+      "finished_at": "2026-11-05T02:17:35.088+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 1.787,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "What's the status of ticket INC-0042?",
+            "question_chars": 37
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 16668.597,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "rules_fallback",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0042"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 4016.618,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0042",
+              "http_status": null,
+              "input": {
+                "ticket_id": "INC-0042"
+              },
+              "latency_ms": 4004.7,
+              "method": "GET",
+              "status": "timeout",
+              "tickets": [],
+              "tool": "ticket_lookup",
+              "total": 0
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "tool_fallback",
+          "status": "completed",
+          "duration_ms": 12.267,
+          "output": {
+            "fallback": {
+              "reason": "timeout",
+              "tool": "ticket_lookup"
+            },
+            "keys": [
+              "fallbacks"
+            ]
+          }
+        },
+        {
+          "seq": 5,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 8.43,
+          "output": {
+            "answer": "I couldn't confirm ticket INC-0042's status right now: the incident manager did not respond in time. Please try again in a moment, or check it directly in the HealthCore backoffice.",
+            "answer_chars": 181,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "tool_fallback",
+            "source_line": null
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
+      ]
+    },
+    {
+      "run_id": "87f458726b6f479aa940c6624c7c192e",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG17-inventory-stock"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "b3887c956b3860f5433d5c79db595d47b93e5f80176cacadd1582c1d65f7c0c6",
+      "question_chars": 40,
+      "question_text": "Do we have stock of nitrile exam gloves?",
+      "answer_text": "Nitrile exam gloves (box of 100) (SKU HC-PPE-GLV-100): 12 in stock, reorder threshold 24 (below threshold).\nSource: HealthCore inventory manager (live)",
+      "started_at": "2026-11-05T02:17:35.163+00:00",
+      "finished_at": "2026-11-05T02:17:42.810+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 7.534,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Do we have stock of nitrile exam gloves?",
+            "question_chars": 40
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 7551.633,
+          "output": {
+            "inventory_input": {
+              "product_query": "nitrile exam gloves"
+            },
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "inventory"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_inventory",
+          "status": "completed",
+          "duration_ms": 68.042,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/inventory/products",
+              "http_status": 200,
+              "input": {
+                "product_query": "nitrile exam gloves"
+              },
+              "latency_ms": 58.1,
+              "method": "GET",
+              "products": [
+                {
+                  "current_stock": 12,
+                  "sku": "HC-PPE-GLV-100",
+                  "threshold": 24
+                }
+              ],
+              "status": "ok",
+              "tool": "inventory_lookup"
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 6.852,
+          "output": {
+            "answer": "Nitrile exam gloves (box of 100) (SKU HC-PPE-GLV-100): 12 in stock, reorder threshold 24 (below threshold).\nSource: HealthCore inventory manager (live)",
+            "answer_chars": 151,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: HealthCore inventory manager (live)"
+          }
+        }
+      ],
+      "sources_used": [
+        "inventory_manager"
+      ]
+    },
+    {
+      "run_id": "991c735e34724848a2fd06e5919124d4",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG18-inventory-unknown-product"
+      },
+      "status": "completed",
+      "outcome": "tool_fallback",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "422f8401cfa5fa4c9ecd3d2c72b91518dace4a02775aa9b18afb1109b89cf27f",
+      "question_chars": 43,
+      "question_text": "Do we have any MRI contrast agent in stock?",
+      "answer_text": "I couldn't find a product matching \"MRI contrast agent\" in the inventory manager, so I can't confirm stock for it.",
+      "started_at": "2026-11-05T02:17:42.814+00:00",
+      "finished_at": "2026-11-05T02:17:53.376+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.17,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Do we have any MRI contrast agent in stock?",
+            "question_chars": 43
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 10508.435,
+          "output": {
+            "inventory_input": {
+              "product_query": "MRI contrast agent"
+            },
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "inventory"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_inventory",
+          "status": "completed",
+          "duration_ms": 26.033,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/inventory/products",
+              "http_status": 200,
+              "input": {
+                "product_query": "MRI contrast agent"
+              },
+              "latency_ms": 19.1,
+              "method": "GET",
+              "products": [],
+              "status": "not_found",
+              "tool": "inventory_lookup"
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "tool_fallback",
+          "status": "completed",
+          "duration_ms": 7.843,
+          "output": {
+            "fallback": {
+              "reason": "not_found",
+              "tool": "inventory_lookup"
+            },
+            "keys": [
+              "fallbacks"
+            ]
+          }
+        },
+        {
+          "seq": 5,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 9.286,
+          "output": {
+            "answer": "I couldn't find a product matching \"MRI contrast agent\" in the inventory manager, so I can't confirm stock for it.",
+            "answer_chars": 114,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "tool_fallback",
+            "source_line": null
+          }
+        }
+      ],
+      "sources_used": [
+        "inventory_manager"
+      ]
+    },
+    {
+      "run_id": "422bb198a30140a9a6005ad0e608c84f",
+      "graph_version": "knowledge-agent/2",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG19-ticket-rejected-by-analyzer"
+      },
+      "status": "completed",
+      "outcome": "tool_fallback",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "802e71025b8f608e3665dcf84a6d0ecd4b323636664befb341aa776a171847fc",
+      "question_chars": 30,
+      "question_text": "Is ticket INC-0095 still open?",
+      "answer_text": "I couldn't find ticket INC-0095 in the incident manager, so I can't confirm its status. Please check the ticket number.",
+      "started_at": "2026-11-05T02:17:53.381+00:00",
+      "finished_at": "2026-11-05T02:17:55.009+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.693,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Is ticket INC-0095 still open?",
+            "question_chars": 30
+          }
+        },
+        {
+          "seq": 2,
+          "node": "plan_sources",
+          "status": "completed",
+          "duration_ms": 1577.32,
+          "output": {
+            "keys": [
+              "plan"
+            ],
+            "planner": "llm",
+            "sources": [
+              "ticket"
+            ],
+            "ticket_input": {
+              "ticket_id": "INC-0095"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "node": "lookup_ticket",
+          "status": "completed",
+          "duration_ms": 21.536,
+          "output": {
+            "keys": [
+              "tool_results"
+            ],
+            "tool_call": {
+              "endpoint": "/api/incidents/INC-0095",
+              "http_status": 404,
+              "input": {
+                "ticket_id": "INC-0095"
+              },
+              "latency_ms": 12.7,
+              "method": "GET",
+              "status": "not_found",
+              "tickets": [],
+              "tool": "ticket_lookup",
+              "total": 0
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "node": "tool_fallback",
+          "status": "completed",
+          "duration_ms": 6.866,
+          "output": {
+            "fallback": {
+              "reason": "not_found",
+              "tool": "ticket_lookup"
+            },
+            "keys": [
+              "fallbacks"
+            ]
+          }
+        },
+        {
+          "seq": 5,
+          "node": "compose_answer",
+          "status": "completed",
+          "duration_ms": 9.44,
+          "output": {
+            "answer": "I couldn't find ticket INC-0095 in the incident manager, so I can't confirm its status. Please check the ticket number.",
+            "answer_chars": 119,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "tool_fallback",
+            "source_line": null
+          }
+        }
+      ],
+      "sources_used": [
+        "incident_manager"
       ]
     }
   ]

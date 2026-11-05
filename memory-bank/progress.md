@@ -1,11 +1,15 @@
 # HealthCore — Progress
 
 **Last updated:** 2026-11-04  
-**Latest stamped plan:** [HC-MS7-PLAN-107](./plans/HC-MS7-PLAN-107-20261104-langgraph-agent-live-trace.md) (`implemented`, MS7, implementation)  
-**Prior completed stamp:** [HC-MS7-PLAN-106](./plans/HC-MS7-PLAN-106-20261104-langgraph-agent-eval-save.md) (`implemented`, MS7, docs)  
+**Latest stamped plan:** [HC-MS7-PLAN-110](./plans/HC-MS7-PLAN-110-20261104-langgraph-external-tools-eval-save.md) (`implemented`, MS7, docs)  
+**Prior completed stamp:** [HC-MS7-PLAN-109](./plans/HC-MS7-PLAN-109-20261104-langgraph-external-tools.md) (`implemented`, MS7, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Today’s update (2026-11-04)
+
+**Agent external tools eval save (PLAN-110):** Human approved. Official rubric **9/9 Pass** (8 required + inventory stretch) on a live trace: [Results/LangGraphExternalTools-20261104.md](./evaluations/Results/LangGraphExternalTools-20261104.md). Does not close MS7.
+
+**Agent external tools (PLAN-108 plan, PLAN-109 implementation):** Support Agent with LangGraph Part 2. The incident manager gains read-only `GET /api/incidents` and `GET /api/incidents/{id}` (no `patient_id`). The agent gains the typed, GET-only tools `ticket_lookup` and `inventory_lookup` (stretch). They use a service-account JWT from env and a 4.0 s deadline. The new nodes are `plan_sources` (LLM planner with a rules fallback), `tool_fallback` (honest reply, never a status), and `compose_answer` (tool facts verbatim). The trace records sources in order. Live trace evals: **101 passed, 10 skipped**, AG09–AG19 included. Mechanics **76 passed**, API **87 passed**. Does not close MS7.
 
 **LangGraph agent live trace (PLAN-107):** Re-recorded against the live 4Geeks models; `setup()` indexed 14 chunks. Evals **33 passed, 1 skipped** (blank question has no retrieve step). The Humana case passes: the agent will not confirm the insurer and refers to Tom Callahan. The Results file is updated in place: **11/11 Pass** on a live trace. Does not close MS7.
 
@@ -147,7 +151,7 @@
 
 | Area | Status |
 |------|--------|
-| Coordinator knowledge agent (LangGraph) | **Implemented** (PLAN-104–105) — `services/knowledge_agent`, `POST /agent/query`, trace evals 33 passed / 1 skipped (live trace, PLAN-107); eval → [Results/LangGraphAgent-20261104.md](./evaluations/Results/LangGraphAgent-20261104.md) (**11/11 Pass**). Does not close MS7. |
+| Coordinator knowledge agent (LangGraph) | **Implemented** (PLAN-104–105; external tools PLAN-109) — `services/knowledge_agent`, `POST /agent/query`, ticket and inventory tools, trace evals 101 passed / 10 skipped (live trace, PLAN-109); Part 1 eval → [Results/LangGraphAgent-20261104.md](./evaluations/Results/LangGraphAgent-20261104.md) (**11/11 Pass**); Part 2 eval → [Results/LangGraphExternalTools-20261104.md](./evaluations/Results/LangGraphExternalTools-20261104.md) (**9/9 Pass**). Does not close MS7. |
 | Coordinator knowledge base (RAG) | **Implemented** (PLAN-101–102) — Qdrant `healthcore_knowledge`, `/knowledge` UI, Recall@3 100%; eval → [Results/RAGKnowledgeBase-20261102.md](./evaluations/Results/RAGKnowledgeBase-20261102.md) (**17/17 Pass**). Does not close MS7. |
 | Monthly revenue forecast | **Implemented** (PLAN-093–095) — Random Forest on official `healthcore_sales.csv`; eval → [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md) (**9/9 Pass**). Does not close MS6. |
 | Regression model evaluation | **Implemented** (PLAN-097–100) — yearly-lift forest, eval → [Results/RegressionModelEval-20261028.md](./evaluations/Results/RegressionModelEval-20261028.md) (**6/6 Pass**, well fitted, validation RMSE 131,697 ± 15,999 USD). Does not close MS6. |

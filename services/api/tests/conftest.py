@@ -23,7 +23,7 @@ from app.main import app  # noqa: E402
 from app.result_store import store as incident_result_store  # noqa: E402
 from app.stores import auth_store  # noqa: E402
 from app import suppliers_store  # noqa: E402
-from app import inventory_store  # noqa: E402
+from app import incidents_store, inventory_store  # noqa: E402
 from app.telemetry.store import init_telemetry_schema, reset_telemetry_engine  # noqa: E402
 
 TEST_JWT_SECRET = "unit-test-jwt-secret-do-not-use-live"
@@ -50,6 +50,10 @@ def _isolate_persistence(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     inv_dir.mkdir()
     monkeypatch.setattr(inventory_store, "DATA_DIR", inv_dir)
     monkeypatch.setattr(inventory_store, "DB_PATH", inv_dir / "inventory.json")
+    incidents_dir = tmp_path / "incidents"
+    incidents_dir.mkdir()
+    monkeypatch.setattr(incidents_store, "DATA_DIR", incidents_dir)
+    monkeypatch.setattr(incidents_store, "DB_PATH", incidents_dir / "incidents.json")
 
     get_settings.cache_clear()
     reset_engine()

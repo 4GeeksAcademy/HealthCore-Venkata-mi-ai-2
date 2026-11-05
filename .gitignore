@@ -1,6 +1,7 @@
 services/api/data/suppliers.json
 services/api/data/auth.json
 services/api/data/inventory.json
+services/api/data/incidents.json
 
 # Local secrets and env templates — never commit
 .env

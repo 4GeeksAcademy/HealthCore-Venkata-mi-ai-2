@@ -65,3 +65,5 @@ RegressionModelEval (20261028) | Yearly-lift revenue forest (time-series CV and 
 RAGKnowledgeBase (20261102) | Coordinator knowledge base RAG (Qdrant, `/knowledge/query`, Recall@3) | 2026-11-02 | complete | 17/17 Pass | [Results/RAGKnowledgeBase-20261102.md](./Results/RAGKnowledgeBase-20261102.md)
 
 LangGraphAgent (20261104) | Coordinator knowledge agent on LangGraph (graph, checkpoints, trace evals, `/agent/query`) | 2026-11-04 | complete | 11/11 Pass (live trace) | [Results/LangGraphAgent-20261104.md](./Results/LangGraphAgent-20261104.md)
+
+LangGraphExternalTools (20261104) | Coordinator agent external tools (ticket + inventory, routing, fallback, live trace) | 2026-11-04 | complete | 9/9 Pass (live trace) | [Results/LangGraphExternalTools-20261104.md](./Results/LangGraphExternalTools-20261104.md)

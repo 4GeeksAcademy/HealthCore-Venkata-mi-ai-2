@@ -115,6 +115,100 @@ python -m pytest                                               # API suite (from
 
 Every trace export records its `mode`. The offline trace proves the wiring, the routing, and that grounded chunks reach the answer. It cannot prove that the real model stays faithful. Re-record with `--mode live` before opening the PR. The live-only Humana case (never confirm an unlisted insurer) is skipped against an offline trace and runs against a live one.
 
+## Part 2 — External tools (ticket and inventory)
+
+Plan: [PLAN-108](../../memory-bank/plans/HC-MS7-PLAN-108-20261104-langgraph-external-tools-plan.md). The agent can now read two live HealthCore systems as well as the knowledge base. It decides per question whether to use the knowledge base, a tool, or both.
+
+| Tool | Reads | Responsibility |
+|------|-------|----------------|
+| `ticket_lookup` (`tools/incidents.py`) | `GET /api/incidents/{id}` or `GET /api/incidents?status=&category=&clinic_id=` on the incident manager | Look up one ticket by id, or count tickets by filter |
+| `inventory_lookup` (`tools/inventory.py`, stretch) | `GET /inventory/products` | Report stock and reorder threshold for a named product |
+
+The incident manager had no read endpoints, so Part 2 adds them to our own service. `POST /api/incidents/analyze` now upserts the valid rows of each uploaded CSV into `services/api/data/incidents.json` (gitignored), and `seed.py` loads the sample CSV. The read endpoints never return `patient_id`.
+
+### Contracts, auth, read-only, timeout
+
+- Input and output are Pydantic models in `tools/contracts.py`. `ticket_id` must match `^INC-\d{4,6}$`, and unknown fields are rejected. Every output carries a `status` from `ok`, `not_found`, `invalid_input`, `timeout`, `unavailable`, `auth_failed`, or `bad_response`, plus `endpoint`, `http_status`, and `latency_ms`.
+- Both API services require a JWT. The agent signs in as a service account through `POST /auth/login` and refreshes the token once on a 401. Credentials come only from env vars, and no token is hardcoded:
+
+  | Env var | Default |
+  |---------|---------|
+  | `HEALTHCORE_API_URL` | `http://localhost:8001` |
+  | `AGENT_SERVICE_EMAIL`, `AGENT_SERVICE_PASSWORD` | none. If they are missing, the tool returns `auth_failed` and the graph falls back. |
+
+- `ReadOnlyApiSession` (`tools/session.py`) allows only `GET` (plus the login `POST`). Any other method raises `ReadOnlyViolation` before a request is sent.
+- `TOOL_TIMEOUT_SECONDS = 4.0` is a deadline for the whole tool call, including login. A real server that never replies times out in about 4.0 s; the live AG16 trace shows 4009 ms.
+
+### Routing
+
+`plan_sources` asks the LLM for a JSON plan (`sources`, `ticket_input`, `inventory_input`, `knowledge_question`), with an 8 s timeout and one retry. If the reply is invalid or slow, the rules planner (`planner.rules_plan`) takes over, and the trace records `planner: rules_fallback`. A ticket id counts only if it appears in the question text, so the model cannot invent one. For a mixed question, the knowledge base gets only the policy part (`knowledge_question`). Offline recordings use the rules planner.
+
+```mermaid
+graph TD;
+	__start__ --> receive_question;
+	receive_question -. "invalid" .-> reject_question;
+	receive_question -. "valid" .-> plan_sources;
+	plan_sources -. "ticket" .-> lookup_ticket;
+	plan_sources -. "inventory" .-> lookup_inventory;
+	plan_sources -. "knowledge base" .-> retrieve;
+	lookup_ticket -. "ok, next source" .-> lookup_inventory;
+	lookup_ticket -. "ok, next source" .-> retrieve;
+	lookup_ticket -. "ok, last source" .-> compose_answer;
+	lookup_ticket -. "not ok" .-> tool_fallback;
+	lookup_inventory -. "ok, next source" .-> retrieve;
+	lookup_inventory -. "ok, last source" .-> compose_answer;
+	lookup_inventory -. "not ok" .-> tool_fallback;
+	tool_fallback -. "next source" .-> lookup_inventory;
+	tool_fallback -. "next source" .-> retrieve;
+	tool_fallback -. "last source" .-> compose_answer;
+	retrieve -. "context" .-> generate_answer;
+	retrieve -. "no context" .-> no_context_answer;
+	generate_answer -. "RAG only" .-> __end__;
+	generate_answer -. "after a tool" .-> compose_answer;
+	no_context_answer -. "RAG only" .-> __end__;
+	no_context_answer -. "after a tool" .-> compose_answer;
+	compose_answer --> __end__;
+	reject_question --> __end__;
+```
+
+- `tool_fallback` turns a failed tool call into an honest reply. For example: "I couldn't confirm ticket INC-0042's status right now: the incident manager did not respond in time. Please try again in a moment, or check it directly in the HealthCore backoffice." It never states a status. The outcome is `tool_fallback`, and the API still returns 200.
+- `compose_answer` writes tool facts word for word from the tool output ("Ticket INC-0042 is closed. … Source: HealthCore incident manager (live)"). In a mixed answer, it adds the knowledge-base answer under "From the HealthCore knowledge base:". The LLM never words a status or a stock figure.
+- Pure knowledge-base questions keep the Part 1 path, with `plan_sources` added before `retrieve`.
+
+### Trace
+
+Tool steps log `tool`, `status`, `method` (always `GET`), `endpoint`, `http_status`, `latency_ms`, and the returned ids, statuses, or SKUs and stock levels. They never log tokens or URLs. `plan_sources` logs `sources`, `planner`, and the ticket input. `agent_runs` gets `sources_used`, and `POST /agent/query` returns `sources`.
+
+```python
+store.source_sequence(run_id)   # e.g. ['incident_manager', 'knowledge_base']
+```
+
+```sql
+-- which source each run used, in order, with tool status and latency
+SELECT run_id, node, json_extract(output, '$.tool_call.status') AS status,
+       json_extract(output, '$.tool_call.latency_ms') AS ms
+FROM agent_steps WHERE node IN ('plan_sources', 'lookup_ticket', 'lookup_inventory', 'retrieve')
+ORDER BY run_id, seq;
+```
+
+### Evals (AG09–AG19)
+
+Cases are in `tests/pipelines/agent_eval_cases.json`:
+
+- Tool, not knowledge base: AG09–AG11 (ticket by id, short number, filtered count).
+- Knowledge base, not tool: AG12, plus AG01–AG07, which must not call any tool.
+- Both: AG13.
+- Fallback: AG14 (not found), AG15 (unreachable), AG16 (timeout), and AG19 (auth failure).
+- Inventory: AG17 (stock) and AG18 (unknown product).
+
+The recorder runs the real tools against the running API. For AG15 and AG16 it points them at a closed port and at a socket that never replies, so those cases exercise a real outage and a real timeout. Recording needs the API on `HEALTHCORE_API_URL` and the service-account env vars:
+
+```bash
+uv run python scripts/record_agent_traces.py --mode live
+uv run pytest tests/pipelines/test_agent_evals.py -v
+uv run pytest tests/pipelines/test_agent_tools.py tests/pipelines/test_agent_graph.py   # tool and graph mechanics
+```
+
 ## Known limits
 
 - Checkpoints hold full state, including the question, because resume needs it. They stay in the local gitignored `.state/` folder.

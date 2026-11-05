@@ -42,6 +42,7 @@ class AgentAnswer(BaseModel):
     answer: str
     outcome: str
     run_id: str
+    sources: list[str]
 
 
 @router.post("/query", response_model=AgentAnswer)
@@ -69,4 +70,6 @@ def post_agent_query(
         ) from exc
     if result.outcome == "invalid_question":
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=result.answer)
-    return AgentAnswer(answer=result.answer, outcome=result.outcome, run_id=result.run_id)
+    return AgentAnswer(
+        answer=result.answer, outcome=result.outcome, run_id=result.run_id, sources=list(result.sources)
+    )

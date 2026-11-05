@@ -47,8 +47,25 @@ CREATE INDEX IF NOT EXISTS idx_agent_steps_node ON agent_steps(node);
 """
 
 
+SOURCE_BY_NODE = {
+    "lookup_ticket": "incident_manager",
+    "lookup_inventory": "inventory_manager",
+    "retrieve": "knowledge_base",
+}
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="milliseconds")
+
+
+def _sources(nodes: list[str]) -> list[str]:
+    """Data sources consulted, in the order the graph called them (once each)."""
+    seen: list[str] = []
+    for node in nodes:
+        source = SOURCE_BY_NODE.get(node)
+        if source and source not in seen:
+            seen.append(source)
+    return seen
 
 
 class TraceStore:
@@ -142,6 +159,7 @@ class TraceStore:
             (run["run_id"],),
         ).fetchall()
         run["steps"] = [{**dict(step), "output": json.loads(step["output"])} for step in steps]
+        run["sources_used"] = _sources([s["node"] for s in run["steps"] if s["status"] == "completed"])
         return run
 
     def get_run(self, run_id: str) -> dict[str, Any] | None:
@@ -171,6 +189,13 @@ class TraceStore:
                 "SELECT node FROM agent_steps WHERE run_id=? ORDER BY seq", (run_id,)
             ).fetchall()
         return [row["node"] for row in rows]
+
+    def source_sequence(self, run_id: str) -> list[str]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT node FROM agent_steps WHERE run_id=? AND status='completed' ORDER BY seq", (run_id,)
+            ).fetchall()
+        return _sources([row["node"] for row in rows])
 
     def export(self, run_ids: list[str] | None = None) -> list[dict[str, Any]]:
         runs = self.list_runs(limit=10_000)

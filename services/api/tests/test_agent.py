@@ -48,7 +48,9 @@ def use_stub(agent, tmp_path: Path):
 
     def _use(stub: StubRag):
         runner = agent.AgentRunner(
-            deps=agent.AgentDependencies(retrieve=stub.retrieve, generate_answer=stub.generate_answer),
+            deps=agent.AgentDependencies(
+                retrieve=stub.retrieve, generate_answer=stub.generate_answer, plan_sources=agent.rules_plan
+            ),
             state_dir=tmp_path,
         )
         runners.append(runner)
@@ -82,11 +84,36 @@ def test_agent_query_returns_answer_outcome_and_run_id(
 
     assert response.status_code == 200, response.text
     body = response.json()
-    assert set(body) == {"answer", "outcome", "run_id"}
+    assert set(body) == {"answer", "outcome", "run_id", "sources"}
     assert body["answer"] == "Bring a valid ID and the insurance card.\nSource: new-patient-checklist"
     assert body["outcome"] == "answered"
+    assert body["sources"] == ["knowledge_base"]
     assert stub.retrieve_calls == ["What should a new patient bring?"]
-    assert runner.traces.node_sequence(body["run_id"]) == ["receive_question", "retrieve", "generate_answer"]
+    assert runner.traces.node_sequence(body["run_id"]) == [
+        "receive_question",
+        "plan_sources",
+        "retrieve",
+        "generate_answer",
+    ]
+
+
+def test_agent_query_tool_fallback_is_a_200_honest_answer(
+    client: TestClient, auth_headers: dict, use_stub, monkeypatch
+) -> None:
+    monkeypatch.delenv("AGENT_SERVICE_EMAIL", raising=False)
+    stub = StubRag([CHUNK])
+    use_stub(stub)
+
+    response = client.post(
+        "/agent/query", headers=auth_headers, json={"question": "What's the status of ticket INC-0042?"}
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["outcome"] == "tool_fallback"
+    assert body["sources"] == ["incident_manager"]
+    assert body["answer"].startswith("I couldn't confirm ticket INC-0042's status right now")
+    assert stub.retrieve_calls == []
 
 
 def test_agent_query_no_context_is_an_honest_answer(
