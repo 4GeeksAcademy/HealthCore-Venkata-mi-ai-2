@@ -1,4 +1,4 @@
-"""HealthCore API — Incident Analyzer + Supplier Directory + Inventory."""
+"""HealthCore API — Incident Analyzer + Supplier Directory + Inventory + Knowledge agent."""
 
 from __future__ import annotations
 
@@ -16,6 +16,8 @@ from fastapi.responses import JSONResponse
 from app.core.errors import StorageError
 from app.database import init_dual_stores
 from app.models.health import HealthResponse
+from app.routers.agent import get_agent_runner
+from app.routers.agent import router as agent_router
 from app.routers.auth import router as auth_router
 from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
@@ -40,6 +42,8 @@ timing_logger = logging.getLogger("api.timing")
 async def lifespan(_app: FastAPI):
     init_dual_stores()
     init_telemetry_schema()
+    # Structural graph errors must stop startup, not surface on the first request.
+    get_agent_runner()
     try:
         pipelines = Path(__file__).resolve().parents[3] / "data" / "pipelines"
         if str(pipelines) not in sys.path:
@@ -82,6 +86,7 @@ app.include_router(telemetry_router)
 app.include_router(reporting_router)
 app.include_router(tasks_router)
 app.include_router(knowledge_router)
+app.include_router(agent_router)
 
 
 @app.middleware("http")

@@ -216,6 +216,14 @@ Format per line:
 
 103 | HC-MS7-PLAN-103 | MS7 | 2026-11-02 | Save RAG Knowledge Base Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-103-20261102-rag-eval-save.md](./HC-MS7-PLAN-103-20261102-rag-eval-save.md)
 
+104 | HC-MS7-PLAN-104 | MS7 | 2026-11-04 | Coordinator Knowledge Agent LangGraph Migration Plan | planned | planning | [HC-MS7-PLAN-104-20261104-langgraph-agent-plan.md](./HC-MS7-PLAN-104-20261104-langgraph-agent-plan.md)
+
+105 | HC-MS7-PLAN-105 | MS7 | 2026-11-04 | Coordinator Knowledge Agent LangGraph Implementation | implemented | implementation | [HC-MS7-PLAN-105-20261104-langgraph-agent-impl.md](./HC-MS7-PLAN-105-20261104-langgraph-agent-impl.md)
+
+106 | HC-MS7-PLAN-106 | MS7 | 2026-11-04 | Save LangGraph Knowledge Agent Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-106-20261104-langgraph-agent-eval-save.md](./HC-MS7-PLAN-106-20261104-langgraph-agent-eval-save.md)
+
+107 | HC-MS7-PLAN-107 | MS7 | 2026-11-04 | LangGraph Knowledge Agent Live Trace Re-record | implemented | implementation | [HC-MS7-PLAN-107-20261104-langgraph-agent-live-trace.md](./HC-MS7-PLAN-107-20261104-langgraph-agent-live-trace.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

@@ -11,6 +11,7 @@ Each subfolder inside `services/` must correspond to **one specific service** (f
 | Incident Analyzer API | [`api/`](./api/) | FastAPI CSV incident analysis (`POST /api/incidents/analyze`, `GET /api/incidents/results/export`) |
 | Celery worker | [`celery_app.py`](./celery_app.py), [`tasks/`](./tasks/) | Ticket `#DEV-55` — async monthly clinic-supply pipeline via Redis |
 | Flower | Compose service `flower` | Queue monitor on port `5555` |
+| Knowledge agent | [`knowledge_agent/`](./knowledge_agent/) | Coordinator RAG as a compiled LangGraph graph with checkpoints and a SQLite trace; `POST /agent/query` ([design](../docs/agent/langgraph-agent.md)) |
 
 - **Main purpose**: to centralize all the backend logic, APIs, and queue consumers that support the company's use cases.
 - **Recommendation**: document in this file (or in sub-READMEs) the services you add, their objective, the technology used, and how to run them.

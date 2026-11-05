@@ -1,9 +1,17 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-11-02  
-**Latest stamped plan:** [HC-MS7-PLAN-103](./plans/HC-MS7-PLAN-103-20261102-rag-eval-save.md) (`implemented`, MS7, docs)  
-**Prior completed stamp:** [HC-MS7-PLAN-102](./plans/HC-MS7-PLAN-102-20261102-rag-knowledge-base-impl.md) (`implemented`, MS7, implementation)  
+**Last updated:** 2026-11-04  
+**Latest stamped plan:** [HC-MS7-PLAN-107](./plans/HC-MS7-PLAN-107-20261104-langgraph-agent-live-trace.md) (`implemented`, MS7, implementation)  
+**Prior completed stamp:** [HC-MS7-PLAN-106](./plans/HC-MS7-PLAN-106-20261104-langgraph-agent-eval-save.md) (`implemented`, MS7, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-11-04)
+
+**LangGraph agent live trace (PLAN-107):** Re-recorded against the live 4Geeks models; `setup()` indexed 14 chunks. Evals **33 passed, 1 skipped** (blank question has no retrieve step). The Humana case passes: the agent will not confirm the insurer and refers to Tom Callahan. The Results file is updated in place: **11/11 Pass** on a live trace. Does not close MS7.
+
+**LangGraph agent eval save (PLAN-106):** Human approved. Official rubric **11/11 Pass**: [Results/LangGraphAgent-20261104.md](./evaluations/Results/LangGraphAgent-20261104.md). Grounding was checked against an offline trace. Re-record `--mode live` before the PR. Does not close MS7.
+
+**Knowledge agent on LangGraph (PLAN-104/105):** Support Agent with LangGraph Part 1, brief at [`docs/Project_Contexts/SupportAgentwithLangGraph_1.md`](../docs/Project_Contexts/SupportAgentwithLangGraph_1.md). The coordinator RAG now runs as a compiled graph in `services/knowledge_agent/`. Nodes: `receive_question`, `retrieve`, `generate_answer`, `no_context_answer`, `reject_question`. Two conditional edges: a blank question goes to reject, and empty context goes to the honest answer. The graph is validated at build time and compiled in the API lifespan. SQLite checkpoints are written per step and a failed run can be resumed. Every run writes to the SQLite trace. `POST /agent/query` sits next to the unchanged `/knowledge/query`. Nodes reuse `retrieve()` and `generate_answer()` from `data/pipelines/rag.py`. Evals run against the recorded trace: **29 passed, 5 skipped**. Graph mechanics **18 passed**, RAG tests **13 passed**, API **79 passed**. The trace fixture was recorded **offline** (no `.env` or Docker in session). Re-record `--mode live` before the PR. Eval Results pending human approval. Design: [`docs/agent/langgraph-agent.md`](../docs/agent/langgraph-agent.md). Does not close MS7.
 
 ## Today’s update (2026-11-02)
 
@@ -139,6 +147,7 @@
 
 | Area | Status |
 |------|--------|
+| Coordinator knowledge agent (LangGraph) | **Implemented** (PLAN-104–105) — `services/knowledge_agent`, `POST /agent/query`, trace evals 33 passed / 1 skipped (live trace, PLAN-107); eval → [Results/LangGraphAgent-20261104.md](./evaluations/Results/LangGraphAgent-20261104.md) (**11/11 Pass**). Does not close MS7. |
 | Coordinator knowledge base (RAG) | **Implemented** (PLAN-101–102) — Qdrant `healthcore_knowledge`, `/knowledge` UI, Recall@3 100%; eval → [Results/RAGKnowledgeBase-20261102.md](./evaluations/Results/RAGKnowledgeBase-20261102.md) (**17/17 Pass**). Does not close MS7. |
 | Monthly revenue forecast | **Implemented** (PLAN-093–095) — Random Forest on official `healthcore_sales.csv`; eval → [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md) (**9/9 Pass**). Does not close MS6. |
 | Regression model evaluation | **Implemented** (PLAN-097–100) — yearly-lift forest, eval → [Results/RegressionModelEval-20261028.md](./evaluations/Results/RegressionModelEval-20261028.md) (**6/6 Pass**, well fitted, validation RMSE 131,697 ± 15,999 USD). Does not close MS6. |

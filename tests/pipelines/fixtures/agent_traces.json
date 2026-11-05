@@ -1,0 +1,611 @@
+{
+  "recorded_at": "2026-11-05T01:26:49+00:00",
+  "mode": "live",
+  "graph_version": "knowledge-agent/1",
+  "models": {
+    "embedding": "downtown-miami/openrouter/perplexity/pplx-embed-v1-0.6b",
+    "generation": "downtown-miami/openrouter/openai/gpt-6-luna"
+  },
+  "min_score": 0.3,
+  "graph_mermaid": "---\nconfig:\n  flowchart:\n    curve: linear\n---\ngraph TD;\n\t__start__([<p>__start__</p>]):::first\n\treceive_question(receive_question)\n\tretrieve(retrieve)\n\tgenerate_answer(generate_answer)\n\tno_context_answer(no_context_answer)\n\treject_question(reject_question)\n\t__end__([<p>__end__</p>]):::last\n\t__start__ --> receive_question;\n\treceive_question -.-> reject_question;\n\treceive_question -.-> retrieve;\n\tretrieve -.-> generate_answer;\n\tretrieve -.-> no_context_answer;\n\tgenerate_answer --> __end__;\n\tno_context_answer --> __end__;\n\treject_question --> __end__;\n\tclassDef default fill:#f2f0ff,line-height:1.2\n\tclassDef first fill-opacity:0\n\tclassDef last fill:#bfb6fc\n",
+  "runs": [
+    {
+      "run_id": "169fe2270ca24e35bd845112f6d7d673",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG01-cancellation-fee"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "916ff7f87c126712808474faffe493a1f5793f65fc03cc9ddbee425516cc7873",
+      "question_chars": 53,
+      "question_text": "Is there a charge for cancelling 12 hours in advance?",
+      "answer_text": "Cancelling 12 hours in advance is within the less-than-24-hour window. The charge is **50 USD** in the United States or **40 GBP** in the UK for private-pay patients. Medicare or Medicaid patients are not charged a no-show fee; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+      "started_at": "2026-11-05T01:24:26.102+00:00",
+      "finished_at": "2026-11-05T01:26:11.765+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 13.373,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Is there a charge for cancelling 12 hours in advance?",
+            "question_chars": 53
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 5782.0,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 1,
+                "score": 0.6365,
+                "section": "Cancellation policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.3859,
+                "section": "Appointment and Cancellation Policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 2,
+                "score": 0.3802,
+                "section": "Automated reminders",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 0,
+                "score": 0.3188,
+                "section": "Booking appointments",
+                "source_document": "appointment-policy"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 99861.229,
+          "output": {
+            "answer": "Cancelling 12 hours in advance is within the less-than-24-hour window. The charge is **50 USD** in the United States or **40 GBP** in the UK for private-pay patients. Medicare or Medicaid patients are not charged a no-show fee; the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 317,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: appointment-policy › Cancellation policy"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "f6fcfd2c314d48f3b688c2320c9f4940",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG02-medicare-no-show"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "3a592242fa62f77c735c193430afed1188f789e7d2997e7978f43f174acba299",
+      "question_chars": 39,
+      "question_text": "Do Medicare patients pay a no-show fee?",
+      "answer_text": "No. Medicare patients are not charged a no-show fee, but the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+      "started_at": "2026-11-05T01:26:11.768+00:00",
+      "finished_at": "2026-11-05T01:26:23.132+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 3.606,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Do Medicare patients pay a no-show fee?",
+            "question_chars": 39
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 8203.772,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 1,
+                "score": 0.5439,
+                "section": "Cancellation policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.4664,
+                "section": "Appointment and Cancellation Policy",
+                "source_document": "appointment-policy"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 3148.363,
+          "output": {
+            "answer": "No. Medicare patients are not charged a no-show fee, but the incident is logged in their record.\n\nSource: appointment-policy › Cancellation policy",
+            "answer_chars": 146,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: appointment-policy › Cancellation policy"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "1c9db970a15e46a7bad043a803a03a7a",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG03-us-commercial-insurers"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "9eab3f07dd93b66bfecf352b351b3b695ace50962e7986bb13730c88d992cf66",
+      "question_chars": 58,
+      "question_text": "Which commercial insurance plans do the US clinics accept?",
+      "answer_text": "The US clinics accept Blue Cross Blue Shield, Aetna, Cigna, and UnitedHealthcare.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+      "started_at": "2026-11-05T01:26:23.136+00:00",
+      "finished_at": "2026-11-05T01:26:25.581+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.424,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Which commercial insurance plans do the US clinics accept?",
+            "question_chars": 58
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 538.964,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 0,
+                "score": 0.5352,
+                "section": "United States (Texas, Florida, Georgia)",
+                "source_document": "insurance-coverage"
+              },
+              {
+                "chunk_index": 1,
+                "score": 0.3743,
+                "section": "United Kingdom (London and Manchester)",
+                "source_document": "insurance-coverage"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 1897.634,
+          "output": {
+            "answer": "The US clinics accept Blue Cross Blue Shield, Aetna, Cigna, and UnitedHealthcare.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+            "answer_chars": 151,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: insurance-coverage › United States (Texas, Florida, Georgia)"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "f62f877b35de439c9d0a29a6a53971a2",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG04-new-patient-documents"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "e3c423f021cc4a509830aa2e9f2946a5f9e5dba17a3f08a7047b5339926c5c7d",
+      "question_chars": 72,
+      "question_text": "What documents should a new patient bring on the day of the appointment?",
+      "answer_text": "Please ask the new patient to bring:\n- A valid ID document.\n- An insurance card, if applicable.\n- A list of current medications, if warranted by the reason for the visit.\n\nSource: new-patient-checklist › Documents the patient should bring on the day of the appointment",
+      "started_at": "2026-11-05T01:26:25.584+00:00",
+      "finished_at": "2026-11-05T01:26:32.495+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.005,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "What documents should a new patient bring on the day of the appointment?",
+            "question_chars": 72
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 250.286,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 1,
+                "score": 0.8388,
+                "section": "Documents the patient should bring on the day of the appointment",
+                "source_document": "new-patient-checklist"
+              },
+              {
+                "chunk_index": 0,
+                "score": 0.7247,
+                "section": "New Patient Checklist",
+                "source_document": "new-patient-checklist"
+              },
+              {
+                "chunk_index": 2,
+                "score": 0.5193,
+                "section": "New Patient Checklist",
+                "source_document": "new-patient-checklist"
+              },
+              {
+                "chunk_index": 0,
+                "score": 0.3418,
+                "section": "Booking appointments",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.3258,
+                "section": "Appointment and Cancellation Policy",
+                "source_document": "appointment-policy"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 6650.441,
+          "output": {
+            "answer": "Please ask the new patient to bring:\n- A valid ID document.\n- An insurance card, if applicable.\n- A list of current medications, if warranted by the reason for the visit.\n\nSource: new-patient-checklist › Documents the patient should bring on the day of the appointment",
+            "answer_chars": 268,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: new-patient-checklist › Documents the patient should bring on the day of the appointment"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "8dc3e34eb8b84c40b9302fcf7f0945ec",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG05-referral-escalation"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "ff433eb8972072d77e55e10fd2ca921bb1c963101586e5a7db6717c253bdc745",
+      "question_chars": 92,
+      "question_text": "A patient has had no referral appointment options for 5 business days. Who do I escalate to?",
+      "answer_text": "Escalate the case directly to Marcus Reid, Director of Clinical Operations.\n\nSource: referral-process › Internal Referral Process",
+      "started_at": "2026-11-05T01:26:32.498+00:00",
+      "finished_at": "2026-11-05T01:26:37.052+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.171,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "A patient has had no referral appointment options for 5 business days. Who do I escalate to?",
+            "question_chars": 92
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 1647.9,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 2,
+                "score": 0.72,
+                "section": "Internal Referral Process",
+                "source_document": "referral-process"
+              },
+              {
+                "chunk_index": 1,
+                "score": 0.4795,
+                "section": "Target completed-referral time",
+                "source_document": "referral-process"
+              },
+              {
+                "chunk_index": 0,
+                "score": 0.4333,
+                "section": "Internal Referral Process",
+                "source_document": "referral-process"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.4065,
+                "section": "Appointment and Cancellation Policy",
+                "source_document": "appointment-policy"
+              },
+              {
+                "chunk_index": 3,
+                "score": 0.4039,
+                "section": "Internal Referral Process",
+                "source_document": "referral-process"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 2896.577,
+          "output": {
+            "answer": "Escalate the case directly to Marcus Reid, Director of Clinical Operations.\n\nSource: referral-process › Internal Referral Process",
+            "answer_chars": 129,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: referral-process › Internal Referral Process"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "63f39135b04740018bbb4ee6ea559a6b",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG06-unlisted-insurer-humana"
+      },
+      "status": "completed",
+      "outcome": "answered",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "727a5fcfe89ac9814e674a54dd05e0ad9b7a1f1351571ba6217a2ba1ed469cbc",
+      "question_chars": 21,
+      "question_text": "Do you accept Humana?",
+      "answer_text": "- **United States:** Humana is not on the documented list of accepted commercial insurers. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n- **United Kingdom:** Humana is not on the documented list. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+      "started_at": "2026-11-05T01:26:37.055+00:00",
+      "finished_at": "2026-11-05T01:26:41.368+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.228,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "Do you accept Humana?",
+            "question_chars": 21
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 736.142,
+          "output": {
+            "hits": [
+              {
+                "chunk_index": 0,
+                "score": 0.3433,
+                "section": "United States (Texas, Florida, Georgia)",
+                "source_document": "insurance-coverage"
+              }
+            ],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "generate_answer",
+          "status": "completed",
+          "duration_ms": 3567.386,
+          "output": {
+            "answer": "- **United States:** Humana is not on the documented list of accepted commercial insurers. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n- **United Kingdom:** Humana is not on the documented list. Please verify with the billing team (Tom Callahan) before confirming anything to the patient.\n\nSource: insurance-coverage › United States (Texas, Florida, Georgia)",
+            "answer_chars": 408,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "answered",
+            "source_line": "Source: insurance-coverage › United States (Texas, Florida, Georgia)"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "0b938e53697947fc9d8f74091d83c1e1",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG07-off-topic-no-context"
+      },
+      "status": "completed",
+      "outcome": "no_context",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "c980b205f543c12ff5476768565c29e53ef889a338174e44a5122c39b684f35e",
+      "question_chars": 49,
+      "question_text": "What is the Wi-Fi password for the staff network?",
+      "answer_text": "I don't have enough information in the HealthCore knowledge base to answer that. Please check with the relevant HealthCore team before answering the patient.",
+      "started_at": "2026-11-05T01:26:41.371+00:00",
+      "finished_at": "2026-11-05T01:26:49.956+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.686,
+          "output": {
+            "keys": [
+              "question"
+            ],
+            "question": "What is the Wi-Fi password for the staff network?",
+            "question_chars": 49
+          }
+        },
+        {
+          "seq": 2,
+          "node": "retrieve",
+          "status": "completed",
+          "duration_ms": 8567.536,
+          "output": {
+            "hits": [],
+            "keys": [
+              "context"
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "node": "no_context_answer",
+          "status": "completed",
+          "duration_ms": 8.391,
+          "output": {
+            "answer": "I don't have enough information in the HealthCore knowledge base to answer that. Please check with the relevant HealthCore team before answering the patient.",
+            "answer_chars": 157,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "no_context",
+            "source_line": null
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "4688fdbdd8964711869d61f5affc878d",
+      "graph_version": "knowledge-agent/1",
+      "mode": "live",
+      "labels": {
+        "case_id": "AG08-blank-question"
+      },
+      "status": "completed",
+      "outcome": "invalid_question",
+      "failed_node": null,
+      "error_type": null,
+      "question_sha256": "0aad7da77d2ed59c396c99a74e49f3a4524dcdbcb5163251b1433d640247aeb4",
+      "question_chars": 3,
+      "question_text": "   ",
+      "answer_text": "Please type a question for the knowledge assistant (up to 1000 characters).",
+      "started_at": "2026-11-05T01:26:49.959+00:00",
+      "finished_at": "2026-11-05T01:26:49.976+00:00",
+      "steps": [
+        {
+          "seq": 1,
+          "node": "receive_question",
+          "status": "completed",
+          "duration_ms": 2.384,
+          "output": {
+            "keys": [
+              "outcome",
+              "question"
+            ],
+            "outcome": "invalid_question",
+            "question": "",
+            "question_chars": 0
+          }
+        },
+        {
+          "seq": 2,
+          "node": "reject_question",
+          "status": "completed",
+          "duration_ms": 7.36,
+          "output": {
+            "answer": "Please type a question for the knowledge assistant (up to 1000 characters).",
+            "answer_chars": 75,
+            "keys": [
+              "answer",
+              "outcome"
+            ],
+            "outcome": "invalid_question",
+            "source_line": null
+          }
+        }
+      ]
+    }
+  ]
+}

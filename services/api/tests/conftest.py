@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,6 +14,7 @@ os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 os.environ.setdefault("RESET_TOKEN_EXPIRE_MINUTES", "30")
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["INVENTORY_BACKEND"] = "tinydb"
+os.environ["AGENT_STATE_DIR"] = tempfile.mkdtemp(prefix="hc-agent-test-")
 
 from app.core.config import get_settings  # noqa: E402
 from app.core.response_cache import response_cache  # noqa: E402

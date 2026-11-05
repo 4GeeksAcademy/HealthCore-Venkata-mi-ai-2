@@ -1,0 +1,45 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.1.1, pluggy-1.7.0 -- C:\Work\Git\RAG\HealthCore-Venkata-mi-ai-2-1\.venv\Scripts\python.exe
+rootdir: C:\Work\Git\RAG\HealthCore-Venkata-mi-ai-2-1
+configfile: pytest.ini
+plugins: anyio-4.16.0, langsmith-0.14.17
+collecting ... collected 34 items
+
+tests/pipelines/test_agent_evals.py::test_trace_covers_every_case_with_the_current_graph PASSED [  2%]
+tests/pipelines/test_agent_evals.py::test_every_run_has_ordered_timed_steps PASSED [  5%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG01-cancellation-fee] PASSED [  8%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG02-medicare-no-show] PASSED [ 11%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG03-us-commercial-insurers] PASSED [ 14%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG04-new-patient-documents] PASSED [ 17%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG05-referral-escalation] PASSED [ 20%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG06-unlisted-insurer-humana] PASSED [ 23%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG07-off-topic-no-context] PASSED [ 26%]
+tests/pipelines/test_agent_evals.py::test_path_matches_expected_route[AG08-blank-question] PASSED [ 29%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG01-cancellation-fee] PASSED [ 32%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG02-medicare-no-show] PASSED [ 35%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG03-us-commercial-insurers] PASSED [ 38%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG04-new-patient-documents] PASSED [ 41%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG05-referral-escalation] PASSED [ 44%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG06-unlisted-insurer-humana] PASSED [ 47%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG07-off-topic-no-context] PASSED [ 50%]
+tests/pipelines/test_agent_evals.py::test_retrieval_matches_expected_source[AG08-blank-question] SKIPPED [ 52%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG01-cancellation-fee] PASSED [ 55%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG02-medicare-no-show] PASSED [ 58%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG03-us-commercial-insurers] PASSED [ 61%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG04-new-patient-documents] PASSED [ 64%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG05-referral-escalation] PASSED [ 67%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG06-unlisted-insurer-humana] PASSED [ 70%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG07-off-topic-no-context] PASSED [ 73%]
+tests/pipelines/test_agent_evals.py::test_answer_contains_briefing_facts[AG08-blank-question] PASSED [ 76%]
+tests/pipelines/test_agent_evals.py::test_grounded_answer_cites_the_retrieved_document[AG01-cancellation-fee] PASSED [ 79%]
+tests/pipelines/test_agent_evals.py::test_grounded_answer_cites_the_retrieved_document[AG02-medicare-no-show] PASSED [ 82%]
+tests/pipelines/test_agent_evals.py::test_grounded_answer_cites_the_retrieved_document[AG03-us-commercial-insurers] PASSED [ 85%]
+tests/pipelines/test_agent_evals.py::test_grounded_answer_cites_the_retrieved_document[AG04-new-patient-documents] PASSED [ 88%]
+tests/pipelines/test_agent_evals.py::test_grounded_answer_cites_the_retrieved_document[AG05-referral-escalation] PASSED [ 91%]
+tests/pipelines/test_agent_evals.py::test_grounded_answer_cites_the_retrieved_document[AG06-unlisted-insurer-humana] PASSED [ 94%]
+tests/pipelines/test_agent_evals.py::test_retrieve_runs_exactly_once_before_generation PASSED [ 97%]
+tests/pipelines/test_agent_evals.py::test_generation_never_runs_on_empty_context PASSED [100%]
+
+=========================== short test summary info ===========================
+SKIPPED [1] tests\pipelines\test_agent_evals.py:93: retrieve is not on this route
+======================== 33 passed, 1 skipped in 0.25s ========================

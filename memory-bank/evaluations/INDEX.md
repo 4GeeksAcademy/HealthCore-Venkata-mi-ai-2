@@ -63,3 +63,5 @@ SalesForecast (20261026) | Monthly consolidated revenue forecast (Random Forest,
 RegressionModelEval (20261028) | Yearly-lift revenue forest (time-series CV and learning curve) | 2026-10-28 | complete | 6/6 Pass | [Results/RegressionModelEval-20261028.md](./Results/RegressionModelEval-20261028.md)
 
 RAGKnowledgeBase (20261102) | Coordinator knowledge base RAG (Qdrant, `/knowledge/query`, Recall@3) | 2026-11-02 | complete | 17/17 Pass | [Results/RAGKnowledgeBase-20261102.md](./Results/RAGKnowledgeBase-20261102.md)
+
+LangGraphAgent (20261104) | Coordinator knowledge agent on LangGraph (graph, checkpoints, trace evals, `/agent/query`) | 2026-11-04 | complete | 11/11 Pass (live trace) | [Results/LangGraphAgent-20261104.md](./Results/LangGraphAgent-20261104.md)

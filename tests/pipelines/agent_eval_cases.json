@@ -1,0 +1,96 @@
+{
+  "description": "Coordinator knowledge agent evals. Each case is run once by scripts/record_agent_traces.py; tests/pipelines/test_agent_evals.py then checks the recorded trace, never a live run. Answer phrases are matched case-insensitively; each inner list is an any-of group and every group must match.",
+  "cases": [
+    {
+      "id": "AG01-cancellation-fee",
+      "kind": "grounding",
+      "question": "Is there a charge for cancelling 12 hours in advance?",
+      "expected_nodes": ["receive_question", "retrieve", "generate_answer"],
+      "forbidden_nodes": ["no_context_answer", "reject_question"],
+      "expected_outcome": "answered",
+      "expected_top_source": "appointment-policy",
+      "answer_must_include": [["50 USD"], ["40 GBP"], ["Medicare", "Medicaid"]],
+      "answer_must_not_include": []
+    },
+    {
+      "id": "AG02-medicare-no-show",
+      "kind": "grounding",
+      "question": "Do Medicare patients pay a no-show fee?",
+      "expected_nodes": ["receive_question", "retrieve", "generate_answer"],
+      "forbidden_nodes": ["no_context_answer", "reject_question"],
+      "expected_outcome": "answered",
+      "expected_top_source": "appointment-policy",
+      "answer_must_include": [
+        ["Medicare"],
+        ["not charged", "aren't charged", "are not charged", "isn't charged", "do not pay", "don't pay", "no no-show fee", "exempt"]
+      ],
+      "answer_must_not_include": []
+    },
+    {
+      "id": "AG03-us-commercial-insurers",
+      "kind": "grounding",
+      "question": "Which commercial insurance plans do the US clinics accept?",
+      "expected_nodes": ["receive_question", "retrieve", "generate_answer"],
+      "forbidden_nodes": ["no_context_answer", "reject_question"],
+      "expected_outcome": "answered",
+      "expected_top_source": "insurance-coverage",
+      "answer_must_include": [["Blue Cross Blue Shield"], ["Aetna"], ["Cigna"], ["UnitedHealthcare"]],
+      "answer_must_not_include": ["Humana", "Kaiser"]
+    },
+    {
+      "id": "AG04-new-patient-documents",
+      "kind": "grounding",
+      "question": "What documents should a new patient bring on the day of the appointment?",
+      "expected_nodes": ["receive_question", "retrieve", "generate_answer"],
+      "forbidden_nodes": ["no_context_answer", "reject_question"],
+      "expected_outcome": "answered",
+      "expected_top_source": "new-patient-checklist",
+      "answer_must_include": [["valid ID", "ID document", "identification", "official document"], ["insurance card"], ["medication"]],
+      "answer_must_not_include": []
+    },
+    {
+      "id": "AG05-referral-escalation",
+      "kind": "grounding",
+      "question": "A patient has had no referral appointment options for 5 business days. Who do I escalate to?",
+      "expected_nodes": ["receive_question", "retrieve", "generate_answer"],
+      "forbidden_nodes": ["no_context_answer", "reject_question"],
+      "expected_outcome": "answered",
+      "expected_top_source": "referral-process",
+      "answer_must_include": [["Marcus Reid"]],
+      "answer_must_not_include": []
+    },
+    {
+      "id": "AG06-unlisted-insurer-humana",
+      "kind": "grounding",
+      "requires_mode": "live",
+      "question": "Do you accept Humana?",
+      "expected_nodes": ["receive_question", "retrieve", "generate_answer"],
+      "forbidden_nodes": ["reject_question"],
+      "expected_outcome": "answered",
+      "expected_top_source": "insurance-coverage",
+      "answer_must_include": [["Tom Callahan", "billing"], ["not on", "not listed", "isn't listed", "not documented", "not included", "verify", "verified"]],
+      "answer_must_not_include": ["we accept Humana", "Humana is accepted", "yes, we accept"]
+    },
+    {
+      "id": "AG07-off-topic-no-context",
+      "kind": "routing",
+      "question": "What is the Wi-Fi password for the staff network?",
+      "expected_nodes": ["receive_question", "retrieve", "no_context_answer"],
+      "forbidden_nodes": ["generate_answer", "reject_question"],
+      "expected_outcome": "no_context",
+      "expected_hits": 0,
+      "answer_must_include": [["I don't have enough information in the HealthCore knowledge base"]],
+      "answer_must_not_include": ["password is"]
+    },
+    {
+      "id": "AG08-blank-question",
+      "kind": "routing",
+      "question": "   ",
+      "expected_nodes": ["receive_question", "reject_question"],
+      "forbidden_nodes": ["retrieve", "generate_answer", "no_context_answer"],
+      "expected_outcome": "invalid_question",
+      "answer_must_include": [["Please type a question"]],
+      "answer_must_not_include": []
+    }
+  ]
+}
