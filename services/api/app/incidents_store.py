@@ -78,6 +78,46 @@ def upsert_incidents(rows: list[dict[str, str]], *, source_file: str) -> int:
         db.close()
 
 
+class IncidentExistsError(Exception):
+    """An incident with this id is already stored. Create does not overwrite it."""
+
+
+def create_incident(row: dict[str, str], *, source_file: str) -> IncidentRecord:
+    """Insert one validated row. Raises ``IncidentExistsError`` when the id exists."""
+    now = utc_now_iso()
+    incident_id = row["incident_id"].strip().upper()
+    db = get_db()
+    try:
+        if db.get(Query().incident_id == incident_id) is not None:
+            raise IncidentExistsError(incident_id)
+        record = {field: row[field].strip() for field in _STORED_FIELDS}
+        record["incident_id"] = incident_id
+        record["satisfaction_score"] = _score(row.get("satisfaction_score"))
+        record["source_file"] = source_file
+        record["updated_at"] = now
+        record["first_recorded_at"] = now
+        db.insert(record)
+        return _to_record(record)
+    finally:
+        db.close()
+
+
+def update_incident_status(incident_id: str, status: str) -> IncidentRecord | None:
+    """Change only ``status`` and ``updated_at``. Returns None when the id is unknown."""
+    incident_id = incident_id.strip().upper()
+    now = utc_now_iso()
+    db = get_db()
+    try:
+        existing = db.get(Query().incident_id == incident_id)
+        if existing is None:
+            return None
+        db.update({"status": status, "updated_at": now}, doc_ids=[existing.doc_id])
+        updated = db.get(doc_id=existing.doc_id)
+        return _to_record(updated) if updated else None
+    finally:
+        db.close()
+
+
 def get_incident(incident_id: str) -> IncidentRecord | None:
     db = get_db()
     try:

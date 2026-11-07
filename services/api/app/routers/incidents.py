@@ -9,13 +9,16 @@ from fastapi.responses import Response
 
 from app import incidents_store
 from app.deps.auth import get_current_user
-from app.incident_analysis import AnalysisError, analyze_rows, parse_csv_rows, valid_rows
+from app.core.errors import StorageError
+from app.incident_analysis import AnalysisError, analyze_rows, parse_csv_rows, valid_rows, validate_row
 from app.models.incidents import (
     IncidentAnalyzeResponse,
     IncidentCategory,
+    IncidentCreate,
     IncidentListResponse,
     IncidentRecord,
     IncidentStatus,
+    IncidentStatusUpdate,
 )
 from app.result_store import store
 
@@ -79,6 +82,45 @@ async def analyze_incidents(
     store.save(result)
     incidents_store.upsert_incidents(valid_rows(rows), source_file=PurePath(file.filename).name[:120])
     return IncidentAnalyzeResponse.model_validate(result.to_dict())
+
+
+@router.post("", response_model=IncidentRecord, status_code=201)
+def create_incident(body: IncidentCreate, _: dict = Depends(get_current_user)) -> IncidentRecord:
+    """Create one incident. Status changes later go through ``PATCH /{id}/status`` only."""
+    row = {
+        "incident_id": body.incident_id.strip(),
+        "clinic_id": body.clinic_id.strip(),
+        "country": body.country.strip(),
+        "patient_id": body.patient_id.strip(),
+        "category": body.category,
+        "status": body.status,
+        "satisfaction_score": "" if body.satisfaction_score is None else str(body.satisfaction_score),
+    }
+    problems = validate_row(row)
+    if problems:
+        raise HTTPException(status_code=400, detail=f"Incident was not accepted: {', '.join(problems)}.")
+    try:
+        return incidents_store.create_incident(row, source_file="api")
+    except incidents_store.IncidentExistsError:
+        raise HTTPException(status_code=409, detail="An incident with this ID already exists.")
+    except StorageError:
+        raise HTTPException(status_code=500, detail="Unable to save this incident. Try again.")
+
+
+@router.patch("/{incident_id}/status", response_model=IncidentRecord)
+def update_incident_status(
+    incident_id: str,
+    body: IncidentStatusUpdate,
+    _: dict = Depends(get_current_user),
+) -> IncidentRecord:
+    """Lifecycle update. This route changes status only — there is no generic incident PATCH."""
+    try:
+        record = incidents_store.update_incident_status(incident_id, body.status)
+    except StorageError:
+        raise HTTPException(status_code=500, detail="Unable to update this incident. Try again.")
+    if record is None:
+        raise HTTPException(status_code=404, detail="Incident not found.")
+    return record
 
 
 @router.get("", response_model=IncidentListResponse)

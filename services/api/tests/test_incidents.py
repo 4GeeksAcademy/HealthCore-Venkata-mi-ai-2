@@ -155,3 +155,73 @@ def test_reupload_updates_status_so_lookups_see_the_latest_value(
     assert second["source_file"] == "update.csv"
     assert second["first_recorded_at"] == first["first_recorded_at"]
     assert client.get("/api/incidents", headers=auth_headers).json()["total"] == 1
+
+
+_NEW = {
+    "incident_id": "INC-8801",
+    "clinic_id": "us-tx-001",
+    "country": "US",
+    "patient_id": "PAT-8801",
+    "category": "BILLING",
+    "status": "open",
+    "satisfaction_score": None,
+}
+
+
+def test_create_incident_stores_a_record_and_hides_patient_id(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    created = client.post("/api/incidents", headers=auth_headers, json=_NEW)
+    fetched = client.get("/api/incidents/INC-8801", headers=auth_headers)
+
+    assert created.status_code == 201, created.text
+    assert "patient_id" not in created.json()
+    assert fetched.json()["status"] == "open"
+    assert fetched.json()["category"] == "BILLING"
+    assert "patient_id" not in fetched.json()
+
+
+def test_create_conflict_and_status_patch_do_not_change_other_fields(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    assert client.post("/api/incidents", headers=auth_headers, json=_NEW).status_code == 201
+    duplicate = client.post("/api/incidents", headers=auth_headers, json=_NEW)
+    patched = client.patch(
+        "/api/incidents/INC-8801/status",
+        headers=auth_headers,
+        json={"status": "closed"},
+    )
+    generic = client.patch("/api/incidents/INC-8801", headers=auth_headers, json={"status": "open"})
+    extra = client.patch(
+        "/api/incidents/INC-8801/status",
+        headers=auth_headers,
+        json={"status": "open", "category": "IT"},
+    )
+
+    assert duplicate.status_code == 409
+    assert patched.status_code == 200
+    assert patched.json()["status"] == "closed"
+    assert patched.json()["category"] == "BILLING"
+    assert patched.json()["clinic_id"] == "us-tx-001"
+    assert generic.status_code == 405
+    assert extra.status_code == 422
+    assert client.get("/api/incidents/INC-8801", headers=auth_headers).json()["status"] == "closed"
+
+
+def test_incident_create_and_status_require_a_token(client: TestClient) -> None:
+    assert client.post("/api/incidents", json=_NEW).status_code == 401
+    assert client.patch("/api/incidents/INC-8801/status", json={"status": "closed"}).status_code == 401
+    missing = client.patch(
+        "/api/incidents/INC-4040/status",
+        headers={"Authorization": "Bearer not-used"},
+        json={"status": "closed"},
+    )
+    # A bad token is 401 before the lookup. A real token and an unknown id is 404,
+    # covered by the authenticated client below.
+    assert missing.status_code == 401
+
+
+def test_status_patch_unknown_incident_is_404(client: TestClient, auth_headers: dict[str, str]) -> None:
+    missing = client.patch("/api/incidents/INC-4040/status", headers=auth_headers, json={"status": "closed"})
+    assert missing.status_code == 404
+    assert missing.json()["detail"] == "Incident not found."

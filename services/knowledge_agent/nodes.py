@@ -28,10 +28,10 @@ from .tools import (  # noqa: E402
     InventoryLookupTool,
     TicketLookupInput,
     TicketLookupOutput,
-    TicketLookupTool,
 )
-from .tools.incidents import TOOL_NAME as TICKET_TOOL  # noqa: E402
 from .tools.inventory import TOOL_NAME as INVENTORY_TOOL  # noqa: E402
+from .tools.incidents import TOOL_NAME as TICKET_TOOL  # noqa: E402
+from .tools.mcp_incidents import McpIncidentLookup  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ class AgentDependencies:
     retrieve: RetrieveFn = rag.retrieve
     generate_answer: GenerateFn = rag.generate_answer
     plan_sources: PlanFn = field(default_factory=SourcePlanner)
-    lookup_ticket: TicketFn = field(default_factory=TicketLookupTool.from_env)
+    lookup_ticket: TicketFn = field(default_factory=McpIncidentLookup.from_env)
     lookup_inventory: InventoryFn = field(default_factory=InventoryLookupTool.from_env)
 
 

@@ -1,4 +1,8 @@
-"""Read-only external tools for the coordinator agent. One tool per service."""
+"""External tools for the coordinator agent.
+
+Ticket lookup is ``McpIncidentLookup`` in ``mcp_incidents.py``. Inventory stays
+a direct read of the inventory API.
+"""
 
 from .contracts import (
     InventoryLookupInput,
@@ -9,7 +13,6 @@ from .contracts import (
     TicketRecord,
     ToolStatus,
 )
-from .incidents import TicketLookupTool
 from .inventory import InventoryLookupTool
 from .session import (
     TOOL_TIMEOUT_SECONDS,
@@ -29,7 +32,6 @@ __all__ = [
     "ServiceCredentials",
     "TicketLookupInput",
     "TicketLookupOutput",
-    "TicketLookupTool",
     "TicketRecord",
     "ToolStatus",
 ]

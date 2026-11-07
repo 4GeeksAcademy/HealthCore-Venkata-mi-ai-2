@@ -1,7 +1,8 @@
-"""The agent's tools against the real incident and inventory routes (FastAPI TestClient).
+"""Inventory tool and the real Incidents Manager routes (FastAPI TestClient).
 
-Same tool classes the agent uses in production; only the transport is in-process.
-The service account logs in with POST /auth/login like any backend client.
+The agent reads inventory directly. Ticket questions go through the MCP server,
+so these tests call the incident routes themselves and do not use a second
+ticket client.
 """
 
 from __future__ import annotations
@@ -36,27 +37,29 @@ def tools(client: TestClient, auth_headers: dict[str, str]):
     return tools_pkg, session
 
 
-def test_ticket_tool_reads_the_incident_manager(tools) -> None:
-    pkg, session = tools
-    tool = pkg.TicketLookupTool(session)
+def test_incident_manager_reads_match_the_routes_the_mcp_server_calls(
+    tools, client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    one = client.get("/api/incidents/INC-0042", headers=auth_headers)
+    open_billing = client.get(
+        "/api/incidents",
+        headers=auth_headers,
+        params={"status": "open", "category": "BILLING", "limit": 5},
+    )
+    missing = client.get("/api/incidents/INC-0482", headers=auth_headers)
 
-    one = tool(pkg.TicketLookupInput(ticket_id="INC-0042"))
-    open_billing = tool(pkg.TicketLookupInput(status="open", category="BILLING"))
-    rejected_row = tool(pkg.TicketLookupInput(ticket_id="INC-0095"))
-    missing = tool(pkg.TicketLookupInput(ticket_id="INC-0482"))
-
-    assert (one.status, one.http_status) == ("ok", 200)
-    assert one.tickets[0].model_dump(include={"incident_id", "status", "category", "clinic_id"}) == {
-        "incident_id": "INC-0042",
-        "status": "closed",
-        "category": "WORKFORCE",
-        "clinic_id": "us-tx-002",
-    }
-    assert (open_billing.total, [t.incident_id for t in open_billing.tickets]) == (
+    assert one.status_code == 200
+    assert one.json()["incident_id"] == "INC-0042"
+    assert one.json()["status"] == "closed"
+    assert one.json()["category"] == "WORKFORCE"
+    assert one.json()["clinic_id"] == "us-tx-002"
+    assert "patient_id" not in one.json()
+    body = open_billing.json()
+    assert (body["total"], [row["incident_id"] for row in body["items"]]) == (
         6,
         ["INC-0061", "INC-0062", "INC-0063", "INC-0064", "INC-0065"],
     )
-    assert (rejected_row.status, missing.status) == ("not_found", "not_found")
+    assert missing.status_code == 404
 
 
 def test_inventory_tool_reads_the_inventory_manager(tools, client: TestClient, auth_headers: dict[str, str]) -> None:
@@ -80,8 +83,8 @@ def test_tools_leave_incident_and_inventory_data_unchanged(
     orders_before = client.get("/inventory/orders", headers=auth_headers).json()
 
     for _ in range(3):
-        pkg.TicketLookupTool(session)(pkg.TicketLookupInput(ticket_id="INC-0042"))
-        pkg.TicketLookupTool(session)(pkg.TicketLookupInput(status="open"))
+        client.get("/api/incidents/INC-0042", headers=auth_headers)
+        client.get("/api/incidents", headers=auth_headers, params={"status": "open"})
         pkg.InventoryLookupTool(session)(pkg.InventoryLookupInput(product_query="gloves"))
 
     assert incidents_store.DB_PATH.read_bytes() == incidents_before
@@ -93,4 +96,4 @@ def test_wrong_service_password_is_an_auth_failure(tools, client: TestClient) ->
     pkg, _ = tools
     bad = pkg.ReadOnlyApiSession(pkg.ServiceCredentials("http://testserver", STAFF_EMAIL, "wrong"), client=client)
 
-    assert pkg.TicketLookupTool(bad)(pkg.TicketLookupInput(ticket_id="INC-0042")).status == "auth_failed"
+    assert pkg.InventoryLookupTool(bad)(pkg.InventoryLookupInput(product_query="gloves")).status == "auth_failed"

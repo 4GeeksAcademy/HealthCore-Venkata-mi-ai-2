@@ -1,9 +1,17 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-11-04  
-**Latest stamped plan:** [HC-MS7-PLAN-110](./plans/HC-MS7-PLAN-110-20261104-langgraph-external-tools-eval-save.md) (`implemented`, MS7, docs)  
-**Prior completed stamp:** [HC-MS7-PLAN-109](./plans/HC-MS7-PLAN-109-20261104-langgraph-external-tools.md) (`implemented`, MS7, implementation)  
+**Last updated:** 2026-11-06  
+**Latest stamped plan:** [HC-MS7-PLAN-115](./plans/HC-MS7-PLAN-115-20261106-mcp-server-eval-save.md) (`implemented`, MS7, docs)  
+**Prior completed stamp:** [HC-MS7-PLAN-114](./plans/HC-MS7-PLAN-114-20261106-gitignore-secrets.md) (`implemented`, MS7, implementation)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-11-06)
+
+**MCP server eval save (PLAN-115):** Human approved. Official rubric **8 Pass, 1 Not run** (Codespaces MCP Playground was not opened): [Results/MCPServer-20261106.md](./evaluations/Results/MCPServer-20261106.md). Does not close MS7. The human commits.
+
+**Secret ignore (PLAN-114):** `.gitignore` now covers `.env`, `.env.*`, private keys, and credential JSON in every directory. `.env` is not tracked. Does not close MS7.
+
+**MCP server alignment (PLAN-113):** The agent package no longer has a direct Incidents Manager client. Ticket questions go through the MCP server. A missing tool scope returns MCP Auth's `missing_required_scopes` body. The agent sends `mcp-protocol-version` unless `MCP_STRIP_PROTOCOL_HEADER=1`. Re-run: MCP and agent mechanics **66 passed**. Incident API tests were not run (no FastAPI in the root environment). MCP Playground was not opened. Does not close MS7.
 
 ## Today’s update (2026-11-04)
 

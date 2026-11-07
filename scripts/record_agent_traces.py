@@ -9,11 +9,12 @@ Usage (from repo root):
                                                                  # in-memory Qdrant, lexical embedding, extractive LLM,
                                                                  # rules planner
 
-Both modes call the real HealthCore API for the tools. Before recording:
+Ticket questions call the MCP server. Inventory still calls the HealthCore API. Before recording:
 
     cd services/api && python seed.py            # inventory seed + scripts/samples/incidents-healthcore.csv
     python -m uvicorn app.main:app --port 8001   # JWT_SECRET_KEY set
-    # env: HEALTHCORE_API_URL, AGENT_SERVICE_EMAIL, AGENT_SERVICE_PASSWORD (an active staff account)
+    # env: HEALTHCORE_API_URL, AGENT_SERVICE_EMAIL, AGENT_SERVICE_PASSWORD
+    #      HEALTHCORE_MCP_URL, MCP_TOKEN_URL, MCP_AGENT_CLIENT_ID, MCP_AGENT_CLIENT_SECRET
 
 Cases with ``tool_override`` point the ticket tool at a closed local port
 (``unreachable``) or at a local server that accepts and never answers
@@ -64,8 +65,8 @@ from services.knowledge_agent.tools import (  # noqa: E402
     ReadOnlyApiSession,
     ServiceCredentials,
     TicketLookupInput,
-    TicketLookupTool,
 )
+from services.knowledge_agent.tools.mcp_incidents import McpIncidentLookup  # noqa: E402
 
 CASES_PATH = REPO_ROOT / "tests" / "pipelines" / "agent_eval_cases.json"
 EXPORT_PATH = REPO_ROOT / "tests" / "pipelines" / "fixtures" / "agent_traces.json"
@@ -111,11 +112,14 @@ def _silent_server() -> Iterator[str]:
 def _preflight(credentials: ServiceCredentials | None) -> str | None:
     if credentials is None:
         return "set AGENT_SERVICE_EMAIL and AGENT_SERVICE_PASSWORD (an active staff account on the API)"
-    probe = TicketLookupTool(ReadOnlyApiSession(credentials))(TicketLookupInput(ticket_id="INC-0042"))
+    lookup = McpIncidentLookup.from_env()
+    if not lookup.configured:
+        return "set HEALTHCORE_MCP_URL, MCP_TOKEN_URL, MCP_AGENT_CLIENT_ID, and MCP_AGENT_CLIENT_SECRET"
+    probe = lookup(TicketLookupInput(ticket_id="INC-0042"))
     if probe.status != "ok":
         return (
-            f"incident manager preflight returned {probe.status}; start the API and load "
-            "scripts/samples/incidents-healthcore.csv (python seed.py or the /incidents upload)"
+            f"MCP incident preflight returned {probe.status}; start the MCP server and the API, "
+            "and load scripts/samples/incidents-healthcore.csv"
         )
     return None
 
@@ -137,7 +141,7 @@ def main() -> int:
         return 1
     assert credentials is not None
     session = ReadOnlyApiSession(credentials)
-    tools = {"lookup_ticket": TicketLookupTool(session), "lookup_inventory": InventoryLookupTool(session)}
+    tools = {"lookup_ticket": McpIncidentLookup.from_env(), "lookup_inventory": InventoryLookupTool(session)}
 
     if mode == "live":
         deps = AgentDependencies(**tools)
@@ -161,7 +165,13 @@ def main() -> int:
     cases = json.loads(CASES_PATH.read_text(encoding="utf-8"))["cases"]
 
     def runner_for(base_url: str) -> AgentRunner:
-        broken = TicketLookupTool(ReadOnlyApiSession(replace(credentials, base_url=base_url)))
+        broken = McpIncidentLookup(
+            mcp_url=base_url,
+            token_url=f"{base_url}/oauth/token",
+            client_id="trace-probe",
+            client_secret="trace-probe",
+            timeout_seconds=TOOL_TIMEOUT_SECONDS,
+        )
         return AgentRunner(
             deps=replace(deps, lookup_ticket=broken),
             checkpointer=InMemorySaver(),
@@ -198,9 +208,9 @@ def main() -> int:
         "models": models,
         "min_score": min_score,
         "tools": {
-            "transport": "HTTP to HEALTHCORE_API_URL (env), bearer JWT from POST /auth/login",
+            "transport": "MCP Streamable HTTP for tickets; HTTP for inventory",
             "timeout_seconds": TOOL_TIMEOUT_SECONDS,
-            "incident_manager": ["GET /api/incidents/{incident_id}", "GET /api/incidents"],
+            "incident_manager": ["MCP incident_check_status"],
             "inventory_manager": ["GET /inventory/products"],
         },
         "graph_mermaid": runner.graph.get_graph().draw_mermaid(),

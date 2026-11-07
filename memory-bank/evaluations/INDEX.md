@@ -67,3 +67,5 @@ RAGKnowledgeBase (20261102) | Coordinator knowledge base RAG (Qdrant, `/knowledg
 LangGraphAgent (20261104) | Coordinator knowledge agent on LangGraph (graph, checkpoints, trace evals, `/agent/query`) | 2026-11-04 | complete | 11/11 Pass (live trace) | [Results/LangGraphAgent-20261104.md](./Results/LangGraphAgent-20261104.md)
 
 LangGraphExternalTools (20261104) | Coordinator agent external tools (ticket + inventory, routing, fallback, live trace) | 2026-11-04 | complete | 9/9 Pass (live trace) | [Results/LangGraphExternalTools-20261104.md](./Results/LangGraphExternalTools-20261104.md)
+
+MCPServer (20261106) | MCP server for incidents and inventory (OAuth, agent client) | 2026-11-06 | recorded | 8 Pass, 1 Not run | [Results/MCPServer-20261106.md](./Results/MCPServer-20261106.md)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 IncidentStatus = Literal["open", "closed", "discarded"]
 IncidentCategory = Literal["APPOINTMENT", "BILLING", "CLINICAL", "FACILITIES", "IT", "WORKFORCE"]
@@ -38,3 +38,25 @@ class IncidentRecord(BaseModel):
 class IncidentListResponse(BaseModel):
     total: int
     items: list[IncidentRecord]
+
+
+class IncidentCreate(BaseModel):
+    """One incident. ``patient_id`` is stored and is never part of ``IncidentRecord``."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    incident_id: str = Field(min_length=1, max_length=40)
+    clinic_id: str = Field(min_length=1, max_length=40)
+    country: str = Field(min_length=2, max_length=4)
+    patient_id: str = Field(min_length=1, max_length=40)
+    category: IncidentCategory
+    status: IncidentStatus
+    satisfaction_score: float | None = None
+
+
+class IncidentStatusUpdate(BaseModel):
+    """The only body ``PATCH /api/incidents/{id}/status`` accepts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    status: IncidentStatus

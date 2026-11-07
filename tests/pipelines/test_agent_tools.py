@@ -1,8 +1,8 @@
 """External tools: contracts, read-only session, timeout, fallback, routing, trace.
 
 No HealthCore API here: HTTP is either ``httpx.MockTransport`` or a local socket
-that accepts and never answers. The same tools are exercised against the real
-API routes in ``services/api/tests/test_agent_tools_live_api.py``.
+that accepts and never answers. Ticket cases inject ``ticket_lookup_double``,
+which the agent package does not import. Inventory is the production tool.
 """
 
 from __future__ import annotations
@@ -22,8 +22,10 @@ import pytest
 from pydantic import ValidationError
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
+_PIPELINES = Path(__file__).resolve().parent
+for _path in (_REPO_ROOT, _PIPELINES):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
 
 from services.knowledge_agent import AgentDependencies, AgentRunner, SourcePlanner, rules_plan  # noqa: E402
 from services.knowledge_agent.planner import extract_ticket_id, plan_from_llm_reply  # noqa: E402
@@ -35,8 +37,8 @@ from services.knowledge_agent.tools import (  # noqa: E402
     ReadOnlyViolation,
     ServiceCredentials,
     TicketLookupInput,
-    TicketLookupTool,
 )
+from ticket_lookup_double import TicketLookupTool  # noqa: E402
 from services.knowledge_agent.tools import incidents as incidents_module  # noqa: E402
 from services.knowledge_agent.tools import inventory as inventory_module  # noqa: E402
 from services.knowledge_agent.tools import session as session_module  # noqa: E402

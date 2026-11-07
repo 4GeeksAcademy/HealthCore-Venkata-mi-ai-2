@@ -229,6 +229,16 @@ Format per line:
 
 110 | HC-MS7-PLAN-110 | MS7 | 2026-11-04 | Save LangGraph External Tools Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-110-20261104-langgraph-external-tools-eval-save.md](./HC-MS7-PLAN-110-20261104-langgraph-external-tools-eval-save.md)
 
+111 | HC-MS7-PLAN-111 | MS7 | 2026-11-06 | MCP Server for Incidents and Inventory (OAuth) Plan | planned | planning | [HC-MS7-PLAN-111-20261106-mcp-oauth-tools-plan.md](./HC-MS7-PLAN-111-20261106-mcp-oauth-tools-plan.md)
+
+112 | HC-MS7-PLAN-112 | MS7 | 2026-11-06 | MCP Server for Incidents and Inventory (OAuth) Implementation | implemented | implementation | [HC-MS7-PLAN-112-20261106-mcp-oauth-tools.md](./HC-MS7-PLAN-112-20261106-mcp-oauth-tools.md)
+
+113 | HC-MS7-PLAN-113 | MS7 | 2026-11-06 | MCP Server Challenge Alignment | implemented | implementation | [HC-MS7-PLAN-113-20261106-mcp-oauth-tools-align.md](./HC-MS7-PLAN-113-20261106-mcp-oauth-tools-align.md)
+
+114 | HC-MS7-PLAN-114 | MS7 | 2026-11-06 | Ignore secret files before any push | implemented | implementation | [HC-MS7-PLAN-114-20261106-gitignore-secrets.md](./HC-MS7-PLAN-114-20261106-gitignore-secrets.md)
+
+115 | HC-MS7-PLAN-115 | MS7 | 2026-11-06 | Save MCP Server Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-115-20261106-mcp-server-eval-save.md](./HC-MS7-PLAN-115-20261106-mcp-server-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

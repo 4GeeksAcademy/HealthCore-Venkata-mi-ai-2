@@ -5,13 +5,22 @@ services/api/data/incidents.json
 
 # Local secrets and env templates — never commit
 .env
-.env.local
-.env.example
+.env.*
 .env*.local
 **/.env
-**/.env.local
-**/.env.example
+**/.env.*
 **/env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+**/credentials.json
+**/secrets.json
+**/*-credentials.json
+**/*service-account*.json
+**/*serviceAccount*.json
 
 # Test / coverage artifacts
 .pytest_cache/
