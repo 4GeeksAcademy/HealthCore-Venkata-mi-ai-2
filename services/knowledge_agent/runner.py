@@ -7,7 +7,7 @@ import os
 import sqlite3
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -15,6 +15,17 @@ from typing import Any
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from .graph import GRAPH_NAME, GRAPH_VERSION, GraphSpec, compile_agent_graph
+from .memory.store import MemoryStore
+from .memory.turn import (
+    UNAVAILABLE,
+    MemoryCoordinator,
+    MemoryUnavailable,
+    TurnEnding,
+    TurnPrelude,
+    join_parts,
+    normalize_actor,
+    normalize_conversation_id,
+)
 from .nodes import AgentDependencies, rag
 from .state import AgentState
 from .trace_store import TraceStore
@@ -30,6 +41,8 @@ class AgentResult:
     answer: str
     outcome: str
     sources: tuple[str, ...] = ()
+    conversation_id: str = ""
+    memory_event: str = "none"
 
 
 class AgentRunFailed(RuntimeError):
@@ -137,6 +150,7 @@ class AgentRunner:
         trace_store: TraceStore | None = None,
         store_text: bool | None = None,
         mode: str = "live",
+        memory: MemoryCoordinator | None = None,
     ) -> None:
         directory = Path(state_dir or os.getenv("AGENT_STATE_DIR") or DEFAULT_STATE_DIR)
         self._checkpoint_conn: sqlite3.Connection | None = None
@@ -147,11 +161,15 @@ class AgentRunner:
             )
             checkpointer = SqliteSaver(self._checkpoint_conn)
         self.traces = trace_store or TraceStore(directory / "traces.sqlite")
+        self.memory = memory if memory is not None else MemoryCoordinator(
+            MemoryStore(directory / "agent_memory.sqlite")
+        )
         self.store_text = _env_flag("AGENT_TRACE_STORE_TEXT") if store_text is None else store_text
         self.mode = mode
         self.graph = compile_agent_graph(spec, deps=deps, checkpointer=checkpointer)
 
     def close(self) -> None:
+        self.memory.close()
         self.traces.close()
         if self._checkpoint_conn is not None:
             self._checkpoint_conn.close()
@@ -164,7 +182,93 @@ class AgentRunner:
             "metadata": {"run_id": run_id, "graph_version": GRAPH_VERSION},
         }
 
-    def run(self, question: str, *, labels: dict[str, Any] | None = None) -> AgentResult:
+    def run(
+        self,
+        question: str,
+        *,
+        labels: dict[str, Any] | None = None,
+        conversation_id: str | None = None,
+        actor_id: str = "staff:unknown",
+    ) -> AgentResult:
+        """Answer one desk turn. Memory is decided here; the graph is unchanged."""
+        conversation_id = normalize_conversation_id(conversation_id)
+        actor_id = normalize_actor(actor_id)
+        try:
+            prelude = self.memory.prepare(conversation_id, question, actor_id)
+        except MemoryUnavailable:
+            logger.error("agent memory unavailable (%s)", "sqlite3.Error")
+            prelude = TurnPrelude(
+                conversation_id=conversation_id,
+                memory_event="none",
+                graph_question=question,
+                locked_suffix=UNAVAILABLE,
+                block_proposal=True,
+                trace_question=question,
+            )
+        if prelude.final_answer is not None:
+            return self._memory_only(prelude, labels)
+
+        result = self._run_graph(prelude.graph_question or question, labels)
+        if result.outcome == "invalid_question":
+            return replace(result, conversation_id=conversation_id, memory_event="none")
+        try:
+            ending = self.memory.finish(
+                conversation_id,
+                prelude.graph_question or question,
+                actor_id,
+                block_proposal=prelude.block_proposal,
+                locked_suffix=prelude.locked_suffix,
+            )
+        except MemoryUnavailable:
+            logger.error("agent memory unavailable (%s)", "sqlite3.Error")
+            ending = TurnEnding(suffix=UNAVAILABLE, memory_event="none")
+        if ending.memory_event == "proposed":
+            event = "proposed"
+        elif prelude.memory_event != "none":
+            event = prelude.memory_event
+        else:
+            event = ending.memory_event
+        return replace(
+            result,
+            answer=join_parts(prelude.lead, result.answer, ending.suffix),
+            conversation_id=conversation_id,
+            memory_event=event,
+        )
+
+    def _memory_only(self, prelude: TurnPrelude, labels: dict[str, Any] | None) -> AgentResult:
+        run_id = uuid.uuid4().hex
+        traced = prelude.trace_question or "[decision]"
+        self.traces.start_run(
+            run_id,
+            question=traced,
+            graph_version=GRAPH_VERSION,
+            mode=self.mode,
+            labels=labels,
+            store_text=self.store_text and traced != "[redacted]",
+        )
+        self.traces.record_step(
+            run_id,
+            "memory_decision",
+            status="completed",
+            duration_ms=0,
+            output={"memory_event": prelude.memory_event},
+        )
+        answer = prelude.final_answer or ""
+        self.traces.finish_run(
+            run_id,
+            status="completed",
+            outcome="answered",
+            answer=answer if self.store_text and traced != "[redacted]" else None,
+        )
+        return AgentResult(
+            run_id=run_id,
+            answer=answer,
+            outcome="answered",
+            conversation_id=prelude.conversation_id,
+            memory_event=prelude.memory_event,
+        )
+
+    def _run_graph(self, question: str, labels: dict[str, Any] | None) -> AgentResult:
         run_id = uuid.uuid4().hex
         self.traces.start_run(
             run_id,

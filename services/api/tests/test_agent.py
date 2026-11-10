@@ -84,7 +84,9 @@ def test_agent_query_returns_answer_outcome_and_run_id(
 
     assert response.status_code == 200, response.text
     body = response.json()
-    assert set(body) == {"answer", "outcome", "run_id", "sources"}
+    assert set(body) == {"answer", "outcome", "run_id", "sources", "conversation_id", "memory_event"}
+    assert body["memory_event"] == "none"
+    assert body["conversation_id"]
     assert body["answer"] == "Bring a valid ID and the insurance card.\nSource: new-patient-checklist"
     assert body["outcome"] == "answered"
     assert body["sources"] == ["knowledge_base"]
@@ -169,6 +171,40 @@ def test_agent_query_unexpected_node_error_returns_500_without_internals(
     run_id = detail.rsplit(" ", 1)[-1]
     run = runner.traces.get_run(run_id)
     assert (run["status"], run["failed_node"], run["error_type"]) == ("failed", "generate_answer", "RuntimeError")
+
+
+def test_agent_query_keeps_a_conversation_and_refuses_patient_memory(
+    client: TestClient, auth_headers: dict, use_stub
+) -> None:
+    stub = StubRag([CHUNK])
+    runner = use_stub(stub)
+
+    echoed = client.post(
+        "/agent/query",
+        headers=auth_headers,
+        json={"question": "What should a new patient bring?", "conversation_id": "desk-1"},
+    )
+    assert echoed.status_code == 200
+    assert echoed.json()["conversation_id"] == "desk-1"
+    assert echoed.json()["memory_event"] == "none"
+
+    blocked = client.post(
+        "/agent/query",
+        headers=auth_headers,
+        json={
+            "question": "Patient Johnson cancelled tomorrow's appointment, note that down.",
+            "conversation_id": "desk-phi",
+        },
+    )
+    assert blocked.status_code == 200, blocked.text
+    assert blocked.json()["memory_event"] == "phi_blocked"
+    assert blocked.json()["conversation_id"] == "desk-phi"
+    assert "Johnson" not in blocked.text
+    assert stub.retrieve_calls == ["What should a new patient bring?"]
+    audit = runner.memory.store.list_audit("desk-phi")
+    assert audit[-1].event == "phi_blocked"
+    assert "Johnson" not in audit[-1].proposal_text
+    assert "Johnson" not in audit[-1].originating_message
 
 
 def test_router_has_no_retrieval_or_generation_logic() -> None:

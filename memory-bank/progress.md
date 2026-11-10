@@ -1,9 +1,16 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-11-06  
-**Latest stamped plan:** [HC-MS7-PLAN-115](./plans/HC-MS7-PLAN-115-20261106-mcp-server-eval-save.md) (`implemented`, MS7, docs)  
-**Prior completed stamp:** [HC-MS7-PLAN-114](./plans/HC-MS7-PLAN-114-20261106-gitignore-secrets.md) (`implemented`, MS7, implementation)  
+**Last updated:** 2026-11-09  
+**Latest stamped plan:** [HC-MS8-PLAN-118](./plans/HC-MS8-PLAN-118-20261109-agent-memory-eval-save.md) (`implemented`, MS8, docs)  
+**Prior completed stamp:** [HC-MS8-PLAN-117](./plans/HC-MS8-PLAN-117-20261109-agent-memory.md) (`implemented`, MS8, implementation)  
+**Prior plan:** [HC-MS8-PLAN-116](./plans/HC-MS8-PLAN-116-20261109-agent-memory-plan.md) (`planned`, MS8, planning)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-11-09)
+
+**Agent memory eval save (PLAN-118):** Human approved. Official rubric **11/11 Pass**: [Results/AgentMemory-20261109.md](./evaluations/Results/AgentMemory-20261109.md). Does not close MS8. The human commits.
+
+**Agent memory (PLAN-116 plan, PLAN-117 implementation):** The coordinator agent can propose one operational fact, wait for a classified yes / no / edit, and store only what was approved. The store is SQLite `agent_memory.sqlite`, not Qdrant `healthcore_knowledge` and not the Celery Redis broker. Patient information is refused before it is shown, stored, or sent to the model. Pytest memory + graph + tools **79 passed**. Agent API + recorded evals **111 passed, 10 skipped**. Does not close MS8.
 
 ## Today’s update (2026-11-06)
 
@@ -159,6 +166,7 @@
 
 | Area | Status |
 |------|--------|
+| Coordinator desk memory | **Implemented** (PLAN-116–117) — episodic SQLite beside the same graph; PHI refused; eval → [Results/AgentMemory-20261109.md](./evaluations/Results/AgentMemory-20261109.md) (**11/11 Pass**). Does not close MS8. |
 | Coordinator knowledge agent (LangGraph) | **Implemented** (PLAN-104–105; external tools PLAN-109) — `services/knowledge_agent`, `POST /agent/query`, ticket and inventory tools, trace evals 101 passed / 10 skipped (live trace, PLAN-109); Part 1 eval → [Results/LangGraphAgent-20261104.md](./evaluations/Results/LangGraphAgent-20261104.md) (**11/11 Pass**); Part 2 eval → [Results/LangGraphExternalTools-20261104.md](./evaluations/Results/LangGraphExternalTools-20261104.md) (**9/9 Pass**). Does not close MS7. |
 | Coordinator knowledge base (RAG) | **Implemented** (PLAN-101–102) — Qdrant `healthcore_knowledge`, `/knowledge` UI, Recall@3 100%; eval → [Results/RAGKnowledgeBase-20261102.md](./evaluations/Results/RAGKnowledgeBase-20261102.md) (**17/17 Pass**). Does not close MS7. |
 | Monthly revenue forecast | **Implemented** (PLAN-093–095) — Random Forest on official `healthcore_sales.csv`; eval → [Results/SalesForecast-20261026.md](./evaluations/Results/SalesForecast-20261026.md) (**9/9 Pass**). Does not close MS6. |

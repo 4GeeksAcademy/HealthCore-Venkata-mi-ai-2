@@ -36,6 +36,7 @@ def get_agent_runner() -> Any:
 
 class AgentQuery(BaseModel):
     question: str = Field(max_length=4000)
+    conversation_id: str | None = Field(default=None, max_length=64)
 
 
 class AgentAnswer(BaseModel):
@@ -43,6 +44,8 @@ class AgentAnswer(BaseModel):
     outcome: str
     run_id: str
     sources: list[str]
+    conversation_id: str
+    memory_event: str
 
 
 @router.post("/query", response_model=AgentAnswer)
@@ -53,7 +56,11 @@ def post_agent_query(
 ) -> AgentAnswer:
     agent = _agent_package()
     try:
-        result = runner.run(body.question)
+        result = runner.run(
+            body.question,
+            conversation_id=body.conversation_id,
+            actor_id=f"staff:{_user['id']}",
+        )
     except agent.AgentRunFailed as exc:
         logger.error("Agent run %s failed at %s (%s)", exc.run_id, exc.node, exc.error_type)
         if exc.service_unavailable:
@@ -71,5 +78,10 @@ def post_agent_query(
     if result.outcome == "invalid_question":
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=result.answer)
     return AgentAnswer(
-        answer=result.answer, outcome=result.outcome, run_id=result.run_id, sources=list(result.sources)
+        answer=result.answer,
+        outcome=result.outcome,
+        run_id=result.run_id,
+        sources=list(result.sources),
+        conversation_id=result.conversation_id,
+        memory_event=result.memory_event,
     )

@@ -239,6 +239,12 @@ Format per line:
 
 115 | HC-MS7-PLAN-115 | MS7 | 2026-11-06 | Save MCP Server Rubric Evaluation | implemented | docs | [HC-MS7-PLAN-115-20261106-mcp-server-eval-save.md](./HC-MS7-PLAN-115-20261106-mcp-server-eval-save.md)
 
+116 | HC-MS8-PLAN-116 | MS8 | 2026-11-09 | Agent Memory and Self-Improvement Part 1 Plan | planned | planning | [HC-MS8-PLAN-116-20261109-agent-memory-plan.md](./HC-MS8-PLAN-116-20261109-agent-memory-plan.md)
+
+117 | HC-MS8-PLAN-117 | MS8 | 2026-11-09 | Agent Memory and Self-Improvement Part 1 Implementation | implemented | implementation | [HC-MS8-PLAN-117-20261109-agent-memory.md](./HC-MS8-PLAN-117-20261109-agent-memory.md)
+
+118 | HC-MS8-PLAN-118 | MS8 | 2026-11-09 | Save Agent Memory Rubric Evaluation | implemented | docs | [HC-MS8-PLAN-118-20261109-agent-memory-eval-save.md](./HC-MS8-PLAN-118-20261109-agent-memory-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

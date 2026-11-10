@@ -212,4 +212,5 @@ uv run pytest tests/pipelines/test_agent_tools.py tests/pipelines/test_agent_gra
 ## Known limits
 
 - Checkpoints hold full state, including the question, because resume needs it. They stay in the local gitignored `.state/` folder.
-- There is no retention job for `.state/` yet.
+- There is no retention job for the trace `.state/` files yet. Desk memory has its own expiry; see [agent-memory.md](./agent-memory.md).
+
