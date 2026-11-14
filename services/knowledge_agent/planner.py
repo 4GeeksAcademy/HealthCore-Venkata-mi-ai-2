@@ -30,16 +30,23 @@ _TICKET_ID_RES = (
     re.compile(r"\b(?:ticket|incident|case)\s*(?:number|no\.?|id)?\s*#?\s*(\d{1,6})\b", re.IGNORECASE),
 )
 _TICKET_WORD_RE = re.compile(r"\b(?:tickets?|incidents?)\b", re.IGNORECASE)
-_STATUS_RE = re.compile(r"\b(open|closed|discarded)\b", re.IGNORECASE)
+_STATUS_RE = re.compile(r"\b(open|in[_\s-]?progress|resolved|discarded|closed)\b", re.IGNORECASE)
 _CATEGORY_RES: tuple[tuple[re.Pattern[str], str], ...] = (
-    (re.compile(r"\bappointments?\b", re.IGNORECASE), "APPOINTMENT"),
-    (re.compile(r"\bbilling\b", re.IGNORECASE), "BILLING"),
-    (re.compile(r"\bclinical\b", re.IGNORECASE), "CLINICAL"),
-    (re.compile(r"\bfacilit(?:y|ies)\b", re.IGNORECASE), "FACILITIES"),
-    (re.compile(r"\bIT\b"), "IT"),
-    (re.compile(r"\bworkforce\b", re.IGNORECASE), "WORKFORCE"),
+    (re.compile(r"\b(?:appointment|patient experience|accessibility)\b", re.IGNORECASE), "patient_experience"),
+    (re.compile(r"\bbilling\b", re.IGNORECASE), "billing_error"),
+    (re.compile(r"\b(?:clinical equipment|equipment)\b", re.IGNORECASE), "clinical_equipment"),
+    (re.compile(r"\b(?:IT|system|ehr|portal)\b", re.IGNORECASE), "it_system"),
+    (re.compile(r"\b(?:staff|workforce)\b", re.IGNORECASE), "staff_issue"),
+    (re.compile(r"\bfacilit(?:y|ies)\b", re.IGNORECASE), "facility_issue"),
+    (re.compile(r"\breferral\b", re.IGNORECASE), "referral_issue"),
+    (re.compile(r"\bcompliance\b", re.IGNORECASE), "compliance_breach"),
 )
-_CLINIC_RE = re.compile(r"\b((?:us|uk)-[a-z]{2,3}-\d{3})\b", re.IGNORECASE)
+_BRANCH_RE = re.compile(
+    r"\b(central|austin_north|dallas_uptown|houston_med_center|san_antonio_west|"
+    r"miami_brickell|miami_doral|orlando_east|tampa_bay|atlanta_midtown|savannah|"
+    r"london_city|london_west|manchester_central)\b",
+    re.IGNORECASE,
+)
 
 _STOCK_RE = re.compile(
     r"\b(?:in stock|out of stock|stock (?:of|for|levels?)|inventory|run(?:ning)? out of|how many .{1,60}? left)\b",
@@ -61,13 +68,13 @@ _POLICY_RE = re.compile(
 PLANNER_PROMPT = """You route questions from HealthCore patient coordinators to data sources.
 
 Sources:
-- "ticket": the live incident manager. Use it for the status, category, or clinic of a support ticket / incident (ids look like INC-0042 or "ticket 482"), or to count or list tickets filtered by status (open, closed, discarded), category (APPOINTMENT, BILLING, CLINICAL, FACILITIES, IT, WORKFORCE), or clinic id (e.g. us-tx-001).
+- "ticket": the live incident manager. Use it for the status, category, or branch of a support ticket / incident (ids look like INC-0042, a UUID, or "ticket 482"), or to count or list tickets filtered by status (open, in_progress, resolved, discarded), category (billing_error, patient_experience, …), or branch (e.g. houston_med_center).
 - "inventory": the live inventory manager. Use it for current stock of a clinic supply product.
 - "knowledge_base": HealthCore policies and procedures (fees, cancellations, no-shows, insurance accepted, new-patient documents, referral escalation). Use it for anything that is not live ticket or stock data, and when unsure.
 
 A question may need more than one source. Reply with JSON only, no prose:
 {"sources": ["ticket" | "inventory" | "knowledge_base", ...],
- "ticket": {"ticket_id": "INC-0042" or null, "status": null, "category": null, "clinic_id": null} or null,
+ "ticket": {"ticket_id": "INC-0042" or null, "status": null, "category": null, "branch": null} or null,
  "inventory": {"product_query": "product name as written"} or null,
  "knowledge_question": "the policy part of the question as a standalone question" or null}
 Only copy a ticket id that is written in the question. Never invent one.
@@ -82,16 +89,25 @@ def extract_ticket_id(text: str) -> str | None:
     return None
 
 
+def _normalize_status(raw: str) -> str:
+    value = raw.strip().lower().replace(" ", "_").replace("-", "_")
+    if value == "closed":
+        return "resolved"
+    if value == "inprogress":
+        return "in_progress"
+    return value
+
+
 def _ticket_filters(question: str) -> dict[str, Any]:
     filters: dict[str, Any] = {}
     if status := _STATUS_RE.search(question):
-        filters["status"] = status.group(1).lower()
+        filters["status"] = _normalize_status(status.group(1))
     for pattern, category in _CATEGORY_RES:
         if pattern.search(question):
             filters["category"] = category
             break
-    if clinic := _CLINIC_RE.search(question):
-        filters["clinic_id"] = clinic.group(1).lower()
+    if branch := _BRANCH_RE.search(question):
+        filters["branch"] = branch.group(1).lower()
     return filters
 
 
@@ -161,7 +177,7 @@ class _TicketRequest(BaseModel):
     ticket_id: str | None = None
     status: str | None = None
     category: str | None = None
-    clinic_id: str | None = None
+    branch: str | None = None
 
 
 class _InventoryRequest(BaseModel):
@@ -205,9 +221,9 @@ def plan_from_llm_reply(question: str, reply: str) -> SourcePlan:
             ticket_input = {
                 key: value
                 for key, value in {
-                    "status": (requested.status or "").lower() or None,
-                    "category": (requested.category or "").upper() or None,
-                    "clinic_id": (requested.clinic_id or "").lower() or None,
+                    "status": _normalize_status(requested.status) if requested.status else None,
+                    "category": (requested.category or "").lower() or None,
+                    "branch": (requested.branch or "").lower() or None,
                 }.items()
                 if value
             }

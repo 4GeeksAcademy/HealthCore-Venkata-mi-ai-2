@@ -1,24 +1,25 @@
-"""Incident analysis and read-only incident lookup HTTP routes."""
+"""Centralized incident manager and CSV analysis HTTP routes."""
 
 from __future__ import annotations
-
-from pathlib import PurePath
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 
 from app import incidents_store
-from app.deps.auth import get_current_user
 from app.core.errors import StorageError
-from app.incident_analysis import AnalysisError, analyze_rows, parse_csv_rows, valid_rows, validate_row
+from app.deps.auth import get_current_user
+from app.incident_analysis import AnalysisError, analyze_rows, parse_csv_rows
 from app.models.incidents import (
     IncidentAnalyzeResponse,
+    IncidentBranch,
     IncidentCategory,
     IncidentCreate,
     IncidentListResponse,
+    IncidentOrigin,
     IncidentRecord,
     IncidentStatus,
     IncidentStatusUpdate,
+    IncidentSummaryResponse,
 )
 from app.result_store import store
 
@@ -40,11 +41,16 @@ def _analysis_detail(exc: AnalysisError) -> str:
     return "Could not analyze this file. Check the CSV format and try again."
 
 
+def _field_error(field: str, message: str) -> HTTPException:
+    return HTTPException(status_code=400, detail={"field": field, "message": message})
+
+
 @router.post("/analyze", response_model=IncidentAnalyzeResponse)
 async def analyze_incidents(
     file: UploadFile = File(...),
     _: dict = Depends(get_current_user),
 ) -> IncidentAnalyzeResponse:
+    """CSV metrics only — does not write to the incident manager store."""
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded.")
 
@@ -80,31 +86,67 @@ async def analyze_incidents(
 
     result = analyze_rows(rows)
     store.save(result)
-    incidents_store.upsert_incidents(valid_rows(rows), source_file=PurePath(file.filename).name[:120])
     return IncidentAnalyzeResponse.model_validate(result.to_dict())
 
 
 @router.post("", response_model=IncidentRecord, status_code=201)
 def create_incident(body: IncidentCreate, _: dict = Depends(get_current_user)) -> IncidentRecord:
-    """Create one incident. Status changes later go through ``PATCH /{id}/status`` only."""
-    row = {
-        "incident_id": body.incident_id.strip(),
-        "clinic_id": body.clinic_id.strip(),
-        "country": body.country.strip(),
-        "patient_id": body.patient_id.strip(),
-        "category": body.category,
-        "status": body.status,
-        "satisfaction_score": "" if body.satisfaction_score is None else str(body.satisfaction_score),
-    }
-    problems = validate_row(row)
-    if problems:
-        raise HTTPException(status_code=400, detail=f"Incident was not accepted: {', '.join(problems)}.")
+    title = body.title.strip()
+    description = body.description.strip()
+    if not title:
+        raise _field_error("title", "Please enter a title for this incident.")
+    if not description:
+        raise _field_error("description", "Please enter a description for this incident.")
+    if body.status not in {"open", "in_progress"}:
+        raise _field_error(
+            "status",
+            "New incidents must start as open or in_progress.",
+        )
     try:
-        return incidents_store.create_incident(row, source_file="api")
-    except incidents_store.IncidentExistsError:
-        raise HTTPException(status_code=409, detail="An incident with this ID already exists.")
+        return incidents_store.create_incident(
+            title=title,
+            description=description,
+            category=body.category,
+            status=body.status,
+            origin=body.origin,
+            branch=body.branch,
+        )
+    except ValueError as exc:
+        field = str(exc)
+        raise _field_error(field, f"The {field} value is not allowed.") from exc
     except StorageError:
         raise HTTPException(status_code=500, detail="Unable to save this incident. Try again.")
+
+
+@router.get("/summary", response_model=IncidentSummaryResponse)
+def incident_summary(_: dict = Depends(get_current_user)) -> IncidentSummaryResponse:
+    try:
+        data = incidents_store.summarize_incidents()
+    except StorageError:
+        raise HTTPException(status_code=500, detail="Unable to load incident summary. Try again.")
+    return IncidentSummaryResponse.model_validate(data)
+
+
+@router.get("", response_model=IncidentListResponse)
+def list_incidents(
+    status: IncidentStatus | None = None,
+    origin: IncidentOrigin | None = None,
+    branch: IncidentBranch | None = None,
+    category: IncidentCategory | None = None,
+    limit: int = Query(default=200, ge=1, le=500),
+    _: dict = Depends(get_current_user),
+) -> IncidentListResponse:
+    try:
+        total, items = incidents_store.list_incidents(
+            status=status,
+            origin=origin,
+            branch=branch,
+            category=category,
+            limit=limit,
+        )
+    except StorageError:
+        raise HTTPException(status_code=500, detail="Unable to load incidents. Try again.")
+    return IncidentListResponse(total=total, items=items)
 
 
 @router.patch("/{incident_id}/status", response_model=IncidentRecord)
@@ -113,29 +155,16 @@ def update_incident_status(
     body: IncidentStatusUpdate,
     _: dict = Depends(get_current_user),
 ) -> IncidentRecord:
-    """Lifecycle update. This route changes status only — there is no generic incident PATCH."""
     try:
-        record = incidents_store.update_incident_status(incident_id, body.status)
+        return incidents_store.update_incident_status(incident_id.strip(), body.status)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Incident not found.")
+    except incidents_store.InvalidTransitionError as exc:
+        raise _field_error("status", exc.message) from exc
+    except ValueError:
+        raise _field_error("status", "That status value is not allowed.")
     except StorageError:
         raise HTTPException(status_code=500, detail="Unable to update this incident. Try again.")
-    if record is None:
-        raise HTTPException(status_code=404, detail="Incident not found.")
-    return record
-
-
-@router.get("", response_model=IncidentListResponse)
-def list_incidents(
-    status: IncidentStatus | None = None,
-    category: IncidentCategory | None = None,
-    clinic_id: str | None = Query(default=None, max_length=40),
-    country: str | None = Query(default=None, max_length=4),
-    limit: int = Query(default=50, ge=1, le=200),
-    _: dict = Depends(get_current_user),
-) -> IncidentListResponse:
-    total, items = incidents_store.list_incidents(
-        status=status, category=category, clinic_id=clinic_id, country=country, limit=limit
-    )
-    return IncidentListResponse(total=total, items=items)
 
 
 @router.get(
@@ -144,7 +173,7 @@ def list_incidents(
     responses={200: {"content": {"text/csv": {}}}},
 )
 async def export_results(_: dict = Depends(get_current_user)) -> Response:
-    """CSV download — documented exception: no JSON response_model."""
+    """CSV download of the last analysis — metrics only."""
     csv_body = store.get_csv()
     if csv_body is None:
         raise HTTPException(
@@ -162,7 +191,10 @@ async def export_results(_: dict = Depends(get_current_user)) -> Response:
 
 @router.get("/{incident_id}", response_model=IncidentRecord)
 def get_incident(incident_id: str, _: dict = Depends(get_current_user)) -> IncidentRecord:
-    record = incidents_store.get_incident(incident_id.strip().upper())
+    try:
+        record = incidents_store.get_incident(incident_id.strip())
+    except StorageError:
+        raise HTTPException(status_code=500, detail="Unable to load this incident. Try again.")
     if record is None:
         raise HTTPException(status_code=404, detail="Incident not found.")
     return record

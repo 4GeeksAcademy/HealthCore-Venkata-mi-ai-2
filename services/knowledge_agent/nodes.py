@@ -204,8 +204,9 @@ def _render_ticket(output: dict[str, Any], request: dict[str, Any]) -> str:
     if request.get("ticket_id"):
         t = tickets[0]
         return (
-            f"Ticket {t['incident_id']} is {t['status']}. Category: {t['category']}. "
-            f"Clinic: {t['clinic_id']} ({t['country']}). Last updated: {t['updated_at']}.\n"
+            f"Ticket {t['id']} is {t['status']}. Category: {t['category']}. "
+            f"Branch: {t['branch']}. Title: {t.get('title') or '(none)'}. "
+            f"Last updated: {t['updated_at']}.\n"
             "Source: HealthCore incident manager (live)"
         )
     described = " ".join(
@@ -213,10 +214,10 @@ def _render_ticket(output: dict[str, Any], request: dict[str, Any]) -> str:
         for part in (request.get("status"), request.get("category"), "incident" if output["total"] == 1 else "incidents")
         if part
     )
-    where = f" at {request['clinic_id']}" if request.get("clinic_id") else ""
+    where = f" at {request['branch']}" if request.get("branch") else ""
     lines = [f"The incident manager has {output['total']} {described}{where}."]
     if tickets:
-        shown = "; ".join(f"{t['incident_id']} ({t['status']}, {t['category']}, {t['clinic_id']})" for t in tickets)
+        shown = "; ".join(f"{t['id']} ({t['status']}, {t['category']}, {t['branch']})" for t in tickets)
         prefix = "First " + str(len(tickets)) if len(tickets) < output["total"] else "They are"
         lines.append(f"{prefix}: {shown}.")
     lines.append("Source: HealthCore incident manager (live)")

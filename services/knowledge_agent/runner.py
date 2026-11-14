@@ -137,7 +137,7 @@ def _summarize_tool_call(result: dict[str, Any], *, store_text: bool) -> dict[st
         call["input"] = result["input"]
         call["total"] = output.get("total", 0)
         call["tickets"] = [
-            {"incident_id": t["incident_id"], "status": t["status"], "category": t["category"]}
+            {"id": t["id"], "status": t["status"], "category": t["category"], "branch": t.get("branch")}
             for t in output.get("tickets", [])
         ]
     else:

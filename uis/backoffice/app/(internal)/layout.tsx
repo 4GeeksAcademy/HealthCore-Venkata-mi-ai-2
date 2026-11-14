@@ -37,7 +37,7 @@ export default function InternalLayout({
                 Operations
               </Link>
               <Link href="/incidents" prefetch={false}>
-                Incident analysis
+                Incidents
               </Link>
               <Link href="/suppliers" prefetch={false}>
                 Suppliers

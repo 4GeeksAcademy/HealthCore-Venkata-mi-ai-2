@@ -73,3 +73,5 @@ MCPServer (20261106) | MCP server for incidents and inventory (OAuth, agent clie
 AgentMemory (20261109) | Agent memory and self-improvement, part 1 (proposal, confirmation, consolidation) | 2026-11-09 | complete | 11/11 Pass | [Results/AgentMemory-20261109.md](./Results/AgentMemory-20261109.md)
 
 HarnessGuardrails (20261113) | Agent harness and guardrails, part 2 (input/output/security, PHI-on-output, summary) | 2026-11-13 | complete | 9/9 Pass | [Results/HarnessGuardrails-20261113.md](./Results/HarnessGuardrails-20261113.md)
+
+CentralizedIncidentManager (20261113) | Centralized incident manager (model, seed, CRUD, summary, backoffice) | 2026-11-13 | complete | 22/22 Pass | [Results/CentralizedIncidentManager-20261113.md](./Results/CentralizedIncidentManager-20261113.md)

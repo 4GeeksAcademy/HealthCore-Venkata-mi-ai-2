@@ -26,18 +26,48 @@ from .errors import (
 
 audit_log = logging.getLogger("healthcore.mcp.audit")
 
-INCIDENT_ID = re.compile(r"^INC-\d{4,6}$")
-STATUSES = frozenset({"open", "closed", "discarded"})
-CATEGORIES = frozenset({"APPOINTMENT", "BILLING", "CLINICAL", "FACILITIES", "IT", "WORKFORCE"})
+STATUSES = frozenset({"open", "in_progress", "resolved", "discarded"})
+ORIGINS = frozenset({"customer", "branch", "internal"})
+CATEGORIES = frozenset(
+    {
+        "clinical_equipment",
+        "it_system",
+        "billing_error",
+        "compliance_breach",
+        "patient_experience",
+        "staff_issue",
+        "facility_issue",
+        "referral_issue",
+        "other",
+    }
+)
+BRANCHES = frozenset(
+    {
+        "central",
+        "austin_north",
+        "dallas_uptown",
+        "houston_med_center",
+        "san_antonio_west",
+        "miami_brickell",
+        "miami_doral",
+        "orlando_east",
+        "tampa_bay",
+        "atlanta_midtown",
+        "savannah",
+        "london_city",
+        "london_west",
+        "manchester_central",
+    }
+)
 INCIDENT_FIELDS = (
-    "incident_id",
-    "clinic_id",
-    "country",
+    "id",
+    "title",
+    "description",
     "category",
     "status",
-    "satisfaction_score",
-    "source_file",
-    "first_recorded_at",
+    "origin",
+    "branch",
+    "created_at",
     "updated_at",
 )
 WRITE_OPERATIONS = frozenset({"create", "update", "delete", "adjust_stock"})
@@ -51,27 +81,24 @@ TOOL_SCOPES = {
 
 CREATE_DESCRIPTION = (
     "Create one Incidents Manager ticket. Requires scope incidents:write. "
-    "Calls POST /api/incidents on the HealthCore API. Fields match that API: "
-    "incident_id (INC- plus 4 to 6 digits), clinic_id, country (US or UK), "
-    "patient_id (stored by the incident manager and never returned or logged), "
-    "category (APPOINTMENT, BILLING, CLINICAL, FACILITIES, IT, WORKFORCE), "
-    "status (open, closed, discarded), and optional satisfaction_score. "
-    "Does not change an existing ticket. A duplicate id returns code incident_conflict. "
-    "Status changes are not done here; use incident_update_status."
+    "Calls POST /api/incidents on the HealthCore API. Fields: title, description, "
+    "category (manager snake_case values such as billing_error or patient_experience), "
+    "origin (customer, branch, internal), branch (clinic branch slug including central), "
+    "and optional status (open or in_progress). The API generates id and timestamps. "
+    "Do not send patient identifiers. Status changes later use incident_update_status."
 )
 UPDATE_DESCRIPTION = (
     "Change only the status of an existing Incidents Manager ticket. Requires scope "
     "incidents:write. Calls PATCH /api/incidents/{id}/status with a body of {status} "
-    "and nothing else. status is open, closed, or discarded. This tool will not edit "
-    "clinic, category, or any other field, and it will not call a generic PATCH on "
-    "the incident. Unknown ids return code incident_not_found."
+    "and nothing else. Lifecycle: open→in_progress|discarded; in_progress→resolved|discarded; "
+    "resolved and discarded are final. Unknown ids return code incident_not_found."
 )
 CHECK_DESCRIPTION = (
     "Read Incidents Manager tickets. Requires scope incidents:read. "
     "Calls GET /api/incidents/{id} when ticket_id is set, otherwise GET /api/incidents "
-    "with optional filters status, category, clinic_id, country, and limit (1-50). "
+    "with optional filters status, category, origin, branch, and limit (1-50). "
     "Provide a ticket_id or at least one filter. This tool never creates or updates. "
-    "Responses omit patient_id. Unknown ids return code incident_not_found."
+    "Responses never include patient identifiers. Unknown ids return code incident_not_found."
 )
 INVENTORY_DESCRIPTION = (
     "Read clinic inventory stock. Requires scope inventory:read. "
@@ -126,48 +153,50 @@ def register_tools(mcp: Any, api: HealthCoreApi, auth_info) -> None:
 
     @mcp.tool(name="incident_create", description=CREATE_DESCRIPTION)
     def incident_create(
-        incident_id: str = Field(description="Incident id, for example INC-0042."),
-        clinic_id: str = Field(description="Clinic id, for example us-tx-001."),
-        country: str = Field(description="US or UK."),
-        patient_id: str = Field(description="Stored by the incident manager. Never returned or logged."),
-        category: str = Field(description="APPOINTMENT, BILLING, CLINICAL, FACILITIES, IT, or WORKFORCE."),
-        status: str = Field(description="open, closed, or discarded."),
-        satisfaction_score: float | None = Field(default=None, description="Optional closed-ticket score."),
+        title: str = Field(description="Short incident title."),
+        description: str = Field(description="Detailed description. Do not include patient identifiers."),
+        category: str = Field(description="Manager category, for example billing_error."),
+        origin: str = Field(description="customer, branch, or internal."),
+        branch: str = Field(description="Branch slug, for example houston_med_center or central."),
+        status: str = Field(default="open", description="open or in_progress for new tickets."),
     ) -> dict[str, Any]:
         if (block := denied("incident_create")) is not None:
             return block
-        problems = _incident_fields(incident_id, clinic_id, country, category, status, patient_id=patient_id)
+        problems = _incident_fields(title, description, category, origin, branch, status)
         if problems:
             return finish("incident_create", ToolResult(ok=False, code=VALIDATION_ERROR, message=problems))
         payload = {
-            "incident_id": incident_id.strip().upper(),
-            "clinic_id": clinic_id.strip(),
-            "country": country.strip().upper(),
-            "patient_id": patient_id.strip(),
-            "category": category.strip().upper(),
+            "title": title.strip(),
+            "description": description.strip(),
+            "category": category.strip().lower(),
+            "origin": origin.strip().lower(),
+            "branch": branch.strip().lower(),
             "status": status.strip().lower(),
-            "satisfaction_score": satisfaction_score,
         }
         return finish("incident_create", _incident_call(api, "POST", "/api/incidents", json=payload))
 
     @mcp.tool(name="incident_update_status", description=UPDATE_DESCRIPTION)
     def incident_update_status(
-        incident_id: str = Field(description="Incident id, for example INC-0042."),
-        status: str = Field(description="New status: open, closed, or discarded. No other field is sent."),
+        incident_id: str = Field(description="Incident id returned by the manager."),
+        status: str = Field(description="New lifecycle status."),
     ) -> dict[str, Any]:
         if (block := denied("incident_update_status")) is not None:
             return block
-        if not INCIDENT_ID.match(incident_id.strip().upper()):
+        if len(incident_id.strip()) < 8:
             return finish(
                 "incident_update_status",
-                ToolResult(ok=False, code=VALIDATION_ERROR, message="incident_id must look like INC-0042."),
+                ToolResult(ok=False, code=VALIDATION_ERROR, message="incident_id is required."),
             )
         if status.strip().lower() not in STATUSES:
             return finish(
                 "incident_update_status",
-                ToolResult(ok=False, code=VALIDATION_ERROR, message="status must be open, closed, or discarded."),
+                ToolResult(
+                    ok=False,
+                    code=VALIDATION_ERROR,
+                    message="status must be open, in_progress, resolved, or discarded.",
+                ),
             )
-        path = f"/api/incidents/{incident_id.strip().upper()}/status"
+        path = f"/api/incidents/{incident_id.strip()}/status"
         return finish(
             "incident_update_status",
             _incident_call(api, "PATCH", path, json={"status": status.strip().lower()}),
@@ -175,24 +204,24 @@ def register_tools(mcp: Any, api: HealthCoreApi, auth_info) -> None:
 
     @mcp.tool(name="incident_check_status", description=CHECK_DESCRIPTION)
     def incident_check_status(
-        ticket_id: str | None = Field(default=None, description="One incident id, for example INC-0042."),
-        status: str | None = Field(default=None, description="Filter: open, closed, or discarded."),
-        category: str | None = Field(default=None, description="Filter: one of the six incident categories."),
-        clinic_id: str | None = Field(default=None, description="Filter: clinic id."),
-        country: str | None = Field(default=None, description="Filter: US or UK."),
+        ticket_id: str | None = Field(default=None, description="One incident id."),
+        status: str | None = Field(default=None, description="Filter: open, in_progress, resolved, or discarded."),
+        category: str | None = Field(default=None, description="Filter: manager category slug."),
+        origin: str | None = Field(default=None, description="Filter: customer, branch, or internal."),
+        branch: str | None = Field(default=None, description="Filter: branch slug."),
         limit: int = Field(default=10, description="How many rows to return when listing. 1 to 50."),
     ) -> dict[str, Any]:
         if (block := denied("incident_check_status")) is not None:
             return block
         if ticket_id:
-            if not INCIDENT_ID.match(ticket_id.strip().upper()):
+            if len(ticket_id.strip()) < 8:
                 return finish(
                     "incident_check_status",
-                    ToolResult(ok=False, code=VALIDATION_ERROR, message="ticket_id must look like INC-0042."),
+                    ToolResult(ok=False, code=VALIDATION_ERROR, message="ticket_id is required."),
                 )
-            path = f"/api/incidents/{ticket_id.strip().upper()}"
+            path = f"/api/incidents/{ticket_id.strip()}"
             return finish("incident_check_status", _incident_call(api, "GET", path))
-        if not any((status, category, clinic_id, country)):
+        if not any((status, category, origin, branch)):
             return finish(
                 "incident_check_status",
                 ToolResult(ok=False, code=VALIDATION_ERROR, message="Provide a ticket_id or at least one filter."),
@@ -200,12 +229,26 @@ def register_tools(mcp: Any, api: HealthCoreApi, auth_info) -> None:
         if status and status.strip().lower() not in STATUSES:
             return finish(
                 "incident_check_status",
-                ToolResult(ok=False, code=VALIDATION_ERROR, message="status must be open, closed, or discarded."),
+                ToolResult(
+                    ok=False,
+                    code=VALIDATION_ERROR,
+                    message="status must be open, in_progress, resolved, or discarded.",
+                ),
             )
-        if category and category.strip().upper() not in CATEGORIES:
+        if category and category.strip().lower() not in CATEGORIES:
             return finish(
                 "incident_check_status",
-                ToolResult(ok=False, code=VALIDATION_ERROR, message="category is not one of the six incident categories."),
+                ToolResult(ok=False, code=VALIDATION_ERROR, message="category is not a valid manager category."),
+            )
+        if origin and origin.strip().lower() not in ORIGINS:
+            return finish(
+                "incident_check_status",
+                ToolResult(ok=False, code=VALIDATION_ERROR, message="origin must be customer, branch, or internal."),
+            )
+        if branch and branch.strip().lower() not in BRANCHES:
+            return finish(
+                "incident_check_status",
+                ToolResult(ok=False, code=VALIDATION_ERROR, message="branch is not a valid HealthCore branch."),
             )
         if not 1 <= limit <= 50:
             return finish(
@@ -216,9 +259,9 @@ def register_tools(mcp: Any, api: HealthCoreApi, auth_info) -> None:
             key: value
             for key, value in (
                 ("status", status.strip().lower() if status else None),
-                ("category", category.strip().upper() if category else None),
-                ("clinic_id", clinic_id.strip() if clinic_id else None),
-                ("country", country.strip().upper() if country else None),
+                ("category", category.strip().lower() if category else None),
+                ("origin", origin.strip().lower() if origin else None),
+                ("branch", branch.strip().lower() if branch else None),
                 ("limit", limit),
             )
             if value is not None
@@ -279,26 +322,25 @@ def register_tools(mcp: Any, api: HealthCoreApi, auth_info) -> None:
 
 
 def _incident_fields(
-    incident_id: str,
-    clinic_id: str,
-    country: str,
+    title: str,
+    description: str,
     category: str,
+    origin: str,
+    branch: str,
     status: str,
-    *,
-    patient_id: str,
 ) -> str:
-    if not INCIDENT_ID.match(incident_id.strip().upper()):
-        return "incident_id must look like INC-0042."
-    if not clinic_id.strip():
-        return "clinic_id is required."
-    if country.strip().upper() not in {"US", "UK"}:
-        return "country must be US or UK."
-    if not patient_id.strip():
-        return "patient_id is required by the incident manager."
-    if category.strip().upper() not in CATEGORIES:
-        return "category is not one of the six incident categories."
-    if status.strip().lower() not in STATUSES:
-        return "status must be open, closed, or discarded."
+    if not title.strip():
+        return "title is required."
+    if not description.strip():
+        return "description is required."
+    if category.strip().lower() not in CATEGORIES:
+        return "category is not a valid manager category."
+    if origin.strip().lower() not in ORIGINS:
+        return "origin must be customer, branch, or internal."
+    if branch.strip().lower() not in BRANCHES:
+        return "branch is not a valid HealthCore branch."
+    if status.strip().lower() not in {"open", "in_progress"}:
+        return "status must be open or in_progress for new tickets."
     return ""
 
 

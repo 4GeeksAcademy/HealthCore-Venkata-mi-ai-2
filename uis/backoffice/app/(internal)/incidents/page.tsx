@@ -1,20 +1,34 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import { IncidentNav } from "@/components/incidents/IncidentNav";
 
 export const metadata: Metadata = {
-  title: "Incident analysis",
+  title: "Incidents",
 };
 
-const IncidentAnalyzerPanel = dynamic(
+const IncidentListPanel = dynamic(
   () =>
-    import("@/components/incidents/IncidentAnalyzerPanel").then(
-      (mod) => mod.IncidentAnalyzerPanel,
+    import("@/components/incidents/IncidentListPanel").then(
+      (mod) => mod.IncidentListPanel,
     ),
   {
     loading: () => (
       <p className="muted-text" role="status">
-        Loading incident analyzer…
+        Loading incident list…
+      </p>
+    ),
+  },
+);
+
+const IncidentSummaryPanel = dynamic(
+  () =>
+    import("@/components/incidents/IncidentSummaryPanel").then(
+      (mod) => mod.IncidentSummaryPanel,
+    ),
+  {
+    loading: () => (
+      <p className="muted-text" role="status">
+        Loading summary…
       </p>
     ),
   },
@@ -26,20 +40,21 @@ export default function IncidentsPage() {
       <div className="page-frame">
         <section className="page-header">
           <p className="eyebrow">HealthCore Digital · Incidents</p>
-          <h1>Incident file analyzer</h1>
+          <h1>Incident manager</h1>
           <p>
-            Upload clinic incident CSVs to validate records, review category and
-            status breakdowns, and export metric results. Logic matches{" "}
-            <code>docs/Project_Contexts/IncidentFileAnalyzer.md</code>.
+            Track clinic and customer incidents across the network. Register new
+            reports, update lifecycle status, and review leadership summary
+            totals.
           </p>
-          <div className="inline-actions">
-            <Link className="link-button secondary" href="/">
-              Back to welcome
-            </Link>
-          </div>
+          <IncidentNav current="/incidents" />
         </section>
 
-        <IncidentAnalyzerPanel />
+        <section className="section-card">
+          <h2>Summary</h2>
+          <IncidentSummaryPanel />
+        </section>
+
+        <IncidentListPanel />
       </div>
     </main>
   );

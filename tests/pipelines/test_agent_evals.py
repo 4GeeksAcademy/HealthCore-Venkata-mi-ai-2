@@ -202,9 +202,10 @@ def test_answer_states_exactly_what_the_tool_returned(case: dict[str, Any]) -> N
     if call["tool"] == "ticket_lookup":
         assert call["tickets"], "tool returned no tickets"
         for ticket in call["tickets"]:
-            assert ticket["incident_id"] in answer
+            ticket_id = ticket.get("id") or ticket.get("incident_id")
+            assert ticket_id in answer
             if len(call["tickets"]) == 1 and call["total"] == 1:
-                assert f"Ticket {ticket['incident_id']} is {ticket['status']}" in answer
+                assert f"Ticket {ticket_id} is {ticket['status']}" in answer
         if call["total"] > 1:
             assert f"has {call['total']} " in answer
     else:

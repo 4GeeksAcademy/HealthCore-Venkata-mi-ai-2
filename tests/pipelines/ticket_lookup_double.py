@@ -41,7 +41,7 @@ class TicketLookupTool:
                 for key, value in (
                     ("status", request.status),
                     ("category", request.category),
-                    ("clinic_id", request.clinic_id),
+                    ("branch", request.branch),
                     ("limit", request.limit),
                 )
                 if value is not None

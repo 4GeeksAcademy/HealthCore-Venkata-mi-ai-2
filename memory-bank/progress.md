@@ -1,12 +1,16 @@
 # HealthCore — Progress
 
 **Last updated:** 2026-11-13  
-**Latest stamped plan:** [HC-MS8-PLAN-121](./plans/HC-MS8-PLAN-121-20261113-agent-guardrails-eval-save.md) (`implemented`, MS8, docs)  
-**Prior completed stamp:** [HC-MS8-PLAN-120](./plans/HC-MS8-PLAN-120-20261113-agent-guardrails.md) (`implemented`, MS8, implementation)  
-**Prior plan:** [HC-MS8-PLAN-119](./plans/HC-MS8-PLAN-119-20261113-agent-guardrails-plan.md) (`planned`, MS8, planning)  
+**Latest stamped plan:** [HC-MS5-PLAN-124](./plans/HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md) (`implemented`, MS5, docs)  
+**Prior completed stamp:** [HC-MS5-PLAN-123](./plans/HC-MS5-PLAN-123-20261113-centralized-incident-manager-impl.md) (`implemented`, MS5, implementation)  
+**Prior plan stamp:** [HC-MS5-PLAN-122](./plans/HC-MS5-PLAN-122-20261113-centralized-incident-manager-plan.md) (`planned`, MS5, planning)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
 
 ## Today’s update (2026-11-13)
+
+**Centralized Incident Manager eval save (PLAN-124):** Human approved. Official rubric **22/22 Pass**: [Results/CentralizedIncidentManager-20261113.md](./evaluations/Results/CentralizedIncidentManager-20261113.md). Does not close MS5. The human commits.
+
+**Centralized Incident Manager (PLAN-122 plan, PLAN-123 implementation):** BRIEFING at [`docs/Project_Contexts/healthcore-incident-manager-BRIEFING.md`](../docs/Project_Contexts/healthcore-incident-manager-BRIEFING.md). Shared package `packages/shared/healthcore_incidents/`, `scripts/seed_incidents.py`, manager API (CRUD + lifecycle + summary), backoffice register/list/summary, MCP/agent adapters. Seed summary matches BRIEFING (94). Pytest incidents **9 passed**; agent tools **45 passed**. Does not close MS5.
 
 **Agent harness eval save (PLAN-121):** Human approved. Official rubric **9/9 Pass**: [Results/HarnessGuardrails-20261113.md](./evaluations/Results/HarnessGuardrails-20261113.md). Does not close MS8. The human commits.
 
@@ -188,7 +192,8 @@
 | Inventory ORM + dual DB | **Implemented first** (PLAN-034–037) — SQLModel/Supabase inventory, TinyDB auth; eval → [Results/InventoryORM-20260911.md](./evaluations/Results/InventoryORM-20260911.md) (**12/12 Pass**) |
 | MS4 evaluation | **complete PASS** |
 | FastAPI architecture proposal | In review (PLAN-006–009) |
-| Incident File Analyzer | **Domain fixed** (PLAN-012) |
+| Incident File Analyzer | **Domain fixed** (PLAN-012); realigned to official syllabus CSV under PLAN-123 |
+| Centralized Incident Manager | **Implemented** (PLAN-122–123) — seed + CRUD + summary + backoffice UI; eval → [Results/CentralizedIncidentManager-20261113.md](./evaluations/Results/CentralizedIncidentManager-20261113.md) (**22/22 Pass**). Does not close MS5. |
 | Supplier Directory | **Domain fixed** (PLAN-016) — `monthly_rate`, `USA`/`UK` + `USD`/`GBP`, 15 seeds (McKesson, Epic); structure from PLAN-015 kept; eval → [Results/SupplierDirectory-20260819.md](./evaluations/Results/SupplierDirectory-20260819.md) |
 | Auth (AUTH-01/02/03) | **Implemented** (PLAN-019, PLAN-020, PLAN-021) — [auth_master_framework_Context.md](../docs/Project_Contexts/auth_master_framework_Context.md). API JWT, protected routes, backoffice auth flows, and password recovery/change are in place. |
 | Error handling skills | **Docs** (PLAN-023) — Cursor skills under `.cursor/skills/error-handling-*` |

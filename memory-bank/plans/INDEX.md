@@ -251,6 +251,12 @@ Format per line:
 
 121 | HC-MS8-PLAN-121 | MS8 | 2026-11-13 | Save Harness and Guardrails Rubric Evaluation | implemented | docs | [HC-MS8-PLAN-121-20261113-agent-guardrails-eval-save.md](./HC-MS8-PLAN-121-20261113-agent-guardrails-eval-save.md)
 
+122 | HC-MS5-PLAN-122 | MS5 | 2026-11-13 | Centralized Incident Manager Plan | planned | planning | [HC-MS5-PLAN-122-20261113-centralized-incident-manager-plan.md](./HC-MS5-PLAN-122-20261113-centralized-incident-manager-plan.md)
+
+123 | HC-MS5-PLAN-123 | MS5 | 2026-11-13 | Centralized Incident Manager Implementation | implemented | implementation | [HC-MS5-PLAN-123-20261113-centralized-incident-manager-impl.md](./HC-MS5-PLAN-123-20261113-centralized-incident-manager-impl.md)
+
+124 | HC-MS5-PLAN-124 | MS5 | 2026-11-13 | Save Centralized Incident Manager Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md](./HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

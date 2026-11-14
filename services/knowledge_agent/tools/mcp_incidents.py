@@ -125,8 +125,8 @@ class McpIncidentLookup:
                 arguments["status"] = request.status
             if request.category:
                 arguments["category"] = request.category
-            if request.clinic_id:
-                arguments["clinic_id"] = request.clinic_id
+            if request.branch:
+                arguments["branch"] = request.branch
             arguments["limit"] = request.limit
         return await tool.ainvoke(arguments)
 

@@ -33,14 +33,14 @@ from services.knowledge_agent.tools.contracts import TicketLookupInput  # noqa: 
 from services.knowledge_agent.tools.mcp_incidents import McpIncidentLookup, mcp_http_client  # noqa: E402
 
 INCIDENT = {
-    "incident_id": "INC-0042",
-    "clinic_id": "us-tx-002",
-    "country": "US",
-    "category": "WORKFORCE",
-    "status": "closed",
-    "satisfaction_score": 4.0,
-    "source_file": "api",
-    "first_recorded_at": "2026-11-06T00:00:00+00:00",
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "title": "Staffing shortage on weekend rota",
+    "description": "Clinic short two coordinators for Saturday clinics.",
+    "category": "staff_issue",
+    "status": "resolved",
+    "origin": "branch",
+    "branch": "austin_north",
+    "created_at": "2026-11-06T00:00:00+00:00",
     "updated_at": "2026-11-06T00:00:00+00:00",
 }
 
@@ -66,15 +66,24 @@ def mcp_server():
             return httpx.Response(200, json={"access_token": "staff-token"})
         if request.method == "POST" and path == "/api/incidents":
             body = json.loads(request.content)
-            created = {**INCIDENT, "incident_id": body["incident_id"], "status": body["status"], "category": body["category"]}
+            created = {
+                **INCIDENT,
+                "id": "11111111-2222-3333-4444-555555555555",
+                "title": body["title"],
+                "description": body["description"],
+                "status": body["status"],
+                "category": body["category"],
+                "origin": body["origin"],
+                "branch": body["branch"],
+            }
             return httpx.Response(201, json=created)
-        if request.method == "PATCH" and path == "/api/incidents/INC-0042/status":
+        if request.method == "PATCH" and path == f"/api/incidents/{INCIDENT['id']}/status":
             body = json.loads(request.content)
             assert list(body) == ["status"]
             return httpx.Response(200, json={**INCIDENT, "status": body["status"]})
-        if request.method == "GET" and path == "/api/incidents/INC-0042":
+        if request.method == "GET" and path == f"/api/incidents/{INCIDENT['id']}":
             return httpx.Response(200, json=INCIDENT)
-        if request.method == "GET" and path == "/api/incidents/INC-4040":
+        if request.method == "GET" and path == "/api/incidents/missing-ticket":
             return httpx.Response(404, json={"detail": "Incident not found."})
         if request.method == "GET" and path == "/api/incidents":
             return httpx.Response(200, json={"total": 1, "items": [INCIDENT]})
@@ -183,7 +192,7 @@ async def _discovery_auth_and_each_tool(mcp_server, caplog) -> None:
             assert "PATCH /api/incidents/{id}/status" in by_name["incident_update_status"].description
             assert "incidents:read" in by_name["incident_check_status"].description
             assert "inventory_write_forbidden" in by_name["inventory_query"].description
-            assert "patient_id" in by_name["incident_create"].description
+            assert "patient" in by_name["incident_create"].description.lower()
             operation = by_name["inventory_query"].inputSchema["properties"]["operation"]
             assert set(operation["enum"]) == {"query", "create", "update", "delete", "adjust_stock"}
 
@@ -191,11 +200,11 @@ async def _discovery_auth_and_each_tool(mcp_server, caplog) -> None:
                 await session.call_tool(
                     "incident_create",
                     {
-                        "incident_id": "INC-8802",
-                        "clinic_id": "us-tx-001",
-                        "country": "US",
-                        "patient_id": "PAT-8802",
-                        "category": "BILLING",
+                        "title": "Billing portal timeout",
+                        "description": "Staff cannot submit claims.",
+                        "category": "billing_error",
+                        "origin": "branch",
+                        "branch": "houston_med_center",
                         "status": "open",
                     },
                 )
@@ -203,11 +212,11 @@ async def _discovery_auth_and_each_tool(mcp_server, caplog) -> None:
             updated = _tool_json(
                 await session.call_tool(
                     "incident_update_status",
-                    {"incident_id": "INC-0042", "status": "closed"},
+                    {"incident_id": INCIDENT["id"], "status": "in_progress"},
                 )
             )
-            checked = _tool_json(await session.call_tool("incident_check_status", {"ticket_id": "INC-0042"}))
-            missing = _tool_json(await session.call_tool("incident_check_status", {"ticket_id": "INC-4040"}))
+            checked = _tool_json(await session.call_tool("incident_check_status", {"ticket_id": INCIDENT["id"]}))
+            missing = _tool_json(await session.call_tool("incident_check_status", {"ticket_id": "missing-ticket"}))
             stock = _tool_json(
                 await session.call_tool("inventory_query", {"operation": "query", "product_query": "nitrile exam gloves"})
             )
@@ -215,25 +224,25 @@ async def _discovery_auth_and_each_tool(mcp_server, caplog) -> None:
             refused = _tool_json(
                 await session.call_tool("inventory_query", {"operation": "delete", "product_query": "nitrile exam gloves"})
             )
-            bad = _tool_json(await session.call_tool("incident_update_status", {"incident_id": "482", "status": "closed"}))
+            bad = _tool_json(await session.call_tool("incident_update_status", {"incident_id": "short", "status": "resolved"}))
 
     assert created["code"] == "ok" and "patient_id" not in created["incident"]
-    assert updated["code"] == "ok" and updated["incident"]["status"] == "closed"
-    assert checked["code"] == "ok" and checked["incident"]["incident_id"] == "INC-0042"
+    assert updated["code"] == "ok" and updated["incident"]["status"] == "in_progress"
+    assert checked["code"] == "ok" and checked["incident"]["id"] == INCIDENT["id"]
     assert missing["code"] == "incident_not_found"
     assert stock["code"] == "ok" and stock["products"][0]["current_stock"] == 12
     assert refused["code"] == "inventory_write_forbidden"
     assert bad["code"] == "validation_error"
     assert len(seen) == before_write
     methods = {(request.method, request.url.path) for request in seen}
-    assert ("PATCH", "/api/incidents/INC-0042/status") in methods
+    assert ("PATCH", f"/api/incidents/{INCIDENT['id']}/status") in methods
     assert ("POST", "/api/incidents") in methods
     assert ("GET", "/inventory/products") in methods
     assert not any(request.method in {"POST", "PUT", "PATCH", "DELETE"} and request.url.path.startswith("/inventory") for request in seen)
     audit = [record.getMessage() for record in caplog.records if record.name == "healthcore.mcp.audit"]
     assert any("tool=incident_check_status" in line and "client=ops" in line and "result=ok" in line for line in audit)
     assert any("result=inventory_write_forbidden" in line for line in audit)
-    assert all("PAT-8802" not in line for line in audit)
+    assert all("PAT-" not in line for line in audit)
 
     stock_token = _token(base, "stock", "stock-secret", "inventory:read")
     forbidden = httpx.post(
@@ -256,13 +265,13 @@ def test_agent_ticket_node_uses_the_mcp_server(mcp_server) -> None:
         client_secret="agent-secret",
         resource=f"{base}{STREAM_PATH}",
     )
-    output = lookup(TicketLookupInput(ticket_id="INC-0042"))
+    output = lookup(TicketLookupInput(ticket_id=INCIDENT["id"]))
 
     assert output.status == "ok"
     assert output.endpoint == "mcp:incident_check_status"
-    assert output.tickets[0].status == "closed"
-    assert output.tickets[0].category == "WORKFORCE"
-    assert any(request.method == "GET" and request.url.path == "/api/incidents/INC-0042" for request in seen[before:])
+    assert output.tickets[0].status == "resolved"
+    assert output.tickets[0].category == "staff_issue"
+    assert any(request.method == "GET" and request.url.path == f"/api/incidents/{INCIDENT['id']}" for request in seen[before:])
     source = inspect.getsource(McpIncidentLookup)
     assert "MultiServerMCPClient" in source
     assert "/api/incidents" not in source

@@ -26,7 +26,7 @@ export default function BackofficeWelcomePage() {
               Open Operations
             </Link>
             <Link className="link-button secondary" href="/incidents" prefetch={false}>
-              Open incident analysis
+              Open incident manager
             </Link>
             <Link className="link-button secondary" href="/suppliers" prefetch={false}>
               Open supplier directory

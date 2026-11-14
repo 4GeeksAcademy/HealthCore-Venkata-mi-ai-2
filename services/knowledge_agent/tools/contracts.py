@@ -21,10 +21,35 @@ ToolStatus = Literal[
     "bad_response",
 ]
 
-IncidentStatus = Literal["open", "closed", "discarded"]
-IncidentCategory = Literal["APPOINTMENT", "BILLING", "CLINICAL", "FACILITIES", "IT", "WORKFORCE"]
-
-TICKET_ID_PATTERN = r"^INC-\d{4,6}$"
+IncidentStatus = Literal["open", "in_progress", "resolved", "discarded"]
+IncidentCategory = Literal[
+    "clinical_equipment",
+    "it_system",
+    "billing_error",
+    "compliance_breach",
+    "patient_experience",
+    "staff_issue",
+    "facility_issue",
+    "referral_issue",
+    "other",
+]
+IncidentOrigin = Literal["customer", "branch", "internal"]
+IncidentBranch = Literal[
+    "central",
+    "austin_north",
+    "dallas_uptown",
+    "houston_med_center",
+    "san_antonio_west",
+    "miami_brickell",
+    "miami_doral",
+    "orlando_east",
+    "tampa_bay",
+    "atlanta_midtown",
+    "savannah",
+    "london_city",
+    "london_west",
+    "manchester_central",
+]
 
 
 class _Contract(BaseModel):
@@ -34,15 +59,15 @@ class _Contract(BaseModel):
 class TicketLookupInput(_Contract):
     """One ticket by id, or a filtered search. At least one of the two."""
 
-    ticket_id: str | None = Field(default=None, pattern=TICKET_ID_PATTERN)
+    ticket_id: str | None = Field(default=None, min_length=8, max_length=80)
     status: IncidentStatus | None = None
     category: IncidentCategory | None = None
-    clinic_id: str | None = Field(default=None, min_length=3, max_length=40)
+    branch: IncidentBranch | None = None
     limit: int = Field(default=5, ge=1, le=10)
 
     @model_validator(mode="after")
     def _id_or_filter(self) -> TicketLookupInput:
-        if self.ticket_id is None and not (self.status or self.category or self.clinic_id):
+        if self.ticket_id is None and not (self.status or self.category or self.branch):
             raise ValueError("a ticket_id or at least one filter is required")
         return self
 
@@ -50,15 +75,15 @@ class TicketLookupInput(_Contract):
 class TicketRecord(_Contract):
     model_config = ConfigDict(extra="ignore", frozen=True)
 
-    incident_id: str
-    clinic_id: str
-    country: str
+    id: str
+    title: str = ""
+    description: str = ""
     category: IncidentCategory
     status: IncidentStatus
-    satisfaction_score: float | None = None
-    source_file: str = ""
-    first_recorded_at: str
-    updated_at: str
+    origin: IncidentOrigin = "customer"
+    branch: IncidentBranch
+    created_at: str = ""
+    updated_at: str = ""
 
 
 class TicketLookupOutput(_Contract):

@@ -45,21 +45,21 @@ from services.knowledge_agent.tools import session as session_module  # noqa: E4
 
 CREDS = ServiceCredentials(base_url="http://api.test", email="agent@healthcore.example", password="pw")
 INC_0042 = {
-    "incident_id": "INC-0042",
-    "clinic_id": "us-tx-002",
-    "country": "US",
-    "category": "WORKFORCE",
-    "status": "closed",
-    "satisfaction_score": 3.5,
-    "source_file": "incidents-healthcore.csv",
-    "first_recorded_at": "2026-11-04T10:00:00+00:00",
+    "id": "INC-0042",
+    "title": "Weekend rota shortfall",
+    "description": "Clinic short two coordinators for Saturday clinics.",
+    "category": "staff_issue",
+    "status": "resolved",
+    "origin": "branch",
+    "branch": "austin_north",
+    "created_at": "2026-11-04T10:00:00+00:00",
     "updated_at": "2026-11-04T10:00:00+00:00",
 }
 PRODUCTS = [
     {"id": 1, "name": "Nitrile exam gloves (box of 100)", "sku": "PPE-GLV-100", "threshold": 20, "current_stock": 12, "category": "ppe"},
     {"id": 2, "name": "Surgical masks (box of 50)", "sku": "PPE-MSK-050", "threshold": 10, "current_stock": 40, "category": "ppe"},
 ]
-STATUS_WORDS = ("is open", "is closed", "is discarded", " in stock,")
+STATUS_WORDS = ("is open", "is closed", "is resolved", "is discarded", "is in_progress", " in stock,")
 
 
 class FakeApi:
@@ -89,7 +89,7 @@ class FakeApi:
         if path.startswith("/api/incidents/"):
             return httpx.Response(404, json={"detail": "Incident not found."})
         if path == "/api/incidents":
-            return httpx.Response(200, json={"total": 6, "items": [INC_0042 | {"status": "open", "category": "BILLING"}] * 5})
+            return httpx.Response(200, json={"total": 6, "items": [INC_0042 | {"status": "open", "category": "billing_error"}] * 5})
         if path == "/inventory/products":
             return httpx.Response(200, json=PRODUCTS)
         return httpx.Response(404, json={"detail": "Not Found"})
@@ -106,7 +106,7 @@ class FakeApi:
 
 def test_ticket_input_needs_an_id_or_a_filter_and_rejects_unknown_fields() -> None:
     assert TicketLookupInput(ticket_id="INC-0042").ticket_id == "INC-0042"
-    assert TicketLookupInput(status="open", category="BILLING").limit == 5
+    assert TicketLookupInput(status="open", category="billing_error").limit == 5
     for bad in ({}, {"ticket_id": "482"}, {"status": "pending"}, {"ticket_id": "INC-0042", "patient_id": "PAT-1"}):
         with pytest.raises(ValidationError):
             TicketLookupInput.model_validate(bad)
@@ -266,13 +266,13 @@ def test_ticket_lookup_returns_typed_records_from_the_service() -> None:
     api = FakeApi()
     one = TicketLookupTool(api.session())(TicketLookupInput(ticket_id="INC-0042"))
     missing = TicketLookupTool(api.session())(TicketLookupInput(ticket_id="INC-0482"))
-    search = TicketLookupTool(api.session())(TicketLookupInput(status="open", category="BILLING"))
+    search = TicketLookupTool(api.session())(TicketLookupInput(status="open", category="billing_error"))
 
-    assert (one.status, one.total, one.tickets[0].status, one.http_status) == ("ok", 1, "closed", 200)
+    assert (one.status, one.total, one.tickets[0].status, one.http_status) == ("ok", 1, "resolved", 200)
     assert one.endpoint == "/api/incidents/INC-0042"
     assert (missing.status, missing.http_status) == ("not_found", 404)
     assert (search.status, search.total, len(search.tickets)) == ("ok", 6, 5)
-    assert search.endpoint == "/api/incidents?status=open&category=BILLING&limit=5"
+    assert search.endpoint == "/api/incidents?status=open&category=billing_error&limit=5"
 
 
 def test_inventory_lookup_matches_by_name_or_sku_and_flags_low_stock() -> None:
@@ -299,7 +299,7 @@ def test_inventory_lookup_matches_by_name_or_sku_and_flags_low_stock() -> None:
         ("What's the status of ticket INC-0042?", ["ticket"], {"ticket_id": "INC-0042"}),
         ("what's the status of ticket 482?", ["ticket"], {"ticket_id": "INC-0482"}),
         ("Can you check incident #63 for me?", ["ticket"], {"ticket_id": "INC-0063"}),
-        ("How many open billing incidents do we have right now?", ["ticket"], {"status": "open", "category": "BILLING"}),
+        ("How many open billing incidents do we have right now?", ["ticket"], {"status": "open", "category": "billing_error"}),
         ("Do we have stock of nitrile exam gloves?", ["inventory"], None),
         ("Do Medicare patients pay a no-show fee?", ["knowledge_base"], None),
         ("Is there a charge for cancelling 12 hours in advance?", ["knowledge_base"], None),
@@ -442,7 +442,9 @@ def test_ticket_question_uses_the_tool_and_not_the_knowledge_base(make_runner) -
     ]
     assert result.sources == ("incident_manager",)
     assert result.outcome == "answered"
-    assert result.answer.startswith("Ticket INC-0042 is closed. Category: WORKFORCE. Clinic: us-tx-002 (US).")
+    assert result.answer.startswith(
+        "Ticket INC-0042 is resolved. Category: staff_issue. Branch: austin_north."
+    )
 
 
 @pytest.mark.parametrize(
@@ -499,7 +501,7 @@ def test_both_sources_run_in_plan_order_and_failure_does_not_stop_the_rag(make_r
         "output_guard",
     ]
     assert both.sources == ("incident_manager", "knowledge_base")
-    assert both.answer.index("Ticket INC-0042 is closed") < both.answer.index(
+    assert both.answer.index("Ticket INC-0042 is resolved") < both.answer.index(
         "From the HealthCore knowledge base:\nLate cancellation is 50 USD."
     )
     assert down.traces.node_sequence(degraded.run_id) == [
