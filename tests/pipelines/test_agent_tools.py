@@ -432,7 +432,14 @@ def test_ticket_question_uses_the_tool_and_not_the_knowledge_base(make_runner) -
     runner = make_runner(FakeApi())
     result = runner.run("What's the status of ticket INC-0042?")
 
-    assert runner.traces.node_sequence(result.run_id) == ["receive_question", "plan_sources", "lookup_ticket", "compose_answer"]
+    assert runner.traces.node_sequence(result.run_id) == [
+        "receive_question",
+        "input_guard",
+        "plan_sources",
+        "lookup_ticket",
+        "compose_answer",
+        "output_guard",
+    ]
     assert result.sources == ("incident_manager",)
     assert result.outcome == "answered"
     assert result.answer.startswith("Ticket INC-0042 is closed. Category: WORKFORCE. Clinic: us-tx-002 (US).")
@@ -447,8 +454,16 @@ def test_every_tool_failure_takes_the_fallback_node_with_an_honest_answer(make_r
     result = runner.run("What's the status of ticket INC-0042?")
     run = runner.traces.get_run(result.run_id)
 
-    assert [s["node"] for s in run["steps"]] == ["receive_question", "plan_sources", "lookup_ticket", "tool_fallback", "compose_answer"]
-    assert run["steps"][3]["output"]["fallback"] == {"tool": "ticket_lookup", "reason": reason}
+    assert [s["node"] for s in run["steps"]] == [
+        "receive_question",
+        "input_guard",
+        "plan_sources",
+        "lookup_ticket",
+        "tool_fallback",
+        "compose_answer",
+        "output_guard",
+    ]
+    assert run["steps"][4]["output"]["fallback"] == {"tool": "ticket_lookup", "reason": reason}
     assert result.outcome == "tool_fallback"
     assert result.answer.startswith("I couldn't confirm ticket INC-0042's status right now")
     assert not any(word in result.answer for word in STATUS_WORDS)
@@ -474,14 +489,29 @@ def test_both_sources_run_in_plan_order_and_failure_does_not_stop_the_rag(make_r
     degraded = down.run(question)
 
     assert ok.traces.node_sequence(both.run_id) == [
-        "receive_question", "plan_sources", "lookup_ticket", "retrieve", "generate_answer", "compose_answer",
+        "receive_question",
+        "input_guard",
+        "plan_sources",
+        "lookup_ticket",
+        "retrieve",
+        "generate_answer",
+        "compose_answer",
+        "output_guard",
     ]
     assert both.sources == ("incident_manager", "knowledge_base")
     assert both.answer.index("Ticket INC-0042 is closed") < both.answer.index(
         "From the HealthCore knowledge base:\nLate cancellation is 50 USD."
     )
     assert down.traces.node_sequence(degraded.run_id) == [
-        "receive_question", "plan_sources", "lookup_ticket", "tool_fallback", "retrieve", "generate_answer", "compose_answer",
+        "receive_question",
+        "input_guard",
+        "plan_sources",
+        "lookup_ticket",
+        "tool_fallback",
+        "retrieve",
+        "generate_answer",
+        "compose_answer",
+        "output_guard",
     ]
     assert degraded.outcome == "tool_fallback" and "50 USD" in degraded.answer
 
@@ -500,7 +530,7 @@ def test_inventory_question_uses_the_inventory_tool_only(make_runner) -> None:
 def test_tool_step_trace_shows_service_method_endpoint_and_latency(make_runner) -> None:
     runner = make_runner(FakeApi())
     result = runner.run("Do we have stock of nitrile exam gloves?")
-    call = runner.traces.get_run(result.run_id)["steps"][2]["output"]["tool_call"]
+    call = runner.traces.get_run(result.run_id)["steps"][3]["output"]["tool_call"]
 
     assert call["tool"] == "inventory_lookup" and call["status"] == "ok"
     assert (call["method"], call["endpoint"], call["http_status"]) == ("GET", "/inventory/products", 200)

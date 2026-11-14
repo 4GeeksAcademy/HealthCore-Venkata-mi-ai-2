@@ -20,8 +20,19 @@ from pydantic import ValidationError  # noqa: E402
 
 from data.pipelines import rag  # noqa: E402
 
+from .guardrails.canned import CASUAL_REDIRECT_SUFFIX  # noqa: E402
+from .guardrails.external import sanitize_external_text  # noqa: E402
+from .guardrails.input import classify_input  # noqa: E402
+from .guardrails.output import validate_output  # noqa: E402
 from .planner import SourcePlanner  # noqa: E402
-from .state import AgentState, FallbackNote, RetrievedChunk, SourcePlan, ToolResult  # noqa: E402
+from .state import (  # noqa: E402
+    AgentState,
+    FallbackNote,
+    GuardEvent,
+    RetrievedChunk,
+    SourcePlan,
+    ToolResult,
+)
 from .tools import (  # noqa: E402
     InventoryLookupInput,
     InventoryLookupOutput,
@@ -82,7 +93,7 @@ def make_retrieve_node(deps: AgentDependencies) -> Callable[[AgentState], AgentS
                 "source_document": str(hit.get("source_document", "")),
                 "chunk_index": int(hit.get("chunk_index", -1)),
                 "section": str(hit.get("section", "")),
-                "text": str(hit.get("text", "")),
+                "text": sanitize_external_text(str(hit.get("text", ""))),
                 "score": float(hit.get("score", 0.0)),
             }
             for hit in hits
@@ -236,11 +247,93 @@ def compose_answer(state: AgentState) -> AgentState:
     if "context" in state and state.get("answer"):
         sections.append(f"From the HealthCore knowledge base:\n{state['answer']}")
     outcome = "tool_fallback" if state.get("fallbacks") else "answered"
-    return {"answer": "\n\n".join(sections), "outcome": outcome}
+    answer = "\n\n".join(sections)
+    if state.get("redirect_required"):
+        answer = f"{answer.rstrip()}{CASUAL_REDIRECT_SUFFIX}"
+    return {"answer": answer, "outcome": outcome}
+
+
+def input_guard(state: AgentState) -> AgentState:
+    """Classify scope / abuse before any planner or tool LLM sees the question."""
+    decision = classify_input(state.get("question") or "")
+    events: list[GuardEvent] = list(state.get("guard_events") or [])
+    if decision.failure_type is not None:
+        events.append(
+            {
+                "layer": "input",
+                "failure_type": decision.failure_type,
+                "action": "block" if decision.action == "block" else "redirect",
+                "rule_id": decision.rule_id,
+                "classification": decision.classification,
+            }
+        )
+        logger.info(
+            "agent input_guard class=%s action=%s rule=%s type=%s",
+            decision.classification,
+            decision.action,
+            decision.rule_id,
+            decision.failure_type,
+        )
+    if decision.action == "block":
+        return {
+            "answer": decision.answer or "",
+            "outcome": "guard_blocked",
+            "redirect_required": False,
+            "guard_events": events,
+        }
+    return {
+        "redirect_required": decision.redirect_required,
+        "guard_events": events,
+    }
+
+
+def output_guard(state: AgentState) -> AgentState:
+    """Validate the composed answer: PHI, instruction leaks, expected shape."""
+    kb_used = bool(state.get("context")) and state.get("outcome") in {"answered", "no_context"}
+    # Tool-only answers still need PHI / leak checks.
+    decision = validate_output(
+        state.get("answer") or "",
+        outcome=state.get("outcome"),
+        kb_used=bool(state.get("context")) and state.get("outcome") == "answered",
+    )
+    events: list[GuardEvent] = list(state.get("guard_events") or [])
+    if decision.failure_type is not None:
+        events.append(
+            {
+                "layer": "output",
+                "failure_type": decision.failure_type,
+                "action": decision.action if decision.action == "block" else "redirect",
+                "rule_id": decision.rule_id,
+                "classification": decision.rule_id,
+            }
+        )
+        logger.info(
+            "agent output_guard action=%s rule=%s type=%s",
+            decision.action,
+            decision.rule_id,
+            decision.failure_type,
+        )
+    if decision.action == "block":
+        return {
+            "answer": decision.answer,
+            "outcome": "guard_blocked",
+            "guard_events": events,
+        }
+    update: AgentState = {"answer": decision.answer, "guard_events": events}
+    if state.get("redirect_required") and CASUAL_REDIRECT_SUFFIX not in decision.answer:
+        # KB-only path may skip compose_answer; attach redirect here.
+        if "tool_results" not in state:
+            update["answer"] = f"{decision.answer.rstrip()}{CASUAL_REDIRECT_SUFFIX}"
+    _ = kb_used  # reserved for future structural tightening
+    return update
 
 
 def route_after_receive(state: AgentState) -> str:
-    return "reject_question" if state.get("outcome") == "invalid_question" else "plan_sources"
+    return "reject_question" if state.get("outcome") == "invalid_question" else "input_guard"
+
+
+def route_after_input_guard(state: AgentState) -> str:
+    return END if state.get("outcome") == "guard_blocked" else "plan_sources"
 
 
 _SOURCE_NODE = {"ticket": ("lookup_ticket", TICKET_TOOL), "inventory": ("lookup_inventory", INVENTORY_TOOL)}
@@ -269,4 +362,4 @@ def route_after_retrieve(state: AgentState) -> str:
 
 
 def route_after_answer(state: AgentState) -> str:
-    return "compose_answer" if state.get("tool_results") else END
+    return "compose_answer" if state.get("tool_results") else "output_guard"

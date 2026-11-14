@@ -245,6 +245,12 @@ Format per line:
 
 118 | HC-MS8-PLAN-118 | MS8 | 2026-11-09 | Save Agent Memory Rubric Evaluation | implemented | docs | [HC-MS8-PLAN-118-20261109-agent-memory-eval-save.md](./HC-MS8-PLAN-118-20261109-agent-memory-eval-save.md)
 
+119 | HC-MS8-PLAN-119 | MS8 | 2026-11-13 | Agent Harness and Guardrails Part 2 Plan | planned | planning | [HC-MS8-PLAN-119-20261113-agent-guardrails-plan.md](./HC-MS8-PLAN-119-20261113-agent-guardrails-plan.md)
+
+120 | HC-MS8-PLAN-120 | MS8 | 2026-11-13 | Agent Harness and Guardrails Part 2 Implementation | implemented | implementation | [HC-MS8-PLAN-120-20261113-agent-guardrails.md](./HC-MS8-PLAN-120-20261113-agent-guardrails.md)
+
+121 | HC-MS8-PLAN-121 | MS8 | 2026-11-13 | Save Harness and Guardrails Rubric Evaluation | implemented | docs | [HC-MS8-PLAN-121-20261113-agent-guardrails-eval-save.md](./HC-MS8-PLAN-121-20261113-agent-guardrails-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

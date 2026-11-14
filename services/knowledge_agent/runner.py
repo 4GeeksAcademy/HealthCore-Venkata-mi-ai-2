@@ -15,6 +15,8 @@ from typing import Any
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from .graph import GRAPH_NAME, GRAPH_VERSION, GraphSpec, compile_agent_graph
+from .guardrails.store import GuardrailStore
+from .memory.phi import redact, phi_scan
 from .memory.store import MemoryStore
 from .memory.turn import (
     UNAVAILABLE,
@@ -104,6 +106,19 @@ def summarize_update(node: str, update: AgentState, *, store_text: bool) -> dict
     if update.get("fallbacks"):
         note = update["fallbacks"][-1]
         summary["fallback"] = {"tool": note["tool"], "reason": note["reason"]}
+    if update.get("guard_events"):
+        summary["guard_events"] = [
+            {
+                "layer": event["layer"],
+                "failure_type": event["failure_type"],
+                "action": event["action"],
+                "rule_id": event["rule_id"],
+                "classification": event["classification"],
+            }
+            for event in update["guard_events"]
+        ]
+    if "redirect_required" in update:
+        summary["redirect_required"] = update["redirect_required"]
     return summary
 
 
@@ -161,6 +176,7 @@ class AgentRunner:
             )
             checkpointer = SqliteSaver(self._checkpoint_conn)
         self.traces = trace_store or TraceStore(directory / "traces.sqlite")
+        self.guardrails = GuardrailStore(directory / "guardrails.sqlite")
         self.memory = memory if memory is not None else MemoryCoordinator(
             MemoryStore(directory / "agent_memory.sqlite")
         )
@@ -170,9 +186,13 @@ class AgentRunner:
 
     def close(self) -> None:
         self.memory.close()
+        self.guardrails.close()
         self.traces.close()
         if self._checkpoint_conn is not None:
             self._checkpoint_conn.close()
+
+    def guardrail_summary(self) -> dict[str, Any]:
+        return self.guardrails.summary()
 
     @staticmethod
     def _config(run_id: str) -> dict[str, Any]:
@@ -312,6 +332,7 @@ class AgentRunner:
                         duration_ms=(now - last) * 1000,
                         output=summarize_update(node, update or {}, store_text=self.store_text),
                     )
+                    self._record_guard_events(run_id, node, update or {})
                 last = now
         except Exception as exc:
             pending = self.graph.get_state(config).next
@@ -344,6 +365,26 @@ class AgentRunner:
             outcome=outcome,
             sources=tuple(self.traces.source_sequence(run_id)),
         )
+
+    def _record_guard_events(self, run_id: str, node: str, update: AgentState) -> None:
+        expected_layer = {"input_guard": "input", "output_guard": "output"}.get(node)
+        if not expected_layer:
+            return
+        for event in update.get("guard_events") or []:
+            if event.get("layer") != expected_layer:
+                continue
+            detail = ""
+            if update.get("answer") and event.get("action") == "block":
+                detail = redact(update["answer"], phi_scan(update["answer"]))
+            self.guardrails.record(
+                run_id=run_id,
+                layer=event["layer"],
+                failure_type=event["failure_type"],
+                action=event["action"],
+                rule_id=event["rule_id"],
+                classification=event.get("classification", ""),
+                detail=detail,
+            )
 
 
 @lru_cache

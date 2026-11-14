@@ -71,3 +71,5 @@ LangGraphExternalTools (20261104) | Coordinator agent external tools (ticket + i
 MCPServer (20261106) | MCP server for incidents and inventory (OAuth, agent client) | 2026-11-06 | recorded | 8 Pass, 1 Not run | [Results/MCPServer-20261106.md](./Results/MCPServer-20261106.md)
 
 AgentMemory (20261109) | Agent memory and self-improvement, part 1 (proposal, confirmation, consolidation) | 2026-11-09 | complete | 11/11 Pass | [Results/AgentMemory-20261109.md](./Results/AgentMemory-20261109.md)
+
+HarnessGuardrails (20261113) | Agent harness and guardrails, part 2 (input/output/security, PHI-on-output, summary) | 2026-11-13 | complete | 9/9 Pass | [Results/HarnessGuardrails-20261113.md](./Results/HarnessGuardrails-20261113.md)

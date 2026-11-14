@@ -48,6 +48,22 @@ class AgentAnswer(BaseModel):
     memory_event: str
 
 
+class GuardrailSummary(BaseModel):
+    total: int
+    by_failure_type: dict[str, int]
+    by_action: dict[str, int]
+    by_rule: dict[str, int]
+
+
+@router.get("/guardrails/summary", response_model=GuardrailSummary)
+def get_guardrail_summary(
+    _user: dict = Depends(get_current_user),
+    runner: Any = Depends(get_agent_runner),
+) -> GuardrailSummary:
+    """How many times each harness guardrail blocked or redirected in this session DB."""
+    return GuardrailSummary(**runner.guardrail_summary())
+
+
 @router.post("/query", response_model=AgentAnswer)
 def post_agent_query(
     body: AgentQuery,

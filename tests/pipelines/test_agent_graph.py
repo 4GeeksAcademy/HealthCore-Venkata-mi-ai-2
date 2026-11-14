@@ -102,6 +102,7 @@ def test_default_graph_compiles_with_conditional_edges() -> None:
     assert set(drawn.nodes) == {
         "__start__",
         "receive_question",
+        "input_guard",
         "plan_sources",
         "lookup_ticket",
         "lookup_inventory",
@@ -110,13 +111,16 @@ def test_default_graph_compiles_with_conditional_edges() -> None:
         "generate_answer",
         "no_context_answer",
         "compose_answer",
+        "output_guard",
         "reject_question",
         "__end__",
     }
     conditional = {(e.source, e.target) for e in drawn.edges if e.conditional}
     assert conditional == {
-        ("receive_question", "plan_sources"),
+        ("receive_question", "input_guard"),
         ("receive_question", "reject_question"),
+        ("input_guard", "plan_sources"),
+        ("input_guard", "__end__"),
         ("plan_sources", "lookup_ticket"),
         ("plan_sources", "lookup_inventory"),
         ("plan_sources", "retrieve"),
@@ -133,9 +137,9 @@ def test_default_graph_compiles_with_conditional_edges() -> None:
         ("retrieve", "generate_answer"),
         ("retrieve", "no_context_answer"),
         ("generate_answer", "compose_answer"),
-        ("generate_answer", "__end__"),
+        ("generate_answer", "output_guard"),
         ("no_context_answer", "compose_answer"),
-        ("no_context_answer", "__end__"),
+        ("no_context_answer", "output_guard"),
     }
 
 
@@ -150,7 +154,8 @@ def test_orphan_node_fails_compilation() -> None:
 def test_node_without_path_to_end_fails_compilation() -> None:
     spec = default_spec(StubRag([]).deps())
     spec = replace(spec, edges=tuple(e for e in spec.edges if e[0] != "reject_question"))
-    assert spec.edges == (("compose_answer", END),)
+    assert ("reject_question", END) not in spec.edges
+    assert ("output_guard", END) in spec.edges
 
     with pytest.raises(AgentGraphBuildError, match="no path to END: \\['reject_question'\\]"):
         compile_agent_graph(spec)
@@ -217,9 +222,11 @@ def test_generation_receives_exactly_the_retrieved_context(make_runner) -> None:
     assert context == [{k: CHUNK[k] for k in ("source_document", "chunk_index", "section", "text", "score")}]
     assert runner.traces.node_sequence(result.run_id) == [
         "receive_question",
+        "input_guard",
         "plan_sources",
         "retrieve",
         "generate_answer",
+        "output_guard",
     ]
     assert result.sources == ("knowledge_base",)
 
@@ -235,9 +242,11 @@ def test_empty_context_routes_to_honest_answer_without_generation(make_runner) -
     assert stub.generate_calls == []
     assert runner.traces.node_sequence(result.run_id) == [
         "receive_question",
+        "input_guard",
         "plan_sources",
         "retrieve",
         "no_context_answer",
+        "output_guard",
     ]
 
 
@@ -264,16 +273,20 @@ def test_checkpoint_after_every_transition(make_runner) -> None:
     result = runner.run("cancel fee?")
     checkpoints = runner.checkpoints(result.run_id)
 
-    assert [c["step"] for c in checkpoints] == [-1, 0, 1, 2, 3, 4]
+    assert [c["step"] for c in checkpoints] == [-1, 0, 1, 2, 3, 4, 5, 6]
     assert [c["next"] for c in checkpoints] == [
         ["__start__"],
         ["receive_question"],
+        ["input_guard"],
         ["plan_sources"],
         ["retrieve"],
         ["generate_answer"],
+        ["output_guard"],
         [],
     ]
-    assert checkpoints[4]["state_keys"] == ["context", "plan", "question"]
+    assert "context" in checkpoints[5]["state_keys"]
+    assert "plan" in checkpoints[5]["state_keys"]
+    assert "question" in checkpoints[5]["state_keys"]
 
 
 def test_failed_run_resumes_from_checkpoint_without_retrieving_again(make_runner) -> None:
@@ -304,10 +317,12 @@ def test_failed_run_resumes_from_checkpoint_without_retrieving_again(make_runner
     assert run["status"] == "completed"
     assert [(s["node"], s["status"]) for s in run["steps"]] == [
         ("receive_question", "completed"),
+        ("input_guard", "completed"),
         ("plan_sources", "completed"),
         ("retrieve", "completed"),
         ("generate_answer", "failed"),
         ("generate_answer", "completed"),
+        ("output_guard", "completed"),
     ]
 
 
@@ -327,13 +342,13 @@ def test_trace_is_queryable_from_disk_after_the_run(tmp_path: Path) -> None:
 
     assert run["labels"] == {"case_id": "probe"}
     assert run["outcome"] == "answered"
-    assert run["steps"][1]["output"]["sources"] == ["knowledge_base"]
-    retrieve_step = run["steps"][2]
+    assert run["steps"][2]["output"]["sources"] == ["knowledge_base"]
+    retrieve_step = run["steps"][3]
     assert retrieve_step["node"] == "retrieve"
     assert retrieve_step["output"]["hits"] == [
         {"source_document": "appointment-policy", "chunk_index": 1, "section": "Cancellation policy", "score": 0.64}
     ]
-    assert run["steps"][3]["output"]["source_line"] == "Source: appointment-policy"
+    assert run["steps"][4]["output"]["source_line"] == "Source: appointment-policy"
     assert run["sources_used"] == ["knowledge_base"]
 
 
@@ -360,4 +375,7 @@ def test_list_runs_filters_by_outcome(make_runner) -> None:
 
 
 def test_graph_end_constant_is_the_terminal_target() -> None:
-    assert all(target == END for _source, target in default_spec(StubRag([]).deps()).edges)
+    edges = default_spec(StubRag([]).deps()).edges
+    assert ("output_guard", END) in edges
+    assert ("reject_question", END) in edges
+    assert ("compose_answer", "output_guard") in edges

@@ -19,15 +19,18 @@ from langgraph.graph import END, START, StateGraph
 from .nodes import (
     AgentDependencies,
     compose_answer,
+    input_guard,
     make_generate_node,
     make_inventory_node,
     make_plan_node,
     make_retrieve_node,
     make_ticket_node,
     no_context_answer,
+    output_guard,
     receive_question,
     reject_question,
     route_after_answer,
+    route_after_input_guard,
     route_after_receive,
     route_after_retrieve,
     route_after_tool,
@@ -37,7 +40,7 @@ from .nodes import (
 from .state import STATE_KEYS, AgentState
 
 GRAPH_NAME = "healthcore_knowledge_agent"
-GRAPH_VERSION = "knowledge-agent/2"
+GRAPH_VERSION = "knowledge-agent/3"
 
 
 class AgentGraphBuildError(RuntimeError):
@@ -76,6 +79,11 @@ def default_spec(deps: AgentDependencies | None = None) -> GraphSpec:
         entry="receive_question",
         nodes=(
             NodeSpec("receive_question", receive_question, frozenset({"question", "outcome"})),
+            NodeSpec(
+                "input_guard",
+                input_guard,
+                frozenset({"answer", "outcome", "redirect_required", "guard_events"}),
+            ),
             NodeSpec("plan_sources", make_plan_node(deps), frozenset({"plan"})),
             NodeSpec("lookup_ticket", make_ticket_node(deps), frozenset({"tool_results"})),
             NodeSpec("lookup_inventory", make_inventory_node(deps), frozenset({"tool_results"})),
@@ -84,10 +92,16 @@ def default_spec(deps: AgentDependencies | None = None) -> GraphSpec:
             NodeSpec("generate_answer", make_generate_node(deps), frozenset({"answer", "outcome"})),
             NodeSpec("no_context_answer", no_context_answer, frozenset({"answer", "outcome"})),
             NodeSpec("compose_answer", compose_answer, frozenset({"answer", "outcome"})),
+            NodeSpec(
+                "output_guard",
+                output_guard,
+                frozenset({"answer", "outcome", "guard_events"}),
+            ),
             NodeSpec("reject_question", reject_question, frozenset({"answer", "outcome"})),
         ),
         routes=(
-            RouteSpec("receive_question", route_after_receive, ("plan_sources", "reject_question")),
+            RouteSpec("receive_question", route_after_receive, ("input_guard", "reject_question")),
+            RouteSpec("input_guard", route_after_input_guard, ("plan_sources", END)),
             RouteSpec("plan_sources", route_next_source, ("lookup_ticket", "lookup_inventory", "retrieve")),
             RouteSpec(
                 "lookup_ticket",
@@ -97,11 +111,12 @@ def default_spec(deps: AgentDependencies | None = None) -> GraphSpec:
             RouteSpec("lookup_inventory", route_after_tool, ("tool_fallback", "retrieve", "compose_answer")),
             RouteSpec("tool_fallback", route_next_source, ("lookup_inventory", "retrieve", "compose_answer")),
             RouteSpec("retrieve", route_after_retrieve, ("generate_answer", "no_context_answer")),
-            RouteSpec("generate_answer", route_after_answer, ("compose_answer", END)),
-            RouteSpec("no_context_answer", route_after_answer, ("compose_answer", END)),
+            RouteSpec("generate_answer", route_after_answer, ("compose_answer", "output_guard")),
+            RouteSpec("no_context_answer", route_after_answer, ("compose_answer", "output_guard")),
         ),
         edges=(
-            ("compose_answer", END),
+            ("compose_answer", "output_guard"),
+            ("output_guard", END),
             ("reject_question", END),
         ),
     )

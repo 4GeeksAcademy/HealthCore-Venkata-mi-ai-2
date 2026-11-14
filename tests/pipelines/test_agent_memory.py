@@ -94,7 +94,7 @@ def _runner(tmp_path: Path, name: str, clock: dict | None = None) -> tuple[Agent
 
 
 def test_graph_version_stays_on_the_tool_agent() -> None:
-    assert GRAPH_VERSION == "knowledge-agent/2"
+    assert GRAPH_VERSION == "knowledge-agent/3"
 
 
 def test_memory_package_does_not_touch_the_knowledge_collection() -> None:

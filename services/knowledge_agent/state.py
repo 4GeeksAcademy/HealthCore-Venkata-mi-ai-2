@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from typing import Any, Literal, TypedDict, get_type_hints
 
-Outcome = Literal["answered", "no_context", "invalid_question", "tool_fallback"]
+Outcome = Literal[
+    "answered",
+    "no_context",
+    "invalid_question",
+    "tool_fallback",
+    "guard_blocked",
+]
 SourceName = Literal["ticket", "inventory", "knowledge_base"]
 PlannerName = Literal["llm", "rules", "rules_fallback"]
 
@@ -46,6 +52,14 @@ class FallbackNote(TypedDict):
     message: str
 
 
+class GuardEvent(TypedDict):
+    layer: str
+    failure_type: str
+    action: str
+    rule_id: str
+    classification: str
+
+
 class AgentState(TypedDict, total=False):
     question: str
     plan: SourcePlan
@@ -54,6 +68,8 @@ class AgentState(TypedDict, total=False):
     context: list[RetrievedChunk]
     answer: str
     outcome: Outcome
+    redirect_required: bool
+    guard_events: list[GuardEvent]
 
 
 STATE_KEYS: frozenset[str] = frozenset(get_type_hints(AgentState))

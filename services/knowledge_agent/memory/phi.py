@@ -35,6 +35,16 @@ _NAME_ALLOW = frozenset(
     }
 )
 
+# Age + named person + clinic (or age + diagnosis + clinic) can re-identify.
+_QUASI_ID = re.compile(
+    r"\b(?:patient|i have)\b.{0,80}\b(?:\d{1,3})\b.{0,80}\b(?:diagnos|clinic|austin|manchester|london)\b",
+    re.IGNORECASE | re.DOTALL,
+)
+_NAMED_AGE_CLINIC = re.compile(
+    r"\b([A-Z][a-z]{2,})\b(?:\s*,\s*|\s+)\d{1,3}\b.{0,60}\b(?:clinic|diagnos)",
+    re.DOTALL,
+)
+
 _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("mrn", re.compile(r"\b(?:mrn|medical record(?: number)?)\b", re.IGNORECASE)),
     ("dob", re.compile(r"\b(?:d\.?o\.?b\.?|date of birth)\b", re.IGNORECASE)),
@@ -64,12 +74,15 @@ class PhiScan:
 def phi_scan(text: str) -> PhiScan:
     """Return which forbidden classes appear. The matched text is discarded."""
     found: list[str] = []
-    name = _PATIENT_NAME.search(text or "")
+    body = text or ""
+    name = _PATIENT_NAME.search(body)
     if name and name.group(1) not in _NAME_ALLOW:
         found.append("patient_name")
     for rule_id, pattern in _RULES:
-        if pattern.search(text or ""):
+        if pattern.search(body):
             found.append(rule_id)
+    if _QUASI_ID.search(body) or _NAMED_AGE_CLINIC.search(body):
+        found.append("quasi_identifier")
     return PhiScan(hit=bool(found), rules=tuple(found))
 
 
