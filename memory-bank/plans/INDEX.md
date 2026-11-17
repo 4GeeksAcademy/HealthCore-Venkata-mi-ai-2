@@ -257,6 +257,12 @@ Format per line:
 
 124 | HC-MS5-PLAN-124 | MS5 | 2026-11-13 | Save Centralized Incident Manager Rubric Evaluation | implemented | docs | [HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md](./HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md)
 
+125 | HC-MS9-PLAN-125 | MS9 | 2026-11-16 | Agentic RFP Intake and Routing Plan | planned | planning | [HC-MS9-PLAN-125-20261116-rfp-intake-plan.md](./HC-MS9-PLAN-125-20261116-rfp-intake-plan.md)
+
+126 | HC-MS9-PLAN-126 | MS9 | 2026-11-16 | Agentic RFP Intake and Routing Implementation | implemented | implementation | [HC-MS9-PLAN-126-20261116-rfp-intake-impl.md](./HC-MS9-PLAN-126-20261116-rfp-intake-impl.md)
+
+127 | HC-MS9-PLAN-127 | MS9 | 2026-11-16 | Save Agentic RFP Intake Rubric Evaluation | implemented | docs | [HC-MS9-PLAN-127-20261116-rfp-intake-eval-save.md](./HC-MS9-PLAN-127-20261116-rfp-intake-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

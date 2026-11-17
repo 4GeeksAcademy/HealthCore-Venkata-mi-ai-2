@@ -23,6 +23,8 @@ from app.routers.incidents import router as incidents_router
 from app.routers.inventory import router as inventory_router
 from app.routers.knowledge import router as knowledge_router
 from app.routers.profiles import router as profiles_router
+from app.routers.rfp import init_rfp_storage
+from app.routers.rfp import router as rfp_router
 from app.routers.suppliers import router as suppliers_router
 from app.routers.tasks import router as tasks_router
 from app.routers.telemetry import router as telemetry_router
@@ -56,6 +58,7 @@ async def lifespan(_app: FastAPI):
             "reporting schema init skipped",
             exc_info=True,
         )
+    init_rfp_storage()
     yield
 
 
@@ -87,6 +90,7 @@ app.include_router(reporting_router)
 app.include_router(tasks_router)
 app.include_router(knowledge_router)
 app.include_router(agent_router)
+app.include_router(rfp_router)
 
 
 @app.middleware("http")

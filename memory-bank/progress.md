@@ -1,10 +1,16 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-11-13  
-**Latest stamped plan:** [HC-MS5-PLAN-124](./plans/HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md) (`implemented`, MS5, docs)  
-**Prior completed stamp:** [HC-MS5-PLAN-123](./plans/HC-MS5-PLAN-123-20261113-centralized-incident-manager-impl.md) (`implemented`, MS5, implementation)  
-**Prior plan stamp:** [HC-MS5-PLAN-122](./plans/HC-MS5-PLAN-122-20261113-centralized-incident-manager-plan.md) (`planned`, MS5, planning)  
+**Last updated:** 2026-11-16  
+**Latest stamped plan:** [HC-MS9-PLAN-127](./plans/HC-MS9-PLAN-127-20261116-rfp-intake-eval-save.md) (`implemented`, MS9, docs)  
+**Prior plan stamp:** [HC-MS9-PLAN-126](./plans/HC-MS9-PLAN-126-20261116-rfp-intake-impl.md) (`implemented`, MS9, implementation)  
+**Prior completed stamp:** [HC-MS5-PLAN-124](./plans/HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md) (`implemented`, MS5, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-11-16)
+
+**RFP intake eval save (PLAN-127):** Human approved. Official rubric **12/12 Pass**: [Results/RfpIntake-20261116.md](./evaluations/Results/RfpIntake-20261116.md). Does not close MS9. The human commits.
+
+**RFP intake (PLAN-125 plan, PLAN-126 implementation):** Revenue Cycle can upload an institutional PDF in the backoffice. The existing API stores it, returns 202, and a dedicated `rfp_intake` graph classifies it and splits notes across revenue, clinical, and compliance. Results stay in SQLModel for Supabase. Pipeline pytest **18 passed**. API pytest **4 passed**. This session had no model key and no Supabase URL, so a live upload ended `failed` / `classifier_unavailable` rather than `intake_complete`. Human approved the rubric under PLAN-127. Does not close MS9.
 
 ## Today’s update (2026-11-13)
 
@@ -178,6 +184,7 @@
 
 | Area | Status |
 |------|--------|
+| RFP intake (Part 1) | **Implemented** (PLAN-125–126) — `/rfp` upload, dedicated `rfp_intake` graph, SQLModel tickets; eval → [Results/RfpIntake-20261116.md](./evaluations/Results/RfpIntake-20261116.md) (**12/12 Pass**). Does not close MS9. |
 | Coordinator desk memory | **Implemented** (PLAN-116–117) — episodic SQLite beside the same graph; PHI refused; eval → [Results/AgentMemory-20261109.md](./evaluations/Results/AgentMemory-20261109.md) (**11/11 Pass**). Does not close MS8. |
 | Agent harness / guardrails | **Implemented** (PLAN-119–120) — input/output/external guards, PHI-on-output, summary endpoint; `knowledge-agent/3`; eval → [Results/HarnessGuardrails-20261113.md](./evaluations/Results/HarnessGuardrails-20261113.md) (**9/9 Pass**). Does not close MS8. |
 | Coordinator knowledge agent (LangGraph) | **Implemented** (PLAN-104–105; external tools PLAN-109) — `services/knowledge_agent`, `POST /agent/query`, ticket and inventory tools, trace evals 101 passed / 10 skipped (live trace, PLAN-109); Part 1 eval → [Results/LangGraphAgent-20261104.md](./evaluations/Results/LangGraphAgent-20261104.md) (**11/11 Pass**); Part 2 eval → [Results/LangGraphExternalTools-20261104.md](./evaluations/Results/LangGraphExternalTools-20261104.md) (**9/9 Pass**). Does not close MS7. |

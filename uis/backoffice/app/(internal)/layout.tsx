@@ -57,6 +57,9 @@ export default function InternalLayout({
               <Link href="/hiring" prefetch={false}>
                 Hiring tracker
               </Link>
+              <Link href="/rfp" prefetch={false}>
+                RFP intake
+              </Link>
             </nav>
             <SessionActions />
           </div>

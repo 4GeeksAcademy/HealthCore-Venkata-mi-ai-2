@@ -36,6 +36,10 @@ data/eval/monthly_clinic_supply_*.json
 data/process/.qdrant/
 services/knowledge_agent/.state/
 
+# RFP intake runtime artifacts (uploaded PDFs). Markdown is not written to disk.
+data/raw/rfp/
+data/process/nltk_data/
+
 # Python bytecode and local uv env
 **/__pycache__/
 *.pyc

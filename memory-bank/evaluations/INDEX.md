@@ -75,3 +75,5 @@ AgentMemory (20261109) | Agent memory and self-improvement, part 1 (proposal, co
 HarnessGuardrails (20261113) | Agent harness and guardrails, part 2 (input/output/security, PHI-on-output, summary) | 2026-11-13 | complete | 9/9 Pass | [Results/HarnessGuardrails-20261113.md](./Results/HarnessGuardrails-20261113.md)
 
 CentralizedIncidentManager (20261113) | Centralized incident manager (model, seed, CRUD, summary, backoffice) | 2026-11-13 | complete | 22/22 Pass | [Results/CentralizedIncidentManager-20261113.md](./Results/CentralizedIncidentManager-20261113.md)
+
+RfpIntake (20261116) | Agentic RFP intake and routing, part 1 (upload, classify, department split) | 2026-11-16 | complete | 12/12 Pass | [Results/RfpIntake-20261116.md](./Results/RfpIntake-20261116.md)

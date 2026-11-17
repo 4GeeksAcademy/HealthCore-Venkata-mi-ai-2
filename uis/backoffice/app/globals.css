@@ -677,3 +677,43 @@ textarea {
     color: var(--foreground);
   }
 }
+
+.rfp-status {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  background: var(--surface-muted, #eef2f4);
+}
+
+.rfp-status-analyzing {
+  background: #e8eef8;
+}
+
+.rfp-status-intake_complete {
+  background: #e5f4ea;
+}
+
+.rfp-status-discarded {
+  background: #f8efe4;
+}
+
+.rfp-status-failed {
+  background: #f8e6e6;
+}
+
+.rfp-banner {
+  border: 1px solid #c9a227;
+  background: #fff8e8;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.rfp-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rfp-list button {
+  text-align: left;
+}
