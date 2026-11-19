@@ -104,3 +104,60 @@ def test_reprocess_queues_a_failed_ticket(
     detail = client.get(f"/rfp/tickets/{ticket_id}", headers=auth_headers)
     assert detail.json()["status"] == "analyzing"
     assert detail.json()["pipeline_error_code"] in {None, ""}
+
+
+def test_draft_returns_202_for_an_intake_complete_ticket(
+    client: TestClient, auth_headers: dict, rfp_service, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    queued: list[str] = []
+    monkeypatch.setattr(rfp_service, "enqueue_response", lambda ticket_id: queued.append(ticket_id))
+    from data.pipelines.rfp_intake import store
+    from data.pipelines.rfp_intake.departments import DEPARTMENTS
+
+    ticket_id = "draft-ready"
+    sections = [
+        {
+            "department_id": department_id,
+            "owner_name": DEPARTMENTS[department_id].owner_name,
+            "owner_role": DEPARTMENTS[department_id].owner_role,
+            "key_aspects": ["A short aspect."],
+            "open_questions": [],
+            "claims": {},
+            "contains_phi": False,
+        }
+        for department_id in ("revenue", "clinical", "compliance")
+    ]
+    metadata = {
+        "client_name": "Meridian Manufacturing",
+        "client_country": "US",
+        "currency": "USD",
+        "departments_needed": ["revenue", "clinical", "compliance"],
+    }
+    store.insert_analyzing(ticket_id=ticket_id, original_filename="request.pdf")
+    assert store.save_complete(
+        ticket_id,
+        phi_detected=False,
+        readability={"word_count": 40, "estimated_tokens": 40, "cost_band": "low"},
+        metadata=metadata,
+        sections=sections,
+        handoff={"ticket_id": ticket_id, "metadata": metadata, "sections": sections, "part2_guard": ""},
+    )
+    response = client.post(f"/rfp/tickets/{ticket_id}/draft", headers=auth_headers)
+    assert response.status_code == 202
+    assert response.json()["status"] == "drafting"
+    assert queued == [ticket_id]
+    detail = client.get(f"/rfp/tickets/{ticket_id}", headers=auth_headers)
+    assert detail.status_code == 200
+    assert detail.json()["status"] == "drafting"
+
+
+def test_draft_rejects_a_ticket_that_is_not_ready(
+    client: TestClient, auth_headers: dict, rfp_service
+) -> None:
+    from data.pipelines.rfp_intake import store
+
+    store.insert_analyzing(ticket_id="still-analyzing", original_filename="request.pdf")
+    response = client.post("/rfp/tickets/still-analyzing/draft", headers=auth_headers)
+    assert response.status_code == 409
+    missing = client.post("/rfp/tickets/missing/draft", headers=auth_headers)
+    assert missing.status_code == 404

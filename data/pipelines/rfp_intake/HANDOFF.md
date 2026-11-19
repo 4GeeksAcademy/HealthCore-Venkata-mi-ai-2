@@ -44,5 +44,6 @@ Rules for Part 2:
 - `part2_guard` of `phi_review_required` means do not draft from the PDF or from any redacted span. Claire Whitfield reviews first.
 - `conflicts[].resolution` stays `unresolved_for_part3`. Do not pick a winner in Part 2.
 - Department ids are only `revenue`, `clinical`, and `compliance`.
-- `draft_content`, `evaluation_results`, and `approval_status` on `rfp_department_section` are empty until later parts.
+- `approval_status` on `rfp_department_section` stays empty until Part 3.
+- Part 2 writes `draft_content` and `evaluation_results`. Contract: `data/pipelines/rfp_response/HANDOFF.md`.
 - A `discarded` or `failed` ticket has `handoff_ready` false. Do not draft it.

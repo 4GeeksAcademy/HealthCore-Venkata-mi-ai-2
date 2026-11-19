@@ -5,12 +5,28 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ErrorActions } from "@/components/async/ErrorActions";
 import { ApiError, authedFetch } from "@/lib/authed-fetch";
 
+type Evaluation = {
+  overall_pass?: boolean;
+  feedback_for_generator?: string;
+  review_state?: string;
+  provisional?: boolean;
+  readability?: { pass?: boolean };
+  relevance?: { pass?: boolean; missing_aspects?: string[] };
+  compliance?: { pass?: boolean; violations?: { rule_id?: string; detail?: string }[] };
+};
+
 type Section = {
   department_id?: string;
   owner_name?: string;
   owner_role?: string;
   key_aspects?: string[];
   open_questions?: string[];
+  draft_content?: string;
+  draft_withheld?: boolean;
+  review_state?: string;
+  provisional?: boolean;
+  contains_phi?: boolean;
+  evaluation?: Evaluation | null;
 };
 
 type TicketSummary = {
@@ -22,6 +38,7 @@ type TicketSummary = {
   client_name?: string;
   discard_message?: string;
   pipeline_message?: string;
+  part2_outcome?: string;
   created_at?: string;
 };
 
@@ -45,17 +62,38 @@ type TicketDetail = TicketSummary & {
   sections?: Section[];
   sales_summary?: string;
   part2_guard?: string;
+  part2_outcome?: string;
   conflicts?: { field?: string; resolution?: string }[];
 };
 
 const STATUS_LABEL: Record<string, string> = {
   analyzing: "Analyzing",
   intake_complete: "Intake complete",
+  drafting: "Drafting",
+  under_evaluation: "Under evaluation",
+  needs_human_review: "Needs human review",
   discarded: "Discarded",
   failed: "Failed",
 };
 
-function statusClass(status: string): string {
+function statusLabel(ticket: { status: string; part2_outcome?: string }): string {
+  if (ticket.part2_outcome === "passed") {
+    return "Evaluation passed";
+  }
+  return STATUS_LABEL[ticket.status] ?? ticket.status;
+}
+
+function isLive(ticket: { status: string; part2_outcome?: string }): boolean {
+  if (ticket.part2_outcome === "passed" || ticket.part2_outcome === "needs_human_review") {
+    return false;
+  }
+  return ticket.status === "analyzing" || ticket.status === "drafting" || ticket.status === "under_evaluation";
+}
+
+function statusClass(status: string, outcome?: string): string {
+  if (outcome === "passed") {
+    return "rfp-status rfp-status-passed";
+  }
   return `rfp-status rfp-status-${status}`;
 }
 
@@ -69,6 +107,8 @@ export default function RfpIntakePage() {
   const [uploading, setUploading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
+  const [draftRequest, setDraftRequest] = useState(false);
 
   const loadTickets = useCallback(async () => {
     const response = await authedFetch("/rfp/tickets");
@@ -141,7 +181,7 @@ export default function RfpIntakePage() {
   }, [loadTickets]);
 
   useEffect(() => {
-    if (!tickets.some((ticket) => ticket.status === "analyzing")) {
+    if (!tickets.some((ticket) => isLive(ticket)) && !(detail && isLive(detail))) {
       return;
     }
     const timer = window.setInterval(() => {
@@ -153,7 +193,7 @@ export default function RfpIntakePage() {
       }
     }, 3000);
     return () => window.clearInterval(timer);
-  }, [tickets, selectedId, loadTickets, loadDetail]);
+  }, [tickets, selectedId, detail, loadTickets, loadDetail]);
 
   async function onUpload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -185,6 +225,24 @@ export default function RfpIntakePage() {
     }
   }
 
+  async function onDraft(ticketId: string) {
+    setDraftRequest(true);
+    setDraftError(null);
+    try {
+      await authedFetch(`/rfp/tickets/${ticketId}/draft`, { method: "POST" });
+      await loadTickets();
+      await loadDetail(ticketId);
+    } catch (caught) {
+      setDraftError(
+        caught instanceof ApiError && caught.status === 409
+          ? "This ticket is not ready for a proposal draft."
+          : "We couldn't start the proposal draft. Please try again.",
+      );
+    } finally {
+      setDraftRequest(false);
+    }
+  }
+
   async function onReprocess(ticketId: string) {
     setDetailError(null);
     try {
@@ -205,8 +263,9 @@ export default function RfpIntakePage() {
           <p className="eyebrow">HealthCore Digital · Revenue Cycle</p>
           <h1>RFP intake</h1>
           <p>
-            Upload an institutional PDF. Revenue Cycle can see who to ask in
-            Clinical Operations and Compliance without opening the file.
+            Upload an institutional PDF. After intake, Revenue Cycle can draft a
+            pricing section for Clinical Operations and Compliance and see which
+            drafts still need a person.
           </p>
           <p>Do not upload documents that name a patient or include a diagnosis.</p>
           <div className="inline-actions">
@@ -269,8 +328,8 @@ export default function RfpIntakePage() {
                         void loadDetail(ticket.ticket_id);
                       }}
                     >
-                      <span className={statusClass(ticket.status)}>
-                        {STATUS_LABEL[ticket.status] ?? ticket.status}
+                      <span className={statusClass(ticket.status, ticket.part2_outcome)}>
+                        {statusLabel(ticket)}
                       </span>{" "}
                       {ticket.client_name || ticket.original_filename || ticket.ticket_id}
                     </button>
@@ -297,8 +356,8 @@ export default function RfpIntakePage() {
                     <header>
                       <h2>{detail.client_name || detail.original_filename || "Ticket"}</h2>
                       <p>
-                        <span className={statusClass(detail.status)}>
-                          {STATUS_LABEL[detail.status] ?? detail.status}
+                        <span className={statusClass(detail.status, detail.part2_outcome)}>
+                          {statusLabel(detail)}
                         </span>
                         {detail.rfp_id ? ` · ${detail.rfp_id}` : ""}
                       </p>
@@ -315,10 +374,25 @@ export default function RfpIntakePage() {
                     {detail.status === "failed" ? (
                       <p>{detail.pipeline_message || "Analysis did not finish."}</p>
                     ) : null}
-                    {detail.status === "analyzing" ? (
+                    {detail.status === "analyzing" || detail.status === "drafting" || detail.status === "under_evaluation" ? (
                       <p className="muted-text" role="status">
-                        Analysis is still running. This page refreshes every few seconds.
+                        {detail.part2_outcome === "passed"
+                          ? "Evaluation passed. Approval is the next step and is not started here."
+                          : "This ticket is still running. This page refreshes every few seconds."}
                       </p>
+                    ) : null}
+                    {detail.status === "needs_human_review" ? (
+                      <p className="rfp-banner">
+                        Provisional draft. Automatic review did not pass. Tom Callahan
+                        should not send it until a person reviews the section.
+                        {detail.pipeline_message ? ` ${detail.pipeline_message}` : ""}
+                      </p>
+                    ) : null}
+                    {draftError ? (
+                      <div role="alert">
+                        <p>{draftError}</p>
+                        <ErrorActions onRetry={() => void onDraft(detail.ticket_id)} />
+                      </div>
                     ) : null}
                     {detail.sales_summary ? <p>{detail.sales_summary}</p> : null}
                     {metadata ? (
@@ -351,6 +425,28 @@ export default function RfpIntakePage() {
                         {(section.open_questions ?? []).length > 0 ? (
                           <p>Open: {(section.open_questions ?? []).join(" ")}</p>
                         ) : null}
+                        {section.provisional ? (
+                          <p className="rfp-banner">
+                            Provisional draft for {section.owner_name || "the department owner"}.
+                            This section is not ready to send.
+                          </p>
+                        ) : null}
+                        {section.draft_withheld ? (
+                          <p>The draft was withheld because it contained patient information.</p>
+                        ) : null}
+                        {section.draft_content ? <p className="rfp-draft">{section.draft_content}</p> : null}
+                        {section.evaluation ? (
+                          <p className="muted-text">
+                            Readability {section.evaluation.readability?.pass ? "passed" : "needs another pass"}.
+                            {" "}
+                            Relevance {section.evaluation.relevance?.pass ? "passed" : "needs another pass"}.
+                            {" "}
+                            Compliance {section.evaluation.compliance?.pass ? "passed" : "needs another pass"}.
+                            {section.evaluation.feedback_for_generator
+                              ? ` ${section.evaluation.feedback_for_generator}`
+                              : ""}
+                          </p>
+                        ) : null}
                       </article>
                     ))}
                     {(metadata?.open_questions ?? []).length > 0 ? (
@@ -362,6 +458,18 @@ export default function RfpIntakePage() {
                         {(detail.conflicts ?? []).map((conflict) => conflict.field).filter(Boolean).join(", ")}.
                         That stays unresolved for the later approval step.
                       </p>
+                    ) : null}
+                    {detail.status === "intake_complete" ? (
+                      <div className="inline-actions">
+                        <button
+                          type="button"
+                          className="button"
+                          disabled={draftRequest}
+                          onClick={() => void onDraft(detail.ticket_id)}
+                        >
+                          {draftRequest ? "Starting draft…" : "Draft the proposal"}
+                        </button>
+                      </div>
                     ) : null}
                     {detail.status === "failed" || detail.status === "discarded" ? (
                       <div className="inline-actions">

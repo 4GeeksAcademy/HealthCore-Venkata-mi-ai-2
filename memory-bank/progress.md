@@ -1,10 +1,16 @@
 # HealthCore — Progress
 
-**Last updated:** 2026-11-16  
-**Latest stamped plan:** [HC-MS9-PLAN-127](./plans/HC-MS9-PLAN-127-20261116-rfp-intake-eval-save.md) (`implemented`, MS9, docs)  
-**Prior plan stamp:** [HC-MS9-PLAN-126](./plans/HC-MS9-PLAN-126-20261116-rfp-intake-impl.md) (`implemented`, MS9, implementation)  
+**Last updated:** 2026-11-18  
+**Latest stamped plan:** [HC-MS9-PLAN-130](./plans/HC-MS9-PLAN-130-20261118-rfp-response-eval-save.md) (`implemented`, MS9, docs)  
+**Prior plan stamp:** [HC-MS9-PLAN-129](./plans/HC-MS9-PLAN-129-20261118-rfp-response-impl.md) (`implemented`, MS9, implementation)  
 **Prior completed stamp:** [HC-MS5-PLAN-124](./plans/HC-MS5-PLAN-124-20261113-centralized-incident-manager-eval-save.md) (`implemented`, MS5, docs)  
 **Latest milestone eval:** [MS5_Project_Eval](./evaluations/MS5_Project_Eval.md) (`complete` — official rubric **8/8 Pass**, re-run 2026-09-11 ORM-first)
+
+## Today’s update (2026-11-18)
+
+**RFP response eval save (PLAN-130):** Human approved. Official rubric **9/9 Pass**: [Results/RfpResponse-20261118.md](./evaluations/Results/RfpResponse-20261118.md). Does not close MS9. The human commits.
+
+**RFP response generation (PLAN-128 plan, PLAN-129 implementation):** Revenue Cycle can draft a pricing section for revenue, clinical, and compliance from the Part 1 handoff. The draft is not taken from the PDF. Readability, relevance, and the briefing rules run together. A failed section goes back to its generator at most twice. The last redacted draft and its evaluation stay on the ticket. If the limit is hit, the ticket is `needs_human_review`. If every section passes, the ticket stays `under_evaluation` with `part2_outcome` `passed`. Part 3 statuses are not set. Pipeline pytest **31 passed**. API pytest was not run here (no FastAPI in this environment). The backoffice page was linted and typechecked, and was not clicked through. Human approved the rubric under PLAN-130. Does not close MS9.
 
 ## Today’s update (2026-11-16)
 
@@ -184,6 +190,7 @@
 
 | Area | Status |
 |------|--------|
+| RFP response (Part 2) | **Implemented** (PLAN-128–129) — department drafts, parallel evaluation, iteration limit, `needs_human_review`; eval → [Results/RfpResponse-20261118.md](./evaluations/Results/RfpResponse-20261118.md) (**9/9 Pass**). Does not close MS9. |
 | RFP intake (Part 1) | **Implemented** (PLAN-125–126) — `/rfp` upload, dedicated `rfp_intake` graph, SQLModel tickets; eval → [Results/RfpIntake-20261116.md](./evaluations/Results/RfpIntake-20261116.md) (**12/12 Pass**). Does not close MS9. |
 | Coordinator desk memory | **Implemented** (PLAN-116–117) — episodic SQLite beside the same graph; PHI refused; eval → [Results/AgentMemory-20261109.md](./evaluations/Results/AgentMemory-20261109.md) (**11/11 Pass**). Does not close MS8. |
 | Agent harness / guardrails | **Implemented** (PLAN-119–120) — input/output/external guards, PHI-on-output, summary endpoint; `knowledge-agent/3`; eval → [Results/HarnessGuardrails-20261113.md](./evaluations/Results/HarnessGuardrails-20261113.md) (**9/9 Pass**). Does not close MS8. |

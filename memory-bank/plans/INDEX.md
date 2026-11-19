@@ -263,6 +263,12 @@ Format per line:
 
 127 | HC-MS9-PLAN-127 | MS9 | 2026-11-16 | Save Agentic RFP Intake Rubric Evaluation | implemented | docs | [HC-MS9-PLAN-127-20261116-rfp-intake-eval-save.md](./HC-MS9-PLAN-127-20261116-rfp-intake-eval-save.md)
 
+128 | HC-MS9-PLAN-128 | MS9 | 2026-11-18 | Agentic RFP Response Generation Plan | planned | planning | [HC-MS9-PLAN-128-20261118-rfp-response-plan.md](./HC-MS9-PLAN-128-20261118-rfp-response-plan.md)
+
+129 | HC-MS9-PLAN-129 | MS9 | 2026-11-18 | Agentic RFP Response Generation Implementation | implemented | implementation | [HC-MS9-PLAN-129-20261118-rfp-response-impl.md](./HC-MS9-PLAN-129-20261118-rfp-response-impl.md)
+
+130 | HC-MS9-PLAN-130 | MS9 | 2026-11-18 | Save Agentic RFP Response Rubric Evaluation | implemented | docs | [HC-MS9-PLAN-130-20261118-rfp-response-eval-save.md](./HC-MS9-PLAN-130-20261118-rfp-response-eval-save.md)
+
 ## Naming note
 
 From sequence **003** onward, filenames must include the milestone token: `HC-MS{N}-PLAN-{NNN}-...`. Sequences 001–002 keep legacy `HC-PLAN-*` names and are attributed to **MS4**.

@@ -690,7 +690,8 @@ textarea {
   background: #e8eef8;
 }
 
-.rfp-status-intake_complete {
+.rfp-status-intake_complete,
+.rfp-status-passed {
   background: #e5f4ea;
 }
 
@@ -700,6 +701,19 @@ textarea {
 
 .rfp-status-failed {
   background: #f8e6e6;
+}
+
+.rfp-status-drafting,
+.rfp-status-under_evaluation {
+  background: #e8eef8;
+}
+
+.rfp-status-needs_human_review {
+  background: #fff8e8;
+}
+
+.rfp-draft {
+  white-space: pre-wrap;
 }
 
 .rfp-banner {

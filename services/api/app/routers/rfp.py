@@ -46,6 +46,11 @@ class SectionOut(BaseModel):
     key_aspects: list[str] = Field(default_factory=list)
     open_questions: list[str] = Field(default_factory=list)
     contains_phi: bool = False
+    draft_content: str = ""
+    draft_withheld: bool = False
+    review_state: str = ""
+    provisional: bool = False
+    evaluation: dict | None = None
 
 
 class MetadataOut(BaseModel):
@@ -80,6 +85,7 @@ class TicketSummary(BaseModel):
     pipeline_message: str = ""
     client_name: str = ""
     client_country: str = ""
+    part2_outcome: str = ""
     created_at: str
     updated_at: str
 
@@ -91,6 +97,9 @@ class TicketDetail(TicketSummary):
     sales_summary: str = ""
     conflicts: list[dict] = Field(default_factory=list)
     part2_guard: str = ""
+    part2_outcome: str = ""
+    evaluation_closed: bool = False
+    status_trail: list[str] = Field(default_factory=list)
 
 
 class TicketList(BaseModel):
@@ -169,6 +178,28 @@ def reprocess_ticket(ticket_id: str, _user: dict = Depends(get_current_user)) ->
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="This ticket cannot be run again from its current status.",
+        ) from None
+    except rfp_service.RfpDatabaseUnconfigured:
+        raise _storage_unavailable() from None
+    except rfp_service.RfpStorageError:
+        raise _storage_unavailable() from None
+    return TicketAccepted(ticket_id=ticket_id, status=new_status)
+
+
+@router.post(
+    "/tickets/{ticket_id}/draft",
+    response_model=TicketAccepted,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+def draft_ticket(ticket_id: str, _user: dict = Depends(get_current_user)) -> TicketAccepted:
+    try:
+        new_status = rfp_service.start_draft(ticket_id)
+    except KeyError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="That ticket was not found.") from None
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This ticket is not ready for a proposal draft.",
         ) from None
     except rfp_service.RfpDatabaseUnconfigured:
         raise _storage_unavailable() from None

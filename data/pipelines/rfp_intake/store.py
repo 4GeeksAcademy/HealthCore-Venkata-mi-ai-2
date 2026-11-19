@@ -14,6 +14,7 @@ from .db import get_engine
 from .errors import RfpStorageError
 from .models import RfpDepartmentSection, RfpMetadata, RfpTicket
 from .paths import relative_pdf_path, sanitize_filename
+from .phi import contains_phi
 
 _locks: dict[str, threading.Lock] = {}
 _locks_guard = threading.Lock()
@@ -25,6 +26,7 @@ PIPELINE_MESSAGES = {
     "pipeline_crashed": "Analysis stopped before it finished. Retry this ticket.",
     "pipeline_interrupted": "Analysis was interrupted before it finished. Retry this ticket.",
     "storage_failed": "The ticket could not be saved. Try again.",
+    "response_interrupted": "Proposal drafting stopped before it finished. The last saved section is kept for review.",
 }
 
 DISCARD_MESSAGES = {
@@ -248,6 +250,120 @@ def save_complete(
             raise RfpStorageError("rfp_complete") from exc
 
 
+_RESPONSE_FROM = {"intake_complete", "drafting", "under_evaluation"}
+
+
+def set_response_status(ticket_id: str, status: str) -> bool:
+    """Move a Part 2 ticket forward. Parallel workers must not call this."""
+    if status not in {"drafting", "under_evaluation", "needs_human_review"}:
+        return False
+    with ticket_lock(ticket_id):
+        try:
+            with _session() as session:
+                row = session.get(RfpTicket, ticket_id)
+                if row is None or row.status not in _RESPONSE_FROM:
+                    return False
+                if row.status == status:
+                    return True
+                handoff = dict(row.handoff_json or {})
+                trail = list(handoff.get("status_trail") or [])
+                trail.append(status)
+                handoff["status_trail"] = trail
+                row.status = status
+                row.handoff_json = handoff
+                row.updated_at = utcnow()
+                session.add(row)
+                session.commit()
+                return True
+        except SQLAlchemyError as exc:
+            raise RfpStorageError("rfp_response_status") from exc
+
+
+def save_response(
+    ticket_id: str,
+    *,
+    final_status: str,
+    part2_outcome: str,
+    sections: list[dict[str, Any]],
+    iteration_limit: int,
+) -> bool:
+    """Write drafts and evaluation results. Does not clear the Part 1 handoff."""
+    if final_status not in {"under_evaluation", "needs_human_review"}:
+        return False
+    with ticket_lock(ticket_id):
+        try:
+            with _session() as session:
+                row = session.get(RfpTicket, ticket_id)
+                if row is None or row.status not in _RESPONSE_FROM | {"needs_human_review"}:
+                    return False
+                by_id = {
+                    section.department_id: section
+                    for section in session.exec(
+                        select(RfpDepartmentSection).where(
+                            RfpDepartmentSection.ticket_id == ticket_id
+                        )
+                    )
+                }
+                for section in sections:
+                    current = by_id.get(str(section["department_id"]))
+                    if current is None:
+                        continue
+                    current.draft_content = str(section.get("draft_content") or "")
+                    current.evaluation_results = dict(section.get("evaluation_results") or {})
+                    if section.get("contains_phi"):
+                        current.contains_phi = True
+                    session.add(current)
+                handoff = dict(row.handoff_json or {})
+                trail = list(handoff.get("status_trail") or [])
+                if row.status != final_status:
+                    trail.append(final_status)
+                handoff["status_trail"] = trail
+                handoff["part"] = 2
+                handoff["next"] = "part3_approval"
+                handoff["part2_outcome"] = part2_outcome
+                handoff["evaluation_closed"] = True
+                handoff["iteration_limit"] = iteration_limit
+                handoff["sections"] = list(sections)
+                row.handoff_json = handoff
+                row.status = final_status
+                row.handoff_ready = True
+                row.pipeline_error_code = None
+                row.updated_at = utcnow()
+                session.add(row)
+                session.commit()
+                return True
+        except SQLAlchemyError as exc:
+            raise RfpStorageError("rfp_response_save") from exc
+
+
+def mark_response_needs_review(ticket_id: str) -> bool:
+    """Keep the ticket when drafting stops. Do not discard it."""
+    with ticket_lock(ticket_id):
+        try:
+            with _session() as session:
+                row = session.get(RfpTicket, ticket_id)
+                if row is None or row.status not in _RESPONSE_FROM:
+                    return False
+                handoff = dict(row.handoff_json or {})
+                trail = list(handoff.get("status_trail") or [])
+                trail.append("needs_human_review")
+                handoff["status_trail"] = trail
+                handoff["part"] = 2
+                handoff["next"] = "part3_approval"
+                handoff["part2_outcome"] = "needs_human_review"
+                handoff["evaluation_closed"] = True
+                row.handoff_json = handoff
+                row.status = "needs_human_review"
+                row.handoff_ready = True
+                row.pipeline_error_code = "response_interrupted"
+                row.updated_at = utcnow()
+                session.add(row)
+                session.commit()
+                return True
+        except SQLAlchemyError as exc:
+            raise RfpStorageError("rfp_response_review") from exc
+
+
 def _replace_metadata(
     session: Session,
     ticket_id: str,
@@ -329,13 +445,22 @@ def _metadata_dict(row: RfpMetadata | None) -> dict[str, Any] | None:
 
 
 def _section_dict(row: RfpDepartmentSection) -> dict[str, Any]:
+    evaluation = dict(row.evaluation_results or {})
+    draft = str(row.draft_content or "")
+    withheld = contains_phi(draft)
+    flagged = bool(row.contains_phi or evaluation.get("contains_phi") or withheld)
     return {
         "department_id": row.department_id,
         "owner_name": row.owner_name,
         "owner_role": row.owner_role,
         "key_aspects": list(row.key_aspects or []),
         "open_questions": list(row.open_questions or []),
-        "contains_phi": row.contains_phi,
+        "contains_phi": flagged,
+        "draft_content": "" if withheld else draft,
+        "draft_withheld": withheld,
+        "review_state": str(evaluation.get("review_state") or ""),
+        "provisional": bool(evaluation.get("provisional")),
+        "evaluation": evaluation or None,
     }
 
 
@@ -392,6 +517,7 @@ def _summary(row: RfpTicket, meta: RfpMetadata | None) -> dict[str, Any]:
         "pipeline_message": PIPELINE_MESSAGES.get(row.pipeline_error_code or "", ""),
         "client_name": meta.client_name if meta else "",
         "client_country": meta.client_country if meta else "",
+        "part2_outcome": str((row.handoff_json or {}).get("part2_outcome") or ""),
         "created_at": _as_utc(row.created_at).isoformat(),
         "updated_at": _as_utc(row.updated_at).isoformat(),
     }
@@ -410,4 +536,7 @@ def _view(
     body["sales_summary"] = str(handoff.get("sales_summary") or "")
     body["conflicts"] = list(handoff.get("conflicts") or [])
     body["part2_guard"] = str(handoff.get("part2_guard") or "")
+    body["part2_outcome"] = str(handoff.get("part2_outcome") or "")
+    body["evaluation_closed"] = bool(handoff.get("evaluation_closed"))
+    body["status_trail"] = list(handoff.get("status_trail") or [])
     return body
